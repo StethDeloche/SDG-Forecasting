@@ -1,0 +1,2112 @@
+Country Name,Country Code,Indicator Name,Indicator Code,Year,Gini index
+United States,USA,Gini index,SI.POV.GINI,1963,37.6
+United States,USA,Gini index,SI.POV.GINI,1964,38.1
+United States,USA,Gini index,SI.POV.GINI,1965,37.5
+United States,USA,Gini index,SI.POV.GINI,1966,37.8
+United States,USA,Gini index,SI.POV.GINI,1967,36.9
+United Kingdom,GBR,Gini index,SI.POV.GINI,1968,26.8
+United States,USA,Gini index,SI.POV.GINI,1968,36.3
+United Kingdom,GBR,Gini index,SI.POV.GINI,1969,27.9
+United States,USA,Gini index,SI.POV.GINI,1969,36.0
+France,FRA,Gini index,SI.POV.GINI,1970,37.1
+United Kingdom,GBR,Gini index,SI.POV.GINI,1970,28.0
+United States,USA,Gini index,SI.POV.GINI,1970,36.6
+Canada,CAN,Gini index,SI.POV.GINI,1971,37.2
+United Kingdom,GBR,Gini index,SI.POV.GINI,1971,29.3
+United States,USA,Gini index,SI.POV.GINI,1971,36.9
+United Kingdom,GBR,Gini index,SI.POV.GINI,1972,28.8
+United States,USA,Gini index,SI.POV.GINI,1972,36.7
+Canada,CAN,Gini index,SI.POV.GINI,1973,34.9
+United Kingdom,GBR,Gini index,SI.POV.GINI,1973,28.8
+United States,USA,Gini index,SI.POV.GINI,1973,36.1
+United Kingdom,GBR,Gini index,SI.POV.GINI,1974,29.0
+United States,USA,Gini index,SI.POV.GINI,1974,35.5
+Canada,CAN,Gini index,SI.POV.GINI,1975,34.1
+France,FRA,Gini index,SI.POV.GINI,1975,35.9
+United Kingdom,GBR,Gini index,SI.POV.GINI,1975,27.9
+Sweden,SWE,Gini index,SI.POV.GINI,1975,24.3
+United States,USA,Gini index,SI.POV.GINI,1975,35.6
+United Kingdom,GBR,Gini index,SI.POV.GINI,1976,27.6
+United States,USA,Gini index,SI.POV.GINI,1976,35.6
+Canada,CAN,Gini index,SI.POV.GINI,1977,33.7
+United Kingdom,GBR,Gini index,SI.POV.GINI,1977,27.1
+India,IND,Gini index,SI.POV.GINI,1977,33.2
+Italy,ITA,Gini index,SI.POV.GINI,1977,34.0
+United States,USA,Gini index,SI.POV.GINI,1977,35.5
+United Kingdom,GBR,Gini index,SI.POV.GINI,1978,27.2
+Italy,ITA,Gini index,SI.POV.GINI,1978,33.3
+United States,USA,Gini index,SI.POV.GINI,1978,34.8
+Canada,CAN,Gini index,SI.POV.GINI,1979,33.5
+France,FRA,Gini index,SI.POV.GINI,1979,34.0
+United Kingdom,GBR,Gini index,SI.POV.GINI,1979,27.4
+Israel,ISR,Gini index,SI.POV.GINI,1979,36.3
+Italy,ITA,Gini index,SI.POV.GINI,1979,33.3
+Norway,NOR,Gini index,SI.POV.GINI,1979,26.9
+Panama,PAN,Gini index,SI.POV.GINI,1979,48.7
+United States,USA,Gini index,SI.POV.GINI,1979,34.8
+Argentina,ARG,Gini index,SI.POV.GINI,1980,40.8
+Colombia,COL,Gini index,SI.POV.GINI,1980,55.1
+Spain,ESP,Gini index,SI.POV.GINI,1980,34.5
+United Kingdom,GBR,Gini index,SI.POV.GINI,1980,28.5
+Italy,ITA,Gini index,SI.POV.GINI,1980,32.9
+Madagascar,MDG,Gini index,SI.POV.GINI,1980,46.8
+United States,USA,Gini index,SI.POV.GINI,1980,34.7
+Australia,AUS,Gini index,SI.POV.GINI,1981,31.3
+Brazil,BRA,Gini index,SI.POV.GINI,1981,57.9
+Canada,CAN,Gini index,SI.POV.GINI,1981,33.0
+Costa Rica,CRI,Gini index,SI.POV.GINI,1981,47.5
+United Kingdom,GBR,Gini index,SI.POV.GINI,1981,29.7
+Italy,ITA,Gini index,SI.POV.GINI,1981,31.6
+Sweden,SWE,Gini index,SI.POV.GINI,1981,22.9
+Thailand,THA,Gini index,SI.POV.GINI,1981,45.2
+Uruguay,URY,Gini index,SI.POV.GINI,1981,43.6
+United States,USA,Gini index,SI.POV.GINI,1981,35.5
+Venezuela, RB,Gini index,SI.POV.GINI,1981,55.6
+Brazil,BRA,Gini index,SI.POV.GINI,1982,58.4
+Canada,CAN,Gini index,SI.POV.GINI,1982,32.9
+Switzerland,CHE,Gini index,SI.POV.GINI,1982,36.0
+United Kingdom,GBR,Gini index,SI.POV.GINI,1982,29.9
+Italy,ITA,Gini index,SI.POV.GINI,1982,29.2
+United States,USA,Gini index,SI.POV.GINI,1982,36.7
+Bangladesh,BGD,Gini index,SI.POV.GINI,1983,25.9
+Brazil,BRA,Gini index,SI.POV.GINI,1983,58.9
+United Kingdom,GBR,Gini index,SI.POV.GINI,1983,29.8
+India,IND,Gini index,SI.POV.GINI,1983,32.0
+Italy,ITA,Gini index,SI.POV.GINI,1983,29.8
+Netherlands,NLD,Gini index,SI.POV.GINI,1983,28.4
+United States,USA,Gini index,SI.POV.GINI,1983,37.3
+Brazil,BRA,Gini index,SI.POV.GINI,1984,58.3
+Canada,CAN,Gini index,SI.POV.GINI,1984,33.5
+France,FRA,Gini index,SI.POV.GINI,1984,33.4
+United Kingdom,GBR,Gini index,SI.POV.GINI,1984,29.2
+Indonesia,IDN,Gini index,SI.POV.GINI,1984,32.3
+Italy,ITA,Gini index,SI.POV.GINI,1984,31.3
+Morocco,MAR,Gini index,SI.POV.GINI,1984,36.5
+Malaysia,MYS,Gini index,SI.POV.GINI,1984,48.5
+United States,USA,Gini index,SI.POV.GINI,1984,37.3
+Australia,AUS,Gini index,SI.POV.GINI,1985,32.5
+Belgium,BEL,Gini index,SI.POV.GINI,1985,25.2
+Bangladesh,BGD,Gini index,SI.POV.GINI,1985,26.9
+Brazil,BRA,Gini index,SI.POV.GINI,1985,55.5
+Botswana,BWA,Gini index,SI.POV.GINI,1985,54.2
+Canada,CAN,Gini index,SI.POV.GINI,1985,33.2
+Cote d'Ivoire,CIV,Gini index,SI.POV.GINI,1985,45.5
+Spain,ESP,Gini index,SI.POV.GINI,1985,34.4
+United Kingdom,GBR,Gini index,SI.POV.GINI,1985,30.4
+Sri Lanka,LKA,Gini index,SI.POV.GINI,1985,32.5
+Luxembourg,LUX,Gini index,SI.POV.GINI,1985,26.3
+Nigeria,NGA,Gini index,SI.POV.GINI,1985,38.7
+Tunisia,TUN,Gini index,SI.POV.GINI,1985,43.4
+United States,USA,Gini index,SI.POV.GINI,1985,37.6
+Argentina,ARG,Gini index,SI.POV.GINI,1986,42.8
+Brazil,BRA,Gini index,SI.POV.GINI,1986,58.4
+Canada,CAN,Gini index,SI.POV.GINI,1986,31.7
+Cote d'Ivoire,CIV,Gini index,SI.POV.GINI,1986,38.0
+Costa Rica,CRI,Gini index,SI.POV.GINI,1986,34.4
+Dominican Republic,DOM,Gini index,SI.POV.GINI,1986,47.8
+United Kingdom,GBR,Gini index,SI.POV.GINI,1986,31.9
+Guatemala,GTM,Gini index,SI.POV.GINI,1986,54.1
+Iran, Islamic Rep.,Gini index,SI.POV.GINI,1986,47.4
+Israel,ISR,Gini index,SI.POV.GINI,1986,36.5
+Italy,ITA,Gini index,SI.POV.GINI,1986,31.2
+Jordan,JOR,Gini index,SI.POV.GINI,1986,36.1
+Lesotho,LSO,Gini index,SI.POV.GINI,1986,56.0
+Luxembourg,LUX,Gini index,SI.POV.GINI,1986,28.1
+Norway,NOR,Gini index,SI.POV.GINI,1986,24.6
+United States,USA,Gini index,SI.POV.GINI,1986,37.6
+Argentina,ARG,Gini index,SI.POV.GINI,1987,45.3
+Brazil,BRA,Gini index,SI.POV.GINI,1987,59.6
+Canada,CAN,Gini index,SI.POV.GINI,1987,31.7
+Chile,CHL,Gini index,SI.POV.GINI,1987,56.2
+Cote d'Ivoire,CIV,Gini index,SI.POV.GINI,1987,40.5
+Denmark,DNK,Gini index,SI.POV.GINI,1987,26.2
+Ecuador,ECU,Gini index,SI.POV.GINI,1987,50.5
+Finland,FIN,Gini index,SI.POV.GINI,1987,22.2
+United Kingdom,GBR,Gini index,SI.POV.GINI,1987,33.9
+Ghana,GHA,Gini index,SI.POV.GINI,1987,35.3
+Indonesia,IDN,Gini index,SI.POV.GINI,1987,30.4
+India,IND,Gini index,SI.POV.GINI,1987,32.5
+Ireland,IRL,Gini index,SI.POV.GINI,1987,35.5
+Italy,ITA,Gini index,SI.POV.GINI,1987,34.2
+Luxembourg,LUX,Gini index,SI.POV.GINI,1987,29.5
+Mauritania,MRT,Gini index,SI.POV.GINI,1987,43.9
+Malaysia,MYS,Gini index,SI.POV.GINI,1987,47.0
+Netherlands,NLD,Gini index,SI.POV.GINI,1987,26.8
+Pakistan,PAK,Gini index,SI.POV.GINI,1987,33.3
+Sweden,SWE,Gini index,SI.POV.GINI,1987,23.1
+United States,USA,Gini index,SI.POV.GINI,1987,37.2
+Venezuela, RB,Gini index,SI.POV.GINI,1987,53.4
+Belgium,BEL,Gini index,SI.POV.GINI,1988,25.7
+Bangladesh,BGD,Gini index,SI.POV.GINI,1988,28.8
+Brazil,BRA,Gini index,SI.POV.GINI,1988,61.4
+Canada,CAN,Gini index,SI.POV.GINI,1988,31.2
+Cote d'Ivoire,CIV,Gini index,SI.POV.GINI,1988,36.9
+Colombia,COL,Gini index,SI.POV.GINI,1988,53.1
+Algeria,DZA,Gini index,SI.POV.GINI,1988,37.4
+United Kingdom,GBR,Gini index,SI.POV.GINI,1988,34.3
+Ghana,GHA,Gini index,SI.POV.GINI,1988,36.0
+Jamaica,JAM,Gini index,SI.POV.GINI,1988,43.2
+Luxembourg,LUX,Gini index,SI.POV.GINI,1988,28.8
+Thailand,THA,Gini index,SI.POV.GINI,1988,43.8
+Trinidad and Tobago,TTO,Gini index,SI.POV.GINI,1988,42.6
+United States,USA,Gini index,SI.POV.GINI,1988,37.7
+Australia,AUS,Gini index,SI.POV.GINI,1989,33.2
+Brazil,BRA,Gini index,SI.POV.GINI,1989,63.2
+Canada,CAN,Gini index,SI.POV.GINI,1989,31.0
+Colombia,COL,Gini index,SI.POV.GINI,1989,52.8
+Costa Rica,CRI,Gini index,SI.POV.GINI,1989,45.5
+Dominican Republic,DOM,Gini index,SI.POV.GINI,1989,50.4
+United Kingdom,GBR,Gini index,SI.POV.GINI,1989,33.4
+Guatemala,GTM,Gini index,SI.POV.GINI,1989,58.8
+Honduras,HND,Gini index,SI.POV.GINI,1989,55.4
+Italy,ITA,Gini index,SI.POV.GINI,1989,32.1
+Luxembourg,LUX,Gini index,SI.POV.GINI,1989,30.8
+Mexico,MEX,Gini index,SI.POV.GINI,1989,50.1
+Malaysia,MYS,Gini index,SI.POV.GINI,1989,46.2
+Panama,PAN,Gini index,SI.POV.GINI,1989,58.6
+El Salvador,SLV,Gini index,SI.POV.GINI,1989,48.7
+Uganda,UGA,Gini index,SI.POV.GINI,1989,44.4
+Uruguay,URY,Gini index,SI.POV.GINI,1989,42.4
+United States,USA,Gini index,SI.POV.GINI,1989,38.2
+Venezuela, RB,Gini index,SI.POV.GINI,1989,43.8
+Bolivia,BOL,Gini index,SI.POV.GINI,1990,42.0
+Brazil,BRA,Gini index,SI.POV.GINI,1990,60.4
+Canada,CAN,Gini index,SI.POV.GINI,1990,31.4
+Chile,CHL,Gini index,SI.POV.GINI,1990,57.2
+China,CHN,Gini index,SI.POV.GINI,1990,32.2
+Costa Rica,CRI,Gini index,SI.POV.GINI,1990,45.2
+Egypt, Arab Rep.,Gini index,SI.POV.GINI,1990,32.0
+Spain,ESP,Gini index,SI.POV.GINI,1990,32.0
+France,FRA,Gini index,SI.POV.GINI,1990,32.1
+United Kingdom,GBR,Gini index,SI.POV.GINI,1990,35.7
+Honduras,HND,Gini index,SI.POV.GINI,1990,55.9
+Indonesia,IDN,Gini index,SI.POV.GINI,1990,31.1
+Iran, Islamic Rep.,Gini index,SI.POV.GINI,1990,43.6
+Jamaica,JAM,Gini index,SI.POV.GINI,1990,41.1
+Sri Lanka,LKA,Gini index,SI.POV.GINI,1990,32.4
+Luxembourg,LUX,Gini index,SI.POV.GINI,1990,27.7
+Morocco,MAR,Gini index,SI.POV.GINI,1990,39.2
+Netherlands,NLD,Gini index,SI.POV.GINI,1990,31.1
+Pakistan,PAK,Gini index,SI.POV.GINI,1990,33.2
+Paraguay,PRY,Gini index,SI.POV.GINI,1990,40.8
+Thailand,THA,Gini index,SI.POV.GINI,1990,45.3
+Tunisia,TUN,Gini index,SI.POV.GINI,1990,40.1
+United States,USA,Gini index,SI.POV.GINI,1990,38.3
+Argentina,ARG,Gini index,SI.POV.GINI,1991,46.8
+Bangladesh,BGD,Gini index,SI.POV.GINI,1991,27.6
+Canada,CAN,Gini index,SI.POV.GINI,1991,31.9
+Colombia,COL,Gini index,SI.POV.GINI,1991,51.3
+Costa Rica,CRI,Gini index,SI.POV.GINI,1991,46.6
+Germany,DEU,Gini index,SI.POV.GINI,1991,29.5
+Finland,FIN,Gini index,SI.POV.GINI,1991,22.9
+United Kingdom,GBR,Gini index,SI.POV.GINI,1991,35.0
+Ghana,GHA,Gini index,SI.POV.GINI,1991,38.4
+Guinea,GIN,Gini index,SI.POV.GINI,1991,44.5
+Guinea-Bissau,GNB,Gini index,SI.POV.GINI,1991,55.8
+Honduras,HND,Gini index,SI.POV.GINI,1991,51.8
+Italy,ITA,Gini index,SI.POV.GINI,1991,31.0
+Luxembourg,LUX,Gini index,SI.POV.GINI,1991,27.2
+Norway,NOR,Gini index,SI.POV.GINI,1991,25.2
+Panama,PAN,Gini index,SI.POV.GINI,1991,58.0
+Senegal,SEN,Gini index,SI.POV.GINI,1991,54.0
+El Salvador,SLV,Gini index,SI.POV.GINI,1991,53.8
+Tanzania,TZA,Gini index,SI.POV.GINI,1991,35.3
+United States,USA,Gini index,SI.POV.GINI,1991,38.0
+Zambia,ZMB,Gini index,SI.POV.GINI,1991,59.4
+Argentina,ARG,Gini index,SI.POV.GINI,1992,45.5
+Burundi,BDI,Gini index,SI.POV.GINI,1992,33.3
+Belgium,BEL,Gini index,SI.POV.GINI,1992,24.9
+Bolivia,BOL,Gini index,SI.POV.GINI,1992,49.1
+Brazil,BRA,Gini index,SI.POV.GINI,1992,53.1
+Central African Republic,CAF,Gini index,SI.POV.GINI,1992,59.3
+Canada,CAN,Gini index,SI.POV.GINI,1992,31.6
+Switzerland,CHE,Gini index,SI.POV.GINI,1992,33.9
+Chile,CHL,Gini index,SI.POV.GINI,1992,54.8
+Cote d'Ivoire,CIV,Gini index,SI.POV.GINI,1992,39.4
+Colombia,COL,Gini index,SI.POV.GINI,1992,51.4
+Costa Rica,CRI,Gini index,SI.POV.GINI,1992,45.6
+Czechia,CZE,Gini index,SI.POV.GINI,1992,20.7
+Germany,DEU,Gini index,SI.POV.GINI,1992,29.1
+Denmark,DNK,Gini index,SI.POV.GINI,1992,24.7
+Dominican Republic,DOM,Gini index,SI.POV.GINI,1992,51.1
+United Kingdom,GBR,Gini index,SI.POV.GINI,1992,35.0
+Guyana,GUY,Gini index,SI.POV.GINI,1992,39.5
+Honduras,HND,Gini index,SI.POV.GINI,1992,51.8
+Israel,ISR,Gini index,SI.POV.GINI,1992,35.5
+Jordan,JOR,Gini index,SI.POV.GINI,1992,43.1
+Kenya,KEN,Gini index,SI.POV.GINI,1992,56.9
+Lao PDR,LAO,Gini index,SI.POV.GINI,1992,34.3
+Luxembourg,LUX,Gini index,SI.POV.GINI,1992,27.3
+Mexico,MEX,Gini index,SI.POV.GINI,1992,52.3
+Malaysia,MYS,Gini index,SI.POV.GINI,1992,47.7
+Niger,NER,Gini index,SI.POV.GINI,1992,36.0
+Nigeria,NGA,Gini index,SI.POV.GINI,1992,44.9
+Sweden,SWE,Gini index,SI.POV.GINI,1992,24.9
+Thailand,THA,Gini index,SI.POV.GINI,1992,47.9
+Trinidad and Tobago,TTO,Gini index,SI.POV.GINI,1992,40.2
+Uganda,UGA,Gini index,SI.POV.GINI,1992,41.4
+Ukraine,UKR,Gini index,SI.POV.GINI,1992,29.7
+Uruguay,URY,Gini index,SI.POV.GINI,1992,41.5
+United States,USA,Gini index,SI.POV.GINI,1992,38.4
+Venezuela, RB,Gini index,SI.POV.GINI,1992,42.1
+Viet Nam,VNM,Gini index,SI.POV.GINI,1992,35.7
+Argentina,ARG,Gini index,SI.POV.GINI,1993,44.8
+Belize,BLZ,Gini index,SI.POV.GINI,1993,60.2
+Brazil,BRA,Gini index,SI.POV.GINI,1993,60.1
+Botswana,BWA,Gini index,SI.POV.GINI,1993,60.1
+Canada,CAN,Gini index,SI.POV.GINI,1993,31.7
+China,CHN,Gini index,SI.POV.GINI,1993,33.9
+Costa Rica,CRI,Gini index,SI.POV.GINI,1993,45.9
+Czechia,CZE,Gini index,SI.POV.GINI,1993,26.6
+Germany,DEU,Gini index,SI.POV.GINI,1993,28.6
+Spain,ESP,Gini index,SI.POV.GINI,1993,35.7
+United Kingdom,GBR,Gini index,SI.POV.GINI,1993,35.1
+Guinea-Bissau,GNB,Gini index,SI.POV.GINI,1993,43.6
+Honduras,HND,Gini index,SI.POV.GINI,1993,53.4
+Indonesia,IDN,Gini index,SI.POV.GINI,1993,31.8
+India,IND,Gini index,SI.POV.GINI,1993,31.6
+Italy,ITA,Gini index,SI.POV.GINI,1993,35.1
+Jamaica,JAM,Gini index,SI.POV.GINI,1993,35.7
+Luxembourg,LUX,Gini index,SI.POV.GINI,1993,27.0
+Madagascar,MDG,Gini index,SI.POV.GINI,1993,45.2
+Mauritania,MRT,Gini index,SI.POV.GINI,1993,49.5
+Nicaragua,NIC,Gini index,SI.POV.GINI,1993,57.1
+Netherlands,NLD,Gini index,SI.POV.GINI,1993,30.4
+Ukraine,UKR,Gini index,SI.POV.GINI,1993,28.9
+United States,USA,Gini index,SI.POV.GINI,1993,40.4
+South Africa,ZAF,Gini index,SI.POV.GINI,1993,59.3
+Zambia,ZMB,Gini index,SI.POV.GINI,1993,52.6
+Argentina,ARG,Gini index,SI.POV.GINI,1994,45.9
+Austria,AUT,Gini index,SI.POV.GINI,1994,30.8
+Burkina Faso,BFA,Gini index,SI.POV.GINI,1994,48.0
+Belize,BLZ,Gini index,SI.POV.GINI,1994,60.9
+Canada,CAN,Gini index,SI.POV.GINI,1994,31.3
+Chile,CHL,Gini index,SI.POV.GINI,1994,56.4
+Costa Rica,CRI,Gini index,SI.POV.GINI,1994,46.7
+Germany,DEU,Gini index,SI.POV.GINI,1994,29.2
+Ecuador,ECU,Gini index,SI.POV.GINI,1994,53.3
+Spain,ESP,Gini index,SI.POV.GINI,1994,35.1
+United Kingdom,GBR,Gini index,SI.POV.GINI,1994,36.0
+Guinea,GIN,Gini index,SI.POV.GINI,1994,46.1
+Honduras,HND,Gini index,SI.POV.GINI,1994,55.0
+Ireland,IRL,Gini index,SI.POV.GINI,1994,36.9
+Iran, Islamic Rep.,Gini index,SI.POV.GINI,1994,43.0
+Kenya,KEN,Gini index,SI.POV.GINI,1994,43.1
+Lesotho,LSO,Gini index,SI.POV.GINI,1994,63.0
+Luxembourg,LUX,Gini index,SI.POV.GINI,1994,28.1
+Mexico,MEX,Gini index,SI.POV.GINI,1994,53.4
+Mali,MLI,Gini index,SI.POV.GINI,1994,50.2
+Niger,NER,Gini index,SI.POV.GINI,1994,41.4
+Senegal,SEN,Gini index,SI.POV.GINI,1994,39.2
+Eswatini,SWZ,Gini index,SI.POV.GINI,1994,58.6
+Thailand,THA,Gini index,SI.POV.GINI,1994,43.5
+United States,USA,Gini index,SI.POV.GINI,1994,40.0
+Argentina,ARG,Gini index,SI.POV.GINI,1995,48.9
+Australia,AUS,Gini index,SI.POV.GINI,1995,32.6
+Austria,AUT,Gini index,SI.POV.GINI,1995,29.9
+Azerbaijan,AZE,Gini index,SI.POV.GINI,1995,34.6
+Belgium,BEL,Gini index,SI.POV.GINI,1995,28.4
+Bangladesh,BGD,Gini index,SI.POV.GINI,1995,32.9
+Brazil,BRA,Gini index,SI.POV.GINI,1995,59.5
+Canada,CAN,Gini index,SI.POV.GINI,1995,31.5
+Cote d'Ivoire,CIV,Gini index,SI.POV.GINI,1995,40.6
+Costa Rica,CRI,Gini index,SI.POV.GINI,1995,45.7
+Germany,DEU,Gini index,SI.POV.GINI,1995,28.8
+Denmark,DNK,Gini index,SI.POV.GINI,1995,23.0
+Algeria,DZA,Gini index,SI.POV.GINI,1995,35.3
+Ecuador,ECU,Gini index,SI.POV.GINI,1995,50.8
+Egypt, Arab Rep.,Gini index,SI.POV.GINI,1995,30.1
+Spain,ESP,Gini index,SI.POV.GINI,1995,35.7
+Ethiopia,ETH,Gini index,SI.POV.GINI,1995,44.6
+Finland,FIN,Gini index,SI.POV.GINI,1995,23.5
+United Kingdom,GBR,Gini index,SI.POV.GINI,1995,35.5
+Greece,GRC,Gini index,SI.POV.GINI,1995,37.0
+Honduras,HND,Gini index,SI.POV.GINI,1995,55.5
+Ireland,IRL,Gini index,SI.POV.GINI,1995,37.0
+Italy,ITA,Gini index,SI.POV.GINI,1995,35.2
+Sri Lanka,LKA,Gini index,SI.POV.GINI,1995,35.4
+Luxembourg,LUX,Gini index,SI.POV.GINI,1995,28.3
+Mongolia,MNG,Gini index,SI.POV.GINI,1995,33.2
+Mauritania,MRT,Gini index,SI.POV.GINI,1995,37.7
+Malaysia,MYS,Gini index,SI.POV.GINI,1995,48.5
+Norway,NOR,Gini index,SI.POV.GINI,1995,26.0
+Nepal,NPL,Gini index,SI.POV.GINI,1995,35.2
+Panama,PAN,Gini index,SI.POV.GINI,1995,57.7
+Paraguay,PRY,Gini index,SI.POV.GINI,1995,58.1
+El Salvador,SLV,Gini index,SI.POV.GINI,1995,49.8
+Sweden,SWE,Gini index,SI.POV.GINI,1995,25.2
+Tunisia,TUN,Gini index,SI.POV.GINI,1995,41.7
+Ukraine,UKR,Gini index,SI.POV.GINI,1995,39.2
+Uruguay,URY,Gini index,SI.POV.GINI,1995,40.9
+United States,USA,Gini index,SI.POV.GINI,1995,39.9
+Venezuela, RB,Gini index,SI.POV.GINI,1995,47.2
+Albania,ALB,Gini index,SI.POV.GINI,1996,27.0
+Argentina,ARG,Gini index,SI.POV.GINI,1996,49.5
+Austria,AUT,Gini index,SI.POV.GINI,1996,29.3
+Belize,BLZ,Gini index,SI.POV.GINI,1996,56.5
+Brazil,BRA,Gini index,SI.POV.GINI,1996,59.8
+Canada,CAN,Gini index,SI.POV.GINI,1996,32.8
+Chile,CHL,Gini index,SI.POV.GINI,1996,54.9
+China,CHN,Gini index,SI.POV.GINI,1996,35.2
+Cameroon,CMR,Gini index,SI.POV.GINI,1996,44.4
+Colombia,COL,Gini index,SI.POV.GINI,1996,56.8
+Costa Rica,CRI,Gini index,SI.POV.GINI,1996,46.5
+Czechia,CZE,Gini index,SI.POV.GINI,1996,25.8
+Germany,DEU,Gini index,SI.POV.GINI,1996,28.0
+Dominican Republic,DOM,Gini index,SI.POV.GINI,1996,47.4
+Spain,ESP,Gini index,SI.POV.GINI,1996,36.5
+France,FRA,Gini index,SI.POV.GINI,1996,32.0
+United Kingdom,GBR,Gini index,SI.POV.GINI,1996,35.3
+Georgia,GEO,Gini index,SI.POV.GINI,1996,37.1
+Honduras,HND,Gini index,SI.POV.GINI,1996,55.7
+Indonesia,IDN,Gini index,SI.POV.GINI,1996,34.2
+Ireland,IRL,Gini index,SI.POV.GINI,1996,35.6
+Jamaica,JAM,Gini index,SI.POV.GINI,1996,40.4
+Kazakhstan,KAZ,Gini index,SI.POV.GINI,1996,35.4
+Luxembourg,LUX,Gini index,SI.POV.GINI,1996,29.0
+Mexico,MEX,Gini index,SI.POV.GINI,1996,52.0
+Mozambique,MOZ,Gini index,SI.POV.GINI,1996,53.3
+Nigeria,NGA,Gini index,SI.POV.GINI,1996,51.9
+Pakistan,PAK,Gini index,SI.POV.GINI,1996,28.7
+Papua New Guinea,PNG,Gini index,SI.POV.GINI,1996,45.8
+El Salvador,SLV,Gini index,SI.POV.GINI,1996,51.0
+Syrian Arab Republic,SYR,Gini index,SI.POV.GINI,1996,35.2
+Thailand,THA,Gini index,SI.POV.GINI,1996,42.9
+Uganda,UGA,Gini index,SI.POV.GINI,1996,39.0
+Ukraine,UKR,Gini index,SI.POV.GINI,1996,35.2
+Uruguay,URY,Gini index,SI.POV.GINI,1996,40.8
+United States,USA,Gini index,SI.POV.GINI,1996,40.3
+Zambia,ZMB,Gini index,SI.POV.GINI,1996,48.3
+Argentina,ARG,Gini index,SI.POV.GINI,1997,49.1
+Austria,AUT,Gini index,SI.POV.GINI,1997,29.1
+Belgium,BEL,Gini index,SI.POV.GINI,1997,26.8
+Belize,BLZ,Gini index,SI.POV.GINI,1997,60.4
+Bolivia,BOL,Gini index,SI.POV.GINI,1997,58.1
+Brazil,BRA,Gini index,SI.POV.GINI,1997,59.8
+Canada,CAN,Gini index,SI.POV.GINI,1997,33.1
+Costa Rica,CRI,Gini index,SI.POV.GINI,1997,45.6
+Germany,DEU,Gini index,SI.POV.GINI,1997,28.2
+Dominican Republic,DOM,Gini index,SI.POV.GINI,1997,48.9
+Spain,ESP,Gini index,SI.POV.GINI,1997,35.3
+France,FRA,Gini index,SI.POV.GINI,1997,31.9
+United Kingdom,GBR,Gini index,SI.POV.GINI,1997,35.7
+Georgia,GEO,Gini index,SI.POV.GINI,1997,40.7
+Honduras,HND,Gini index,SI.POV.GINI,1997,52.7
+Israel,ISR,Gini index,SI.POV.GINI,1997,38.1
+Jordan,JOR,Gini index,SI.POV.GINI,1997,36.4
+Kenya,KEN,Gini index,SI.POV.GINI,1997,45.0
+Lao PDR,LAO,Gini index,SI.POV.GINI,1997,34.9
+Luxembourg,LUX,Gini index,SI.POV.GINI,1997,29.6
+Moldova,MDA,Gini index,SI.POV.GINI,1997,36.9
+Madagascar,MDG,Gini index,SI.POV.GINI,1997,39.4
+Malawi,MWI,Gini index,SI.POV.GINI,1997,65.8
+Malaysia,MYS,Gini index,SI.POV.GINI,1997,49.1
+Panama,PAN,Gini index,SI.POV.GINI,1997,58.1
+Peru,PER,Gini index,SI.POV.GINI,1997,53.3
+Paraguay,PRY,Gini index,SI.POV.GINI,1997,54.9
+Uruguay,URY,Gini index,SI.POV.GINI,1997,41.5
+United States,USA,Gini index,SI.POV.GINI,1997,40.5
+Viet Nam,VNM,Gini index,SI.POV.GINI,1997,35.4
+Argentina,ARG,Gini index,SI.POV.GINI,1998,50.7
+Austria,AUT,Gini index,SI.POV.GINI,1998,31.3
+Burundi,BDI,Gini index,SI.POV.GINI,1998,42.1
+Burkina Faso,BFA,Gini index,SI.POV.GINI,1998,49.9
+Belarus,BLR,Gini index,SI.POV.GINI,1998,32.0
+Belize,BLZ,Gini index,SI.POV.GINI,1998,54.9
+Brazil,BRA,Gini index,SI.POV.GINI,1998,59.6
+Canada,CAN,Gini index,SI.POV.GINI,1998,33.2
+Chile,CHL,Gini index,SI.POV.GINI,1998,55.5
+Cote d'Ivoire,CIV,Gini index,SI.POV.GINI,1998,39.0
+Costa Rica,CRI,Gini index,SI.POV.GINI,1998,45.6
+Germany,DEU,Gini index,SI.POV.GINI,1998,28.3
+Ecuador,ECU,Gini index,SI.POV.GINI,1998,49.6
+Spain,ESP,Gini index,SI.POV.GINI,1998,34.6
+France,FRA,Gini index,SI.POV.GINI,1998,31.7
+United Kingdom,GBR,Gini index,SI.POV.GINI,1998,36.6
+Georgia,GEO,Gini index,SI.POV.GINI,1998,41.2
+Ghana,GHA,Gini index,SI.POV.GINI,1998,40.1
+Gambia, The,Gini index,SI.POV.GINI,1998,48.3
+Guatemala,GTM,Gini index,SI.POV.GINI,1998,49.4
+Guyana,GUY,Gini index,SI.POV.GINI,1998,45.0
+Honduras,HND,Gini index,SI.POV.GINI,1998,57.3
+Indonesia,IDN,Gini index,SI.POV.GINI,1998,30.9
+Iran, Islamic Rep.,Gini index,SI.POV.GINI,1998,44.1
+Italy,ITA,Gini index,SI.POV.GINI,1998,36.7
+Luxembourg,LUX,Gini index,SI.POV.GINI,1998,30.6
+Morocco,MAR,Gini index,SI.POV.GINI,1998,39.4
+Moldova,MDA,Gini index,SI.POV.GINI,1998,39.5
+Mexico,MEX,Gini index,SI.POV.GINI,1998,53.3
+Mongolia,MNG,Gini index,SI.POV.GINI,1998,30.3
+Nicaragua,NIC,Gini index,SI.POV.GINI,1998,54.4
+Pakistan,PAK,Gini index,SI.POV.GINI,1998,33.1
+Panama,PAN,Gini index,SI.POV.GINI,1998,57.4
+Peru,PER,Gini index,SI.POV.GINI,1998,55.1
+El Salvador,SLV,Gini index,SI.POV.GINI,1998,54.4
+Thailand,THA,Gini index,SI.POV.GINI,1998,41.5
+Turkmenistan,TKM,Gini index,SI.POV.GINI,1998,40.8
+Uruguay,URY,Gini index,SI.POV.GINI,1998,42.5
+United States,USA,Gini index,SI.POV.GINI,1998,40.0
+Uzbekistan,UZB,Gini index,SI.POV.GINI,1998,44.3
+Venezuela, RB,Gini index,SI.POV.GINI,1998,48.0
+Yemen, Rep.,Gini index,SI.POV.GINI,1998,35.0
+Zambia,ZMB,Gini index,SI.POV.GINI,1998,49.1
+Argentina,ARG,Gini index,SI.POV.GINI,1999,49.8
+Armenia,ARM,Gini index,SI.POV.GINI,1999,36.2
+Austria,AUT,Gini index,SI.POV.GINI,1999,29.7
+Belarus,BLR,Gini index,SI.POV.GINI,1999,31.7
+Belize,BLZ,Gini index,SI.POV.GINI,1999,53.2
+Bolivia,BOL,Gini index,SI.POV.GINI,1999,58.0
+Brazil,BRA,Gini index,SI.POV.GINI,1999,59.0
+Canada,CAN,Gini index,SI.POV.GINI,1999,33.1
+China,CHN,Gini index,SI.POV.GINI,1999,38.7
+Colombia,COL,Gini index,SI.POV.GINI,1999,58.5
+Costa Rica,CRI,Gini index,SI.POV.GINI,1999,47.6
+Germany,DEU,Gini index,SI.POV.GINI,1999,29.0
+Ecuador,ECU,Gini index,SI.POV.GINI,1999,58.6
+Egypt, Arab Rep.,Gini index,SI.POV.GINI,1999,30.8
+Spain,ESP,Gini index,SI.POV.GINI,1999,33.8
+Ethiopia,ETH,Gini index,SI.POV.GINI,1999,30.0
+France,FRA,Gini index,SI.POV.GINI,1999,32.5
+United Kingdom,GBR,Gini index,SI.POV.GINI,1999,36.8
+Georgia,GEO,Gini index,SI.POV.GINI,1999,40.1
+Honduras,HND,Gini index,SI.POV.GINI,1999,55.2
+Indonesia,IDN,Gini index,SI.POV.GINI,1999,30.8
+Jamaica,JAM,Gini index,SI.POV.GINI,1999,44.1
+Luxembourg,LUX,Gini index,SI.POV.GINI,1999,30.0
+Moldova,MDA,Gini index,SI.POV.GINI,1999,42.6
+Madagascar,MDG,Gini index,SI.POV.GINI,1999,38.6
+Netherlands,NLD,Gini index,SI.POV.GINI,1999,28.1
+Panama,PAN,Gini index,SI.POV.GINI,1999,56.4
+Peru,PER,Gini index,SI.POV.GINI,1999,54.8
+Paraguay,PRY,Gini index,SI.POV.GINI,1999,54.6
+El Salvador,SLV,Gini index,SI.POV.GINI,1999,52.1
+Thailand,THA,Gini index,SI.POV.GINI,1999,43.1
+Tajikistan,TJK,Gini index,SI.POV.GINI,1999,29.5
+Uganda,UGA,Gini index,SI.POV.GINI,1999,43.0
+United States,USA,Gini index,SI.POV.GINI,1999,40.0
+Venezuela, RB,Gini index,SI.POV.GINI,1999,47.7
+Angola,AGO,Gini index,SI.POV.GINI,2000,51.9
+Argentina,ARG,Gini index,SI.POV.GINI,2000,51.0
+Austria,AUT,Gini index,SI.POV.GINI,2000,29.0
+Belgium,BEL,Gini index,SI.POV.GINI,2000,33.1
+Bangladesh,BGD,Gini index,SI.POV.GINI,2000,33.4
+Belarus,BLR,Gini index,SI.POV.GINI,2000,31.2
+Bolivia,BOL,Gini index,SI.POV.GINI,2000,61.6
+Canada,CAN,Gini index,SI.POV.GINI,2000,33.4
+Switzerland,CHE,Gini index,SI.POV.GINI,2000,33.4
+Chile,CHL,Gini index,SI.POV.GINI,2000,52.8
+Colombia,COL,Gini index,SI.POV.GINI,2000,58.4
+Costa Rica,CRI,Gini index,SI.POV.GINI,2000,47.4
+Germany,DEU,Gini index,SI.POV.GINI,2000,28.9
+Denmark,DNK,Gini index,SI.POV.GINI,2000,23.8
+Dominican Republic,DOM,Gini index,SI.POV.GINI,2000,51.5
+Ecuador,ECU,Gini index,SI.POV.GINI,2000,56.3
+Spain,ESP,Gini index,SI.POV.GINI,2000,34.1
+Finland,FIN,Gini index,SI.POV.GINI,2000,27.2
+France,FRA,Gini index,SI.POV.GINI,2000,32.6
+United Kingdom,GBR,Gini index,SI.POV.GINI,2000,38.8
+Georgia,GEO,Gini index,SI.POV.GINI,2000,40.5
+Greece,GRC,Gini index,SI.POV.GINI,2000,34.2
+Guatemala,GTM,Gini index,SI.POV.GINI,2000,54.2
+Indonesia,IDN,Gini index,SI.POV.GINI,2000,30.3
+Ireland,IRL,Gini index,SI.POV.GINI,2000,33.0
+Italy,ITA,Gini index,SI.POV.GINI,2000,35.2
+Kyrgyz Republic,KGZ,Gini index,SI.POV.GINI,2000,31.0
+Luxembourg,LUX,Gini index,SI.POV.GINI,2000,30.1
+Morocco,MAR,Gini index,SI.POV.GINI,2000,40.6
+Moldova,MDA,Gini index,SI.POV.GINI,2000,36.4
+Mexico,MEX,Gini index,SI.POV.GINI,2000,53.4
+Mauritania,MRT,Gini index,SI.POV.GINI,2000,39.0
+Norway,NOR,Gini index,SI.POV.GINI,2000,27.4
+Panama,PAN,Gini index,SI.POV.GINI,2000,56.6
+Peru,PER,Gini index,SI.POV.GINI,2000,49.1
+Philippines,PHL,Gini index,SI.POV.GINI,2000,47.7
+Rwanda,RWA,Gini index,SI.POV.GINI,2000,48.5
+El Salvador,SLV,Gini index,SI.POV.GINI,2000,51.5
+Sao Tome and Principe,STP,Gini index,SI.POV.GINI,2000,32.1
+Sweden,SWE,Gini index,SI.POV.GINI,2000,27.0
+Eswatini,SWZ,Gini index,SI.POV.GINI,2000,53.1
+Thailand,THA,Gini index,SI.POV.GINI,2000,42.8
+Tonga,TON,Gini index,SI.POV.GINI,2000,37.7
+Tunisia,TUN,Gini index,SI.POV.GINI,2000,40.8
+Tanzania,TZA,Gini index,SI.POV.GINI,2000,37.3
+Uruguay,URY,Gini index,SI.POV.GINI,2000,42.9
+United States,USA,Gini index,SI.POV.GINI,2000,40.1
+Uzbekistan,UZB,Gini index,SI.POV.GINI,2000,36.0
+South Africa,ZAF,Gini index,SI.POV.GINI,2000,57.8
+Argentina,ARG,Gini index,SI.POV.GINI,2001,53.3
+Armenia,ARM,Gini index,SI.POV.GINI,2001,35.4
+Australia,AUS,Gini index,SI.POV.GINI,2001,33.5
+Azerbaijan,AZE,Gini index,SI.POV.GINI,2001,36.5
+Bosnia and Herzegovina,BIH,Gini index,SI.POV.GINI,2001,30.0
+Belarus,BLR,Gini index,SI.POV.GINI,2001,30.6
+Bolivia,BOL,Gini index,SI.POV.GINI,2001,57.4
+Brazil,BRA,Gini index,SI.POV.GINI,2001,58.4
+Canada,CAN,Gini index,SI.POV.GINI,2001,33.6
+Cameroon,CMR,Gini index,SI.POV.GINI,2001,42.1
+Colombia,COL,Gini index,SI.POV.GINI,2001,57.3
+Cabo Verde,CPV,Gini index,SI.POV.GINI,2001,52.5
+Costa Rica,CRI,Gini index,SI.POV.GINI,2001,51.5
+Germany,DEU,Gini index,SI.POV.GINI,2001,29.9
+Dominican Republic,DOM,Gini index,SI.POV.GINI,2001,50.0
+France,FRA,Gini index,SI.POV.GINI,2001,32.5
+United Kingdom,GBR,Gini index,SI.POV.GINI,2001,37.1
+Georgia,GEO,Gini index,SI.POV.GINI,2001,39.6
+Honduras,HND,Gini index,SI.POV.GINI,2001,55.4
+Indonesia,IDN,Gini index,SI.POV.GINI,2001,31.2
+Israel,ISR,Gini index,SI.POV.GINI,2001,38.9
+Kazakhstan,KAZ,Gini index,SI.POV.GINI,2001,36.0
+Kyrgyz Republic,KGZ,Gini index,SI.POV.GINI,2001,30.2
+Luxembourg,LUX,Gini index,SI.POV.GINI,2001,30.9
+Moldova,MDA,Gini index,SI.POV.GINI,2001,38.0
+Madagascar,MDG,Gini index,SI.POV.GINI,2001,47.4
+Mali,MLI,Gini index,SI.POV.GINI,2001,39.9
+Nicaragua,NIC,Gini index,SI.POV.GINI,2001,52.9
+Pakistan,PAK,Gini index,SI.POV.GINI,2001,28.7
+Panama,PAN,Gini index,SI.POV.GINI,2001,56.7
+Peru,PER,Gini index,SI.POV.GINI,2001,51.3
+Paraguay,PRY,Gini index,SI.POV.GINI,2001,54.6
+Senegal,SEN,Gini index,SI.POV.GINI,2001,41.2
+El Salvador,SLV,Gini index,SI.POV.GINI,2001,51.3
+Sweden,SWE,Gini index,SI.POV.GINI,2001,26.5
+Timor-Leste,TLS,Gini index,SI.POV.GINI,2001,35.9
+Uruguay,URY,Gini index,SI.POV.GINI,2001,45.0
+United States,USA,Gini index,SI.POV.GINI,2001,40.6
+Venezuela, RB,Gini index,SI.POV.GINI,2001,47.2
+Albania,ALB,Gini index,SI.POV.GINI,2002,31.7
+Argentina,ARG,Gini index,SI.POV.GINI,2002,53.8
+Armenia,ARM,Gini index,SI.POV.GINI,2002,34.8
+Azerbaijan,AZE,Gini index,SI.POV.GINI,2002,25.3
+Belarus,BLR,Gini index,SI.POV.GINI,2002,30.3
+Bolivia,BOL,Gini index,SI.POV.GINI,2002,59.3
+Brazil,BRA,Gini index,SI.POV.GINI,2002,58.1
+Botswana,BWA,Gini index,SI.POV.GINI,2002,64.7
+Canada,CAN,Gini index,SI.POV.GINI,2002,33.6
+Switzerland,CHE,Gini index,SI.POV.GINI,2002,31.7
+China,CHN,Gini index,SI.POV.GINI,2002,42.0
+Cote d'Ivoire,CIV,Gini index,SI.POV.GINI,2002,41.3
+Colombia,COL,Gini index,SI.POV.GINI,2002,56.0
+Costa Rica,CRI,Gini index,SI.POV.GINI,2002,51.8
+Czechia,CZE,Gini index,SI.POV.GINI,2002,26.6
+Germany,DEU,Gini index,SI.POV.GINI,2002,29.8
+Djibouti,DJI,Gini index,SI.POV.GINI,2002,40.0
+Dominican Republic,DOM,Gini index,SI.POV.GINI,2002,49.7
+Fiji,FJI,Gini index,SI.POV.GINI,2002,38.1
+France,FRA,Gini index,SI.POV.GINI,2002,31.8
+United Kingdom,GBR,Gini index,SI.POV.GINI,2002,35.1
+Georgia,GEO,Gini index,SI.POV.GINI,2002,37.2
+Guinea,GIN,Gini index,SI.POV.GINI,2002,43.0
+Guinea-Bissau,GNB,Gini index,SI.POV.GINI,2002,35.6
+Honduras,HND,Gini index,SI.POV.GINI,2002,55.7
+Indonesia,IDN,Gini index,SI.POV.GINI,2002,30.2
+Ireland,IRL,Gini index,SI.POV.GINI,2002,32.3
+Israel,ISR,Gini index,SI.POV.GINI,2002,39.6
+Italy,ITA,Gini index,SI.POV.GINI,2002,34.7
+Jamaica,JAM,Gini index,SI.POV.GINI,2002,48.3
+Jordan,JOR,Gini index,SI.POV.GINI,2002,37.0
+Kazakhstan,KAZ,Gini index,SI.POV.GINI,2002,34.8
+Kyrgyz Republic,KGZ,Gini index,SI.POV.GINI,2002,30.3
+Lao PDR,LAO,Gini index,SI.POV.GINI,2002,32.6
+Sri Lanka,LKA,Gini index,SI.POV.GINI,2002,40.2
+Lesotho,LSO,Gini index,SI.POV.GINI,2002,51.2
+Luxembourg,LUX,Gini index,SI.POV.GINI,2002,31.0
+Moldova,MDA,Gini index,SI.POV.GINI,2002,35.8
+Maldives,MDV,Gini index,SI.POV.GINI,2002,41.3
+Mexico,MEX,Gini index,SI.POV.GINI,2002,50.6
+Mongolia,MNG,Gini index,SI.POV.GINI,2002,32.9
+Mozambique,MOZ,Gini index,SI.POV.GINI,2002,47.0
+Panama,PAN,Gini index,SI.POV.GINI,2002,56.1
+Peru,PER,Gini index,SI.POV.GINI,2002,53.6
+Paraguay,PRY,Gini index,SI.POV.GINI,2002,57.3
+El Salvador,SLV,Gini index,SI.POV.GINI,2002,51.9
+Sweden,SWE,Gini index,SI.POV.GINI,2002,26.2
+Thailand,THA,Gini index,SI.POV.GINI,2002,41.9
+Uganda,UGA,Gini index,SI.POV.GINI,2002,45.2
+Ukraine,UKR,Gini index,SI.POV.GINI,2002,29.0
+Uruguay,URY,Gini index,SI.POV.GINI,2002,45.5
+United States,USA,Gini index,SI.POV.GINI,2002,40.4
+Uzbekistan,UZB,Gini index,SI.POV.GINI,2002,33.0
+Venezuela, RB,Gini index,SI.POV.GINI,2002,48.9
+Viet Nam,VNM,Gini index,SI.POV.GINI,2002,37.0
+Samoa,WSM,Gini index,SI.POV.GINI,2002,40.7
+Zambia,ZMB,Gini index,SI.POV.GINI,2002,42.1
+Argentina,ARG,Gini index,SI.POV.GINI,2003,51.0
+Armenia,ARM,Gini index,SI.POV.GINI,2003,33.0
+Australia,AUS,Gini index,SI.POV.GINI,2003,33.5
+Austria,AUT,Gini index,SI.POV.GINI,2003,29.5
+Azerbaijan,AZE,Gini index,SI.POV.GINI,2003,26.8
+Belgium,BEL,Gini index,SI.POV.GINI,2003,28.1
+Benin,BEN,Gini index,SI.POV.GINI,2003,38.6
+Burkina Faso,BFA,Gini index,SI.POV.GINI,2003,43.3
+Belarus,BLR,Gini index,SI.POV.GINI,2003,28.8
+Brazil,BRA,Gini index,SI.POV.GINI,2003,57.6
+Bhutan,BTN,Gini index,SI.POV.GINI,2003,40.9
+Canada,CAN,Gini index,SI.POV.GINI,2003,33.8
+Chile,CHL,Gini index,SI.POV.GINI,2003,51.5
+Colombia,COL,Gini index,SI.POV.GINI,2003,53.6
+Costa Rica,CRI,Gini index,SI.POV.GINI,2003,49.3
+Germany,DEU,Gini index,SI.POV.GINI,2003,29.8
+Denmark,DNK,Gini index,SI.POV.GINI,2003,25.6
+Dominican Republic,DOM,Gini index,SI.POV.GINI,2003,52.1
+Ecuador,ECU,Gini index,SI.POV.GINI,2003,53.5
+Spain,ESP,Gini index,SI.POV.GINI,2003,31.8
+Estonia,EST,Gini index,SI.POV.GINI,2003,37.2
+Finland,FIN,Gini index,SI.POV.GINI,2003,27.7
+France,FRA,Gini index,SI.POV.GINI,2003,31.4
+United Kingdom,GBR,Gini index,SI.POV.GINI,2003,34.9
+Georgia,GEO,Gini index,SI.POV.GINI,2003,36.7
+Gambia, The,Gini index,SI.POV.GINI,2003,47.3
+Greece,GRC,Gini index,SI.POV.GINI,2003,32.8
+Honduras,HND,Gini index,SI.POV.GINI,2003,58.1
+Indonesia,IDN,Gini index,SI.POV.GINI,2003,29.3
+Ireland,IRL,Gini index,SI.POV.GINI,2003,32.9
+Iceland,ISL,Gini index,SI.POV.GINI,2003,26.8
+Israel,ISR,Gini index,SI.POV.GINI,2003,40.7
+Italy,ITA,Gini index,SI.POV.GINI,2003,34.9
+Kazakhstan,KAZ,Gini index,SI.POV.GINI,2003,33.7
+Kyrgyz Republic,KGZ,Gini index,SI.POV.GINI,2003,28.7
+Luxembourg,LUX,Gini index,SI.POV.GINI,2003,30.2
+Moldova,MDA,Gini index,SI.POV.GINI,2003,34.9
+Malaysia,MYS,Gini index,SI.POV.GINI,2003,46.4
+Namibia,NAM,Gini index,SI.POV.GINI,2003,63.3
+Nigeria,NGA,Gini index,SI.POV.GINI,2003,40.1
+Norway,NOR,Gini index,SI.POV.GINI,2003,27.6
+Nepal,NPL,Gini index,SI.POV.GINI,2003,43.8
+Panama,PAN,Gini index,SI.POV.GINI,2003,55.7
+Peru,PER,Gini index,SI.POV.GINI,2003,53.1
+Philippines,PHL,Gini index,SI.POV.GINI,2003,46.6
+Portugal,PRT,Gini index,SI.POV.GINI,2003,38.8
+Paraguay,PRY,Gini index,SI.POV.GINI,2003,54.9
+Sierra Leone,SLE,Gini index,SI.POV.GINI,2003,40.2
+El Salvador,SLV,Gini index,SI.POV.GINI,2003,50.4
+Sweden,SWE,Gini index,SI.POV.GINI,2003,25.3
+Syrian Arab Republic,SYR,Gini index,SI.POV.GINI,2003,37.5
+Chad,TCD,Gini index,SI.POV.GINI,2003,39.8
+Tajikistan,TJK,Gini index,SI.POV.GINI,2003,32.7
+Ukraine,UKR,Gini index,SI.POV.GINI,2003,28.7
+Uruguay,URY,Gini index,SI.POV.GINI,2003,45.0
+United States,USA,Gini index,SI.POV.GINI,2003,40.8
+Uzbekistan,UZB,Gini index,SI.POV.GINI,2003,35.3
+Venezuela, RB,Gini index,SI.POV.GINI,2003,47.9
+Kosovo,XKX,Gini index,SI.POV.GINI,2003,29.0
+Argentina,ARG,Gini index,SI.POV.GINI,2004,48.5
+Armenia,ARM,Gini index,SI.POV.GINI,2004,37.5
+Australia,AUS,Gini index,SI.POV.GINI,2004,33.1
+Austria,AUT,Gini index,SI.POV.GINI,2004,29.8
+Azerbaijan,AZE,Gini index,SI.POV.GINI,2004,26.6
+Belgium,BEL,Gini index,SI.POV.GINI,2004,30.5
+Bosnia and Herzegovina,BIH,Gini index,SI.POV.GINI,2004,34.0
+Belarus,BLR,Gini index,SI.POV.GINI,2004,26.5
+Bolivia,BOL,Gini index,SI.POV.GINI,2004,55.0
+Brazil,BRA,Gini index,SI.POV.GINI,2004,56.5
+Canada,CAN,Gini index,SI.POV.GINI,2004,33.8
+Switzerland,CHE,Gini index,SI.POV.GINI,2004,31.6
+Congo, Dem. Rep.,Gini index,SI.POV.GINI,2004,41.6
+Colombia,COL,Gini index,SI.POV.GINI,2004,55.0
+Comoros,COM,Gini index,SI.POV.GINI,2004,55.9
+Costa Rica,CRI,Gini index,SI.POV.GINI,2004,48.4
+Cyprus,CYP,Gini index,SI.POV.GINI,2004,30.1
+Czechia,CZE,Gini index,SI.POV.GINI,2004,27.5
+Germany,DEU,Gini index,SI.POV.GINI,2004,30.2
+Denmark,DNK,Gini index,SI.POV.GINI,2004,24.9
+Dominican Republic,DOM,Gini index,SI.POV.GINI,2004,52.0
+Ecuador,ECU,Gini index,SI.POV.GINI,2004,53.9
+Egypt, Arab Rep.,Gini index,SI.POV.GINI,2004,31.8
+Spain,ESP,Gini index,SI.POV.GINI,2004,33.3
+Estonia,EST,Gini index,SI.POV.GINI,2004,33.6
+Ethiopia,ETH,Gini index,SI.POV.GINI,2004,29.8
+Finland,FIN,Gini index,SI.POV.GINI,2004,27.9
+France,FRA,Gini index,SI.POV.GINI,2004,30.6
+United Kingdom,GBR,Gini index,SI.POV.GINI,2004,34.8
+Georgia,GEO,Gini index,SI.POV.GINI,2004,36.2
+Greece,GRC,Gini index,SI.POV.GINI,2004,33.6
+Honduras,HND,Gini index,SI.POV.GINI,2004,58.1
+Hungary,HUN,Gini index,SI.POV.GINI,2004,29.9
+Indonesia,IDN,Gini index,SI.POV.GINI,2004,30.4
+India,IND,Gini index,SI.POV.GINI,2004,34.0
+Ireland,IRL,Gini index,SI.POV.GINI,2004,33.6
+Iceland,ISL,Gini index,SI.POV.GINI,2004,28.0
+Israel,ISR,Gini index,SI.POV.GINI,2004,41.5
+Italy,ITA,Gini index,SI.POV.GINI,2004,34.3
+Jamaica,JAM,Gini index,SI.POV.GINI,2004,45.5
+Kazakhstan,KAZ,Gini index,SI.POV.GINI,2004,31.8
+Kyrgyz Republic,KGZ,Gini index,SI.POV.GINI,2004,34.8
+Lithuania,LTU,Gini index,SI.POV.GINI,2004,37.0
+Luxembourg,LUX,Gini index,SI.POV.GINI,2004,30.2
+Latvia,LVA,Gini index,SI.POV.GINI,2004,36.4
+Moldova,MDA,Gini index,SI.POV.GINI,2004,35.0
+Mexico,MEX,Gini index,SI.POV.GINI,2004,50.3
+Mauritania,MRT,Gini index,SI.POV.GINI,2004,40.2
+Malawi,MWI,Gini index,SI.POV.GINI,2004,39.9
+Netherlands,NLD,Gini index,SI.POV.GINI,2004,29.8
+Norway,NOR,Gini index,SI.POV.GINI,2004,31.6
+Pakistan,PAK,Gini index,SI.POV.GINI,2004,30.9
+Panama,PAN,Gini index,SI.POV.GINI,2004,54.8
+Peru,PER,Gini index,SI.POV.GINI,2004,49.9
+Poland,POL,Gini index,SI.POV.GINI,2004,38.0
+Portugal,PRT,Gini index,SI.POV.GINI,2004,38.9
+Paraguay,PRY,Gini index,SI.POV.GINI,2004,52.3
+West Bank and Gaza,PSE,Gini index,SI.POV.GINI,2004,34.0
+El Salvador,SLV,Gini index,SI.POV.GINI,2004,47.8
+Slovak Republic,SVK,Gini index,SI.POV.GINI,2004,27.1
+Slovenia,SVN,Gini index,SI.POV.GINI,2004,24.8
+Sweden,SWE,Gini index,SI.POV.GINI,2004,26.1
+Thailand,THA,Gini index,SI.POV.GINI,2004,42.5
+Tajikistan,TJK,Gini index,SI.POV.GINI,2004,33.6
+Ukraine,UKR,Gini index,SI.POV.GINI,2004,28.9
+Uruguay,URY,Gini index,SI.POV.GINI,2004,45.9
+United States,USA,Gini index,SI.POV.GINI,2004,40.3
+Venezuela, RB,Gini index,SI.POV.GINI,2004,47.3
+Viet Nam,VNM,Gini index,SI.POV.GINI,2004,36.8
+Zambia,ZMB,Gini index,SI.POV.GINI,2004,54.3
+Albania,ALB,Gini index,SI.POV.GINI,2005,30.6
+Argentina,ARG,Gini index,SI.POV.GINI,2005,47.8
+Armenia,ARM,Gini index,SI.POV.GINI,2005,36.0
+Austria,AUT,Gini index,SI.POV.GINI,2005,28.7
+Azerbaijan,AZE,Gini index,SI.POV.GINI,2005,26.6
+Belgium,BEL,Gini index,SI.POV.GINI,2005,29.3
+Bangladesh,BGD,Gini index,SI.POV.GINI,2005,33.2
+Belarus,BLR,Gini index,SI.POV.GINI,2005,27.6
+Bolivia,BOL,Gini index,SI.POV.GINI,2005,58.5
+Brazil,BRA,Gini index,SI.POV.GINI,2005,56.3
+Canada,CAN,Gini index,SI.POV.GINI,2005,33.6
+China,CHN,Gini index,SI.POV.GINI,2005,40.9
+Congo, Rep.,Gini index,SI.POV.GINI,2005,47.3
+Colombia,COL,Gini index,SI.POV.GINI,2005,53.9
+Costa Rica,CRI,Gini index,SI.POV.GINI,2005,47.5
+Cyprus,CYP,Gini index,SI.POV.GINI,2005,30.3
+Czechia,CZE,Gini index,SI.POV.GINI,2005,26.9
+Germany,DEU,Gini index,SI.POV.GINI,2005,31.7
+Denmark,DNK,Gini index,SI.POV.GINI,2005,25.2
+Dominican Republic,DOM,Gini index,SI.POV.GINI,2005,50.0
+Ecuador,ECU,Gini index,SI.POV.GINI,2005,53.0
+Spain,ESP,Gini index,SI.POV.GINI,2005,32.4
+Estonia,EST,Gini index,SI.POV.GINI,2005,33.4
+Finland,FIN,Gini index,SI.POV.GINI,2005,27.6
+France,FRA,Gini index,SI.POV.GINI,2005,29.8
+Micronesia, Fed. Sts.,Gini index,SI.POV.GINI,2005,42.4
+Gabon,GAB,Gini index,SI.POV.GINI,2005,42.2
+United Kingdom,GBR,Gini index,SI.POV.GINI,2005,35.5
+Georgia,GEO,Gini index,SI.POV.GINI,2005,37.4
+Ghana,GHA,Gini index,SI.POV.GINI,2005,42.8
+Greece,GRC,Gini index,SI.POV.GINI,2005,34.6
+Honduras,HND,Gini index,SI.POV.GINI,2005,59.5
+Hungary,HUN,Gini index,SI.POV.GINI,2005,34.7
+Indonesia,IDN,Gini index,SI.POV.GINI,2005,29.9
+Ireland,IRL,Gini index,SI.POV.GINI,2005,33.8
+Iran, Islamic Rep.,Gini index,SI.POV.GINI,2005,43.6
+Iceland,ISL,Gini index,SI.POV.GINI,2005,29.0
+Israel,ISR,Gini index,SI.POV.GINI,2005,42.3
+Italy,ITA,Gini index,SI.POV.GINI,2005,33.8
+Kazakhstan,KAZ,Gini index,SI.POV.GINI,2005,39.8
+Kenya,KEN,Gini index,SI.POV.GINI,2005,46.4
+Kyrgyz Republic,KGZ,Gini index,SI.POV.GINI,2005,32.6
+Lithuania,LTU,Gini index,SI.POV.GINI,2005,35.3
+Luxembourg,LUX,Gini index,SI.POV.GINI,2005,30.8
+Latvia,LVA,Gini index,SI.POV.GINI,2005,39.0
+Moldova,MDA,Gini index,SI.POV.GINI,2005,36.3
+Madagascar,MDG,Gini index,SI.POV.GINI,2005,39.9
+Mexico,MEX,Gini index,SI.POV.GINI,2005,50.9
+Niger,NER,Gini index,SI.POV.GINI,2005,44.4
+Nicaragua,NIC,Gini index,SI.POV.GINI,2005,48.8
+Netherlands,NLD,Gini index,SI.POV.GINI,2005,29.0
+Norway,NOR,Gini index,SI.POV.GINI,2005,30.6
+Pakistan,PAK,Gini index,SI.POV.GINI,2005,31.3
+Panama,PAN,Gini index,SI.POV.GINI,2005,53.8
+Peru,PER,Gini index,SI.POV.GINI,2005,50.4
+Poland,POL,Gini index,SI.POV.GINI,2005,35.8
+Portugal,PRT,Gini index,SI.POV.GINI,2005,38.5
+Paraguay,PRY,Gini index,SI.POV.GINI,2005,51.4
+West Bank and Gaza,PSE,Gini index,SI.POV.GINI,2005,34.7
+Rwanda,RWA,Gini index,SI.POV.GINI,2005,52.0
+Senegal,SEN,Gini index,SI.POV.GINI,2005,39.2
+Solomon Islands,SLB,Gini index,SI.POV.GINI,2005,46.1
+El Salvador,SLV,Gini index,SI.POV.GINI,2005,48.5
+Slovak Republic,SVK,Gini index,SI.POV.GINI,2005,29.3
+Slovenia,SVN,Gini index,SI.POV.GINI,2005,24.6
+Sweden,SWE,Gini index,SI.POV.GINI,2005,26.8
+Tunisia,TUN,Gini index,SI.POV.GINI,2005,37.7
+Uganda,UGA,Gini index,SI.POV.GINI,2005,42.9
+Ukraine,UKR,Gini index,SI.POV.GINI,2005,29.0
+Uruguay,URY,Gini index,SI.POV.GINI,2005,44.7
+United States,USA,Gini index,SI.POV.GINI,2005,41.0
+Venezuela, RB,Gini index,SI.POV.GINI,2005,49.3
+Kosovo,XKX,Gini index,SI.POV.GINI,2005,31.2
+Yemen, Rep.,Gini index,SI.POV.GINI,2005,34.7
+South Africa,ZAF,Gini index,SI.POV.GINI,2005,64.8
+Argentina,ARG,Gini index,SI.POV.GINI,2006,46.4
+Armenia,ARM,Gini index,SI.POV.GINI,2006,29.7
+Austria,AUT,Gini index,SI.POV.GINI,2006,29.6
+Burundi,BDI,Gini index,SI.POV.GINI,2006,33.4
+Belgium,BEL,Gini index,SI.POV.GINI,2006,28.1
+Bulgaria,BGR,Gini index,SI.POV.GINI,2006,35.7
+Belarus,BLR,Gini index,SI.POV.GINI,2006,28.3
+Bolivia,BOL,Gini index,SI.POV.GINI,2006,56.7
+Brazil,BRA,Gini index,SI.POV.GINI,2006,55.6
+Canada,CAN,Gini index,SI.POV.GINI,2006,34.1
+Switzerland,CHE,Gini index,SI.POV.GINI,2006,33.9
+Chile,CHL,Gini index,SI.POV.GINI,2006,47.7
+Costa Rica,CRI,Gini index,SI.POV.GINI,2006,49.3
+Cyprus,CYP,Gini index,SI.POV.GINI,2006,31.1
+Czechia,CZE,Gini index,SI.POV.GINI,2006,26.7
+Germany,DEU,Gini index,SI.POV.GINI,2006,31.0
+Denmark,DNK,Gini index,SI.POV.GINI,2006,25.9
+Dominican Republic,DOM,Gini index,SI.POV.GINI,2006,52.0
+Ecuador,ECU,Gini index,SI.POV.GINI,2006,52.2
+Spain,ESP,Gini index,SI.POV.GINI,2006,33.5
+Estonia,EST,Gini index,SI.POV.GINI,2006,33.7
+Finland,FIN,Gini index,SI.POV.GINI,2006,28.0
+France,FRA,Gini index,SI.POV.GINI,2006,29.7
+United Kingdom,GBR,Gini index,SI.POV.GINI,2006,35.9
+Georgia,GEO,Gini index,SI.POV.GINI,2006,36.9
+Greece,GRC,Gini index,SI.POV.GINI,2006,35.1
+Guatemala,GTM,Gini index,SI.POV.GINI,2006,54.6
+Honduras,HND,Gini index,SI.POV.GINI,2006,57.5
+Hungary,HUN,Gini index,SI.POV.GINI,2006,28.3
+Indonesia,IDN,Gini index,SI.POV.GINI,2006,31.5
+Ireland,IRL,Gini index,SI.POV.GINI,2006,32.7
+Iran, Islamic Rep.,Gini index,SI.POV.GINI,2006,44.8
+Iraq,IRQ,Gini index,SI.POV.GINI,2006,28.6
+Iceland,ISL,Gini index,SI.POV.GINI,2006,30.2
+Israel,ISR,Gini index,SI.POV.GINI,2006,41.6
+Italy,ITA,Gini index,SI.POV.GINI,2006,33.7
+Jordan,JOR,Gini index,SI.POV.GINI,2006,33.9
+Kazakhstan,KAZ,Gini index,SI.POV.GINI,2006,30.2
+Kyrgyz Republic,KGZ,Gini index,SI.POV.GINI,2006,37.4
+Kiribati,KIR,Gini index,SI.POV.GINI,2006,37.0
+Korea, Rep.,Gini index,SI.POV.GINI,2006,31.7
+Sri Lanka,LKA,Gini index,SI.POV.GINI,2006,39.7
+Lithuania,LTU,Gini index,SI.POV.GINI,2006,34.4
+Luxembourg,LUX,Gini index,SI.POV.GINI,2006,30.9
+Latvia,LVA,Gini index,SI.POV.GINI,2006,35.6
+Morocco,MAR,Gini index,SI.POV.GINI,2006,40.7
+Moldova,MDA,Gini index,SI.POV.GINI,2006,35.4
+Mexico,MEX,Gini index,SI.POV.GINI,2006,49.7
+Mali,MLI,Gini index,SI.POV.GINI,2006,38.9
+Malta,MLT,Gini index,SI.POV.GINI,2006,28.0
+Mauritius,MUS,Gini index,SI.POV.GINI,2006,35.7
+Malaysia,MYS,Gini index,SI.POV.GINI,2006,44.8
+Netherlands,NLD,Gini index,SI.POV.GINI,2006,30.0
+Norway,NOR,Gini index,SI.POV.GINI,2006,26.4
+Panama,PAN,Gini index,SI.POV.GINI,2006,54.6
+Peru,PER,Gini index,SI.POV.GINI,2006,50.3
+Philippines,PHL,Gini index,SI.POV.GINI,2006,47.2
+Poland,POL,Gini index,SI.POV.GINI,2006,34.7
+Portugal,PRT,Gini index,SI.POV.GINI,2006,38.1
+Paraguay,PRY,Gini index,SI.POV.GINI,2006,53.0
+West Bank and Gaza,PSE,Gini index,SI.POV.GINI,2006,34.0
+Romania,ROU,Gini index,SI.POV.GINI,2006,39.6
+El Salvador,SLV,Gini index,SI.POV.GINI,2006,45.7
+Slovak Republic,SVK,Gini index,SI.POV.GINI,2006,25.8
+Slovenia,SVN,Gini index,SI.POV.GINI,2006,24.4
+Sweden,SWE,Gini index,SI.POV.GINI,2006,26.4
+Syrian Arab Republic,SYR,Gini index,SI.POV.GINI,2006,40.1
+Togo,TGO,Gini index,SI.POV.GINI,2006,42.2
+Thailand,THA,Gini index,SI.POV.GINI,2006,41.8
+Ukraine,UKR,Gini index,SI.POV.GINI,2006,29.8
+Uruguay,URY,Gini index,SI.POV.GINI,2006,45.9
+United States,USA,Gini index,SI.POV.GINI,2006,41.4
+Venezuela, RB,Gini index,SI.POV.GINI,2006,44.7
+Viet Nam,VNM,Gini index,SI.POV.GINI,2006,35.8
+Kosovo,XKX,Gini index,SI.POV.GINI,2006,30.3
+Zambia,ZMB,Gini index,SI.POV.GINI,2006,54.6
+Argentina,ARG,Gini index,SI.POV.GINI,2007,46.3
+Armenia,ARM,Gini index,SI.POV.GINI,2007,31.2
+Austria,AUT,Gini index,SI.POV.GINI,2007,30.6
+Belgium,BEL,Gini index,SI.POV.GINI,2007,29.2
+Bulgaria,BGR,Gini index,SI.POV.GINI,2007,36.1
+Bosnia and Herzegovina,BIH,Gini index,SI.POV.GINI,2007,33.1
+Belarus,BLR,Gini index,SI.POV.GINI,2007,29.6
+Bolivia,BOL,Gini index,SI.POV.GINI,2007,54.5
+Brazil,BRA,Gini index,SI.POV.GINI,2007,54.9
+Bhutan,BTN,Gini index,SI.POV.GINI,2007,38.1
+Canada,CAN,Gini index,SI.POV.GINI,2007,33.8
+Switzerland,CHE,Gini index,SI.POV.GINI,2007,34.3
+Cameroon,CMR,Gini index,SI.POV.GINI,2007,42.8
+Cabo Verde,CPV,Gini index,SI.POV.GINI,2007,47.2
+Costa Rica,CRI,Gini index,SI.POV.GINI,2007,49.3
+Cyprus,CYP,Gini index,SI.POV.GINI,2007,31.1
+Czechia,CZE,Gini index,SI.POV.GINI,2007,26.0
+Germany,DEU,Gini index,SI.POV.GINI,2007,31.2
+Denmark,DNK,Gini index,SI.POV.GINI,2007,26.2
+Dominican Republic,DOM,Gini index,SI.POV.GINI,2007,48.9
+Ecuador,ECU,Gini index,SI.POV.GINI,2007,53.4
+Spain,ESP,Gini index,SI.POV.GINI,2007,34.1
+Estonia,EST,Gini index,SI.POV.GINI,2007,31.2
+Finland,FIN,Gini index,SI.POV.GINI,2007,28.3
+France,FRA,Gini index,SI.POV.GINI,2007,32.4
+United Kingdom,GBR,Gini index,SI.POV.GINI,2007,34.4
+Georgia,GEO,Gini index,SI.POV.GINI,2007,38.1
+Guinea,GIN,Gini index,SI.POV.GINI,2007,39.4
+Greece,GRC,Gini index,SI.POV.GINI,2007,34.0
+Honduras,HND,Gini index,SI.POV.GINI,2007,55.8
+Hungary,HUN,Gini index,SI.POV.GINI,2007,27.9
+Indonesia,IDN,Gini index,SI.POV.GINI,2007,33.2
+Ireland,IRL,Gini index,SI.POV.GINI,2007,31.9
+Iceland,ISL,Gini index,SI.POV.GINI,2007,29.5
+Israel,ISR,Gini index,SI.POV.GINI,2007,41.1
+Italy,ITA,Gini index,SI.POV.GINI,2007,32.9
+Kazakhstan,KAZ,Gini index,SI.POV.GINI,2007,30.1
+Kyrgyz Republic,KGZ,Gini index,SI.POV.GINI,2007,33.9
+Lao PDR,LAO,Gini index,SI.POV.GINI,2007,35.4
+Liberia,LBR,Gini index,SI.POV.GINI,2007,36.4
+Lithuania,LTU,Gini index,SI.POV.GINI,2007,34.8
+Luxembourg,LUX,Gini index,SI.POV.GINI,2007,31.1
+Latvia,LVA,Gini index,SI.POV.GINI,2007,37.5
+Moldova,MDA,Gini index,SI.POV.GINI,2007,34.4
+Malta,MLT,Gini index,SI.POV.GINI,2007,29.2
+Mongolia,MNG,Gini index,SI.POV.GINI,2007,35.8
+Niger,NER,Gini index,SI.POV.GINI,2007,37.3
+Netherlands,NLD,Gini index,SI.POV.GINI,2007,29.6
+Norway,NOR,Gini index,SI.POV.GINI,2007,27.1
+Pakistan,PAK,Gini index,SI.POV.GINI,2007,29.7
+Panama,PAN,Gini index,SI.POV.GINI,2007,52.7
+Peru,PER,Gini index,SI.POV.GINI,2007,50.0
+Poland,POL,Gini index,SI.POV.GINI,2007,34.0
+Portugal,PRT,Gini index,SI.POV.GINI,2007,36.8
+Paraguay,PRY,Gini index,SI.POV.GINI,2007,53.0
+West Bank and Gaza,PSE,Gini index,SI.POV.GINI,2007,35.6
+Romania,ROU,Gini index,SI.POV.GINI,2007,37.5
+El Salvador,SLV,Gini index,SI.POV.GINI,2007,45.2
+Slovak Republic,SVK,Gini index,SI.POV.GINI,2007,24.7
+Slovenia,SVN,Gini index,SI.POV.GINI,2007,24.4
+Sweden,SWE,Gini index,SI.POV.GINI,2007,27.1
+Thailand,THA,Gini index,SI.POV.GINI,2007,39.8
+Tajikistan,TJK,Gini index,SI.POV.GINI,2007,32.2
+Timor-Leste,TLS,Gini index,SI.POV.GINI,2007,27.8
+Tanzania,TZA,Gini index,SI.POV.GINI,2007,40.3
+Ukraine,UKR,Gini index,SI.POV.GINI,2007,27.0
+Uruguay,URY,Gini index,SI.POV.GINI,2007,46.4
+United States,USA,Gini index,SI.POV.GINI,2007,40.8
+Angola,AGO,Gini index,SI.POV.GINI,2008,42.7
+Albania,ALB,Gini index,SI.POV.GINI,2008,30.0
+Argentina,ARG,Gini index,SI.POV.GINI,2008,45.0
+Armenia,ARM,Gini index,SI.POV.GINI,2008,29.2
+Australia,AUS,Gini index,SI.POV.GINI,2008,35.4
+Austria,AUT,Gini index,SI.POV.GINI,2008,30.4
+Belgium,BEL,Gini index,SI.POV.GINI,2008,28.4
+Bulgaria,BGR,Gini index,SI.POV.GINI,2008,33.6
+Belarus,BLR,Gini index,SI.POV.GINI,2008,27.8
+Bolivia,BOL,Gini index,SI.POV.GINI,2008,50.8
+Brazil,BRA,Gini index,SI.POV.GINI,2008,54.0
+Central African Republic,CAF,Gini index,SI.POV.GINI,2008,56.2
+Canada,CAN,Gini index,SI.POV.GINI,2008,33.9
+Switzerland,CHE,Gini index,SI.POV.GINI,2008,33.8
+China,CHN,Gini index,SI.POV.GINI,2008,43.0
+Cote d'Ivoire,CIV,Gini index,SI.POV.GINI,2008,43.2
+Colombia,COL,Gini index,SI.POV.GINI,2008,55.3
+Costa Rica,CRI,Gini index,SI.POV.GINI,2008,48.6
+Cyprus,CYP,Gini index,SI.POV.GINI,2008,31.7
+Czechia,CZE,Gini index,SI.POV.GINI,2008,26.3
+Germany,DEU,Gini index,SI.POV.GINI,2008,30.8
+Denmark,DNK,Gini index,SI.POV.GINI,2008,25.2
+Dominican Republic,DOM,Gini index,SI.POV.GINI,2008,48.1
+Ecuador,ECU,Gini index,SI.POV.GINI,2008,49.8
+Egypt, Arab Rep.,Gini index,SI.POV.GINI,2008,31.1
+Spain,ESP,Gini index,SI.POV.GINI,2008,34.2
+Estonia,EST,Gini index,SI.POV.GINI,2008,31.9
+Finland,FIN,Gini index,SI.POV.GINI,2008,27.8
+Fiji,FJI,Gini index,SI.POV.GINI,2008,40.4
+France,FRA,Gini index,SI.POV.GINI,2008,33.0
+United Kingdom,GBR,Gini index,SI.POV.GINI,2008,35.4
+Georgia,GEO,Gini index,SI.POV.GINI,2008,38.5
+Greece,GRC,Gini index,SI.POV.GINI,2008,33.6
+Honduras,HND,Gini index,SI.POV.GINI,2008,55.5
+Hungary,HUN,Gini index,SI.POV.GINI,2008,27.5
+Indonesia,IDN,Gini index,SI.POV.GINI,2008,32.6
+Ireland,IRL,Gini index,SI.POV.GINI,2008,30.9
+Iceland,ISL,Gini index,SI.POV.GINI,2008,31.8
+Israel,ISR,Gini index,SI.POV.GINI,2008,41.6
+Italy,ITA,Gini index,SI.POV.GINI,2008,33.8
+Jordan,JOR,Gini index,SI.POV.GINI,2008,32.6
+Japan,JPN,Gini index,SI.POV.GINI,2008,34.8
+Kazakhstan,KAZ,Gini index,SI.POV.GINI,2008,28.5
+Kyrgyz Republic,KGZ,Gini index,SI.POV.GINI,2008,31.5
+Korea, Rep.,Gini index,SI.POV.GINI,2008,32.3
+Lithuania,LTU,Gini index,SI.POV.GINI,2008,35.7
+Luxembourg,LUX,Gini index,SI.POV.GINI,2008,32.6
+Latvia,LVA,Gini index,SI.POV.GINI,2008,37.2
+Moldova,MDA,Gini index,SI.POV.GINI,2008,34.7
+Mexico,MEX,Gini index,SI.POV.GINI,2008,50.8
+Malta,MLT,Gini index,SI.POV.GINI,2008,29.0
+Mozambique,MOZ,Gini index,SI.POV.GINI,2008,45.5
+Mauritania,MRT,Gini index,SI.POV.GINI,2008,35.7
+Malaysia,MYS,Gini index,SI.POV.GINI,2008,45.5
+Netherlands,NLD,Gini index,SI.POV.GINI,2008,29.3
+Norway,NOR,Gini index,SI.POV.GINI,2008,27.0
+Panama,PAN,Gini index,SI.POV.GINI,2008,52.7
+Peru,PER,Gini index,SI.POV.GINI,2008,47.5
+Poland,POL,Gini index,SI.POV.GINI,2008,33.5
+Portugal,PRT,Gini index,SI.POV.GINI,2008,36.6
+Paraguay,PRY,Gini index,SI.POV.GINI,2008,50.7
+Romania,ROU,Gini index,SI.POV.GINI,2008,36.4
+El Salvador,SLV,Gini index,SI.POV.GINI,2008,46.9
+Slovak Republic,SVK,Gini index,SI.POV.GINI,2008,26.0
+Slovenia,SVN,Gini index,SI.POV.GINI,2008,23.7
+Sweden,SWE,Gini index,SI.POV.GINI,2008,28.1
+Thailand,THA,Gini index,SI.POV.GINI,2008,40.3
+Ukraine,UKR,Gini index,SI.POV.GINI,2008,26.6
+Uruguay,URY,Gini index,SI.POV.GINI,2008,45.1
+United States,USA,Gini index,SI.POV.GINI,2008,40.8
+Viet Nam,VNM,Gini index,SI.POV.GINI,2008,35.6
+Samoa,WSM,Gini index,SI.POV.GINI,2008,42.0
+South Africa,ZAF,Gini index,SI.POV.GINI,2008,63.0
+Argentina,ARG,Gini index,SI.POV.GINI,2009,43.8
+Armenia,ARM,Gini index,SI.POV.GINI,2009,28.0
+Austria,AUT,Gini index,SI.POV.GINI,2009,31.5
+Belgium,BEL,Gini index,SI.POV.GINI,2009,28.6
+Burkina Faso,BFA,Gini index,SI.POV.GINI,2009,39.8
+Bulgaria,BGR,Gini index,SI.POV.GINI,2009,33.8
+Belarus,BLR,Gini index,SI.POV.GINI,2009,27.7
+Bolivia,BOL,Gini index,SI.POV.GINI,2009,49.2
+Brazil,BRA,Gini index,SI.POV.GINI,2009,53.7
+Botswana,BWA,Gini index,SI.POV.GINI,2009,60.5
+Canada,CAN,Gini index,SI.POV.GINI,2009,34.0
+Switzerland,CHE,Gini index,SI.POV.GINI,2009,32.9
+Chile,CHL,Gini index,SI.POV.GINI,2009,47.4
+Colombia,COL,Gini index,SI.POV.GINI,2009,54.3
+Costa Rica,CRI,Gini index,SI.POV.GINI,2009,50.6
+Cyprus,CYP,Gini index,SI.POV.GINI,2009,32.1
+Czechia,CZE,Gini index,SI.POV.GINI,2009,26.2
+Germany,DEU,Gini index,SI.POV.GINI,2009,30.5
+Denmark,DNK,Gini index,SI.POV.GINI,2009,26.7
+Dominican Republic,DOM,Gini index,SI.POV.GINI,2009,48.9
+Ecuador,ECU,Gini index,SI.POV.GINI,2009,48.5
+Spain,ESP,Gini index,SI.POV.GINI,2009,34.9
+Estonia,EST,Gini index,SI.POV.GINI,2009,31.4
+Finland,FIN,Gini index,SI.POV.GINI,2009,27.5
+France,FRA,Gini index,SI.POV.GINI,2009,32.7
+United Kingdom,GBR,Gini index,SI.POV.GINI,2009,35.1
+Georgia,GEO,Gini index,SI.POV.GINI,2009,38.2
+Greece,GRC,Gini index,SI.POV.GINI,2009,33.6
+Honduras,HND,Gini index,SI.POV.GINI,2009,51.3
+Croatia,HRV,Gini index,SI.POV.GINI,2009,32.6
+Hungary,HUN,Gini index,SI.POV.GINI,2009,27.0
+Indonesia,IDN,Gini index,SI.POV.GINI,2009,33.4
+India,IND,Gini index,SI.POV.GINI,2009,34.9
+Ireland,IRL,Gini index,SI.POV.GINI,2009,32.7
+Iran, Islamic Rep.,Gini index,SI.POV.GINI,2009,42.1
+Iceland,ISL,Gini index,SI.POV.GINI,2009,28.7
+Israel,ISR,Gini index,SI.POV.GINI,2009,42.6
+Italy,ITA,Gini index,SI.POV.GINI,2009,33.8
+Kazakhstan,KAZ,Gini index,SI.POV.GINI,2009,28.2
+Kyrgyz Republic,KGZ,Gini index,SI.POV.GINI,2009,29.9
+Sri Lanka,LKA,Gini index,SI.POV.GINI,2009,36.1
+Lithuania,LTU,Gini index,SI.POV.GINI,2009,37.2
+Luxembourg,LUX,Gini index,SI.POV.GINI,2009,31.2
+Latvia,LVA,Gini index,SI.POV.GINI,2009,35.9
+Moldova,MDA,Gini index,SI.POV.GINI,2009,32.9
+Maldives,MDV,Gini index,SI.POV.GINI,2009,38.4
+North Macedonia,MKD,Gini index,SI.POV.GINI,2009,42.8
+Mali,MLI,Gini index,SI.POV.GINI,2009,33.0
+Malta,MLT,Gini index,SI.POV.GINI,2009,30.2
+Namibia,NAM,Gini index,SI.POV.GINI,2009,61.0
+Nicaragua,NIC,Gini index,SI.POV.GINI,2009,43.9
+Netherlands,NLD,Gini index,SI.POV.GINI,2009,27.9
+Norway,NOR,Gini index,SI.POV.GINI,2009,26.2
+Panama,PAN,Gini index,SI.POV.GINI,2009,51.8
+Peru,PER,Gini index,SI.POV.GINI,2009,47.0
+Philippines,PHL,Gini index,SI.POV.GINI,2009,46.3
+Papua New Guinea,PNG,Gini index,SI.POV.GINI,2009,41.9
+Poland,POL,Gini index,SI.POV.GINI,2009,33.4
+Portugal,PRT,Gini index,SI.POV.GINI,2009,34.9
+Paraguay,PRY,Gini index,SI.POV.GINI,2009,49.1
+West Bank and Gaza,PSE,Gini index,SI.POV.GINI,2009,34.5
+Romania,ROU,Gini index,SI.POV.GINI,2009,35.6
+Sudan,SDN,Gini index,SI.POV.GINI,2009,35.4
+El Salvador,SLV,Gini index,SI.POV.GINI,2009,45.8
+South Sudan,SSD,Gini index,SI.POV.GINI,2009,46.3
+Slovak Republic,SVK,Gini index,SI.POV.GINI,2009,27.2
+Slovenia,SVN,Gini index,SI.POV.GINI,2009,24.8
+Sweden,SWE,Gini index,SI.POV.GINI,2009,27.3
+Eswatini,SWZ,Gini index,SI.POV.GINI,2009,51.4
+Syrian Arab Republic,SYR,Gini index,SI.POV.GINI,2009,40.4
+Thailand,THA,Gini index,SI.POV.GINI,2009,39.6
+Tajikistan,TJK,Gini index,SI.POV.GINI,2009,30.8
+Tonga,TON,Gini index,SI.POV.GINI,2009,37.5
+Uganda,UGA,Gini index,SI.POV.GINI,2009,44.2
+Ukraine,UKR,Gini index,SI.POV.GINI,2009,25.3
+Uruguay,URY,Gini index,SI.POV.GINI,2009,45.5
+United States,USA,Gini index,SI.POV.GINI,2009,40.6
+Kosovo,XKX,Gini index,SI.POV.GINI,2009,31.8
+Argentina,ARG,Gini index,SI.POV.GINI,2010,43.7
+Armenia,ARM,Gini index,SI.POV.GINI,2010,30.0
+Australia,AUS,Gini index,SI.POV.GINI,2010,34.7
+Austria,AUT,Gini index,SI.POV.GINI,2010,30.3
+Belgium,BEL,Gini index,SI.POV.GINI,2010,28.4
+Bangladesh,BGD,Gini index,SI.POV.GINI,2010,32.1
+Bulgaria,BGR,Gini index,SI.POV.GINI,2010,35.7
+Belarus,BLR,Gini index,SI.POV.GINI,2010,28.6
+Canada,CAN,Gini index,SI.POV.GINI,2010,33.6
+Switzerland,CHE,Gini index,SI.POV.GINI,2010,32.6
+China,CHN,Gini index,SI.POV.GINI,2010,43.7
+Colombia,COL,Gini index,SI.POV.GINI,2010,54.6
+Costa Rica,CRI,Gini index,SI.POV.GINI,2010,48.0
+Cyprus,CYP,Gini index,SI.POV.GINI,2010,31.5
+Czechia,CZE,Gini index,SI.POV.GINI,2010,26.6
+Germany,DEU,Gini index,SI.POV.GINI,2010,30.2
+Denmark,DNK,Gini index,SI.POV.GINI,2010,27.2
+Dominican Republic,DOM,Gini index,SI.POV.GINI,2010,47.3
+Ecuador,ECU,Gini index,SI.POV.GINI,2010,48.8
+Egypt, Arab Rep.,Gini index,SI.POV.GINI,2010,30.2
+Spain,ESP,Gini index,SI.POV.GINI,2010,35.2
+Estonia,EST,Gini index,SI.POV.GINI,2010,32.0
+Ethiopia,ETH,Gini index,SI.POV.GINI,2010,33.2
+Finland,FIN,Gini index,SI.POV.GINI,2010,27.7
+France,FRA,Gini index,SI.POV.GINI,2010,33.7
+United Kingdom,GBR,Gini index,SI.POV.GINI,2010,33.7
+Georgia,GEO,Gini index,SI.POV.GINI,2010,39.5
+Gambia, The,Gini index,SI.POV.GINI,2010,43.6
+Guinea-Bissau,GNB,Gini index,SI.POV.GINI,2010,50.6
+Greece,GRC,Gini index,SI.POV.GINI,2010,34.1
+Honduras,HND,Gini index,SI.POV.GINI,2010,53.1
+Croatia,HRV,Gini index,SI.POV.GINI,2010,32.4
+Hungary,HUN,Gini index,SI.POV.GINI,2010,29.4
+Indonesia,IDN,Gini index,SI.POV.GINI,2010,34.6
+Ireland,IRL,Gini index,SI.POV.GINI,2010,32.3
+Iceland,ISL,Gini index,SI.POV.GINI,2010,26.2
+Israel,ISR,Gini index,SI.POV.GINI,2010,42.6
+Italy,ITA,Gini index,SI.POV.GINI,2010,34.7
+Jordan,JOR,Gini index,SI.POV.GINI,2010,33.7
+Japan,JPN,Gini index,SI.POV.GINI,2010,32.1
+Kazakhstan,KAZ,Gini index,SI.POV.GINI,2010,28.0
+Kyrgyz Republic,KGZ,Gini index,SI.POV.GINI,2010,30.1
+Korea, Rep.,Gini index,SI.POV.GINI,2010,32.0
+Lithuania,LTU,Gini index,SI.POV.GINI,2010,33.6
+Luxembourg,LUX,Gini index,SI.POV.GINI,2010,30.5
+Latvia,LVA,Gini index,SI.POV.GINI,2010,35.0
+Moldova,MDA,Gini index,SI.POV.GINI,2010,32.1
+Madagascar,MDG,Gini index,SI.POV.GINI,2010,42.4
+Mexico,MEX,Gini index,SI.POV.GINI,2010,47.7
+North Macedonia,MKD,Gini index,SI.POV.GINI,2010,40.1
+Malta,MLT,Gini index,SI.POV.GINI,2010,29.0
+Mongolia,MNG,Gini index,SI.POV.GINI,2010,33.1
+Malawi,MWI,Gini index,SI.POV.GINI,2010,45.5
+Nigeria,NGA,Gini index,SI.POV.GINI,2010,35.7
+Netherlands,NLD,Gini index,SI.POV.GINI,2010,27.8
+Norway,NOR,Gini index,SI.POV.GINI,2010,25.7
+Nepal,NPL,Gini index,SI.POV.GINI,2010,32.8
+Pakistan,PAK,Gini index,SI.POV.GINI,2010,28.8
+Panama,PAN,Gini index,SI.POV.GINI,2010,51.6
+Peru,PER,Gini index,SI.POV.GINI,2010,45.5
+Poland,POL,Gini index,SI.POV.GINI,2010,33.2
+Portugal,PRT,Gini index,SI.POV.GINI,2010,35.8
+Paraguay,PRY,Gini index,SI.POV.GINI,2010,51.0
+West Bank and Gaza,PSE,Gini index,SI.POV.GINI,2010,35.3
+Romania,ROU,Gini index,SI.POV.GINI,2010,35.5
+Rwanda,RWA,Gini index,SI.POV.GINI,2010,47.2
+El Salvador,SLV,Gini index,SI.POV.GINI,2010,43.5
+Sao Tome and Principe,STP,Gini index,SI.POV.GINI,2010,30.8
+Slovak Republic,SVK,Gini index,SI.POV.GINI,2010,27.3
+Slovenia,SVN,Gini index,SI.POV.GINI,2010,24.9
+Sweden,SWE,Gini index,SI.POV.GINI,2010,27.7
+Thailand,THA,Gini index,SI.POV.GINI,2010,39.4
+Tunisia,TUN,Gini index,SI.POV.GINI,2010,35.8
+Tuvalu,TUV,Gini index,SI.POV.GINI,2010,39.1
+Ukraine,UKR,Gini index,SI.POV.GINI,2010,24.8
+Uruguay,URY,Gini index,SI.POV.GINI,2010,44.5
+United States,USA,Gini index,SI.POV.GINI,2010,40.0
+Viet Nam,VNM,Gini index,SI.POV.GINI,2010,39.3
+Vanuatu,VUT,Gini index,SI.POV.GINI,2010,37.4
+Kosovo,XKX,Gini index,SI.POV.GINI,2010,33.3
+South Africa,ZAF,Gini index,SI.POV.GINI,2010,63.4
+Zambia,ZMB,Gini index,SI.POV.GINI,2010,52.0
+Argentina,ARG,Gini index,SI.POV.GINI,2011,42.7
+Armenia,ARM,Gini index,SI.POV.GINI,2011,29.4
+Austria,AUT,Gini index,SI.POV.GINI,2011,30.8
+Belgium,BEL,Gini index,SI.POV.GINI,2011,28.1
+Benin,BEN,Gini index,SI.POV.GINI,2011,43.4
+Bulgaria,BGR,Gini index,SI.POV.GINI,2011,34.3
+Bosnia and Herzegovina,BIH,Gini index,SI.POV.GINI,2011,33.0
+Belarus,BLR,Gini index,SI.POV.GINI,2011,27.2
+Bolivia,BOL,Gini index,SI.POV.GINI,2011,46.1
+Brazil,BRA,Gini index,SI.POV.GINI,2011,52.9
+Canada,CAN,Gini index,SI.POV.GINI,2011,32.7
+Switzerland,CHE,Gini index,SI.POV.GINI,2011,31.7
+Chile,CHL,Gini index,SI.POV.GINI,2011,46.9
+China,CHN,Gini index,SI.POV.GINI,2011,42.4
+Congo, Rep.,Gini index,SI.POV.GINI,2011,48.9
+Colombia,COL,Gini index,SI.POV.GINI,2011,53.5
+Costa Rica,CRI,Gini index,SI.POV.GINI,2011,48.8
+Cyprus,CYP,Gini index,SI.POV.GINI,2011,32.6
+Czechia,CZE,Gini index,SI.POV.GINI,2011,26.4
+Germany,DEU,Gini index,SI.POV.GINI,2011,30.6
+Denmark,DNK,Gini index,SI.POV.GINI,2011,27.3
+Dominican Republic,DOM,Gini index,SI.POV.GINI,2011,47.7
+Algeria,DZA,Gini index,SI.POV.GINI,2011,27.6
+Ecuador,ECU,Gini index,SI.POV.GINI,2011,45.9
+Spain,ESP,Gini index,SI.POV.GINI,2011,35.7
+Estonia,EST,Gini index,SI.POV.GINI,2011,32.5
+Finland,FIN,Gini index,SI.POV.GINI,2011,27.6
+France,FRA,Gini index,SI.POV.GINI,2011,33.3
+United Kingdom,GBR,Gini index,SI.POV.GINI,2011,33.2
+Georgia,GEO,Gini index,SI.POV.GINI,2011,39.6
+Greece,GRC,Gini index,SI.POV.GINI,2011,34.8
+Honduras,HND,Gini index,SI.POV.GINI,2011,52.6
+Croatia,HRV,Gini index,SI.POV.GINI,2011,32.3
+Hungary,HUN,Gini index,SI.POV.GINI,2011,29.2
+Indonesia,IDN,Gini index,SI.POV.GINI,2011,37.9
+India,IND,Gini index,SI.POV.GINI,2011,35.4
+Ireland,IRL,Gini index,SI.POV.GINI,2011,32.9
+Iran, Islamic Rep.,Gini index,SI.POV.GINI,2011,34.7
+Iceland,ISL,Gini index,SI.POV.GINI,2011,26.8
+Israel,ISR,Gini index,SI.POV.GINI,2011,41.4
+Italy,ITA,Gini index,SI.POV.GINI,2011,35.1
+Kazakhstan,KAZ,Gini index,SI.POV.GINI,2011,28.0
+Kyrgyz Republic,KGZ,Gini index,SI.POV.GINI,2011,27.8
+Lebanon,LBN,Gini index,SI.POV.GINI,2011,31.8
+Lithuania,LTU,Gini index,SI.POV.GINI,2011,32.5
+Luxembourg,LUX,Gini index,SI.POV.GINI,2011,32.1
+Latvia,LVA,Gini index,SI.POV.GINI,2011,35.8
+Moldova,MDA,Gini index,SI.POV.GINI,2011,30.6
+North Macedonia,MKD,Gini index,SI.POV.GINI,2011,39.4
+Malta,MLT,Gini index,SI.POV.GINI,2011,29.1
+Mongolia,MNG,Gini index,SI.POV.GINI,2011,33.9
+Malaysia,MYS,Gini index,SI.POV.GINI,2011,43.9
+Niger,NER,Gini index,SI.POV.GINI,2011,31.5
+Netherlands,NLD,Gini index,SI.POV.GINI,2011,27.8
+Norway,NOR,Gini index,SI.POV.GINI,2011,25.3
+Pakistan,PAK,Gini index,SI.POV.GINI,2011,29.7
+Panama,PAN,Gini index,SI.POV.GINI,2011,51.3
+Peru,PER,Gini index,SI.POV.GINI,2011,44.7
+Poland,POL,Gini index,SI.POV.GINI,2011,33.2
+Portugal,PRT,Gini index,SI.POV.GINI,2011,36.3
+Paraguay,PRY,Gini index,SI.POV.GINI,2011,52.3
+West Bank and Gaza,PSE,Gini index,SI.POV.GINI,2011,34.4
+Romania,ROU,Gini index,SI.POV.GINI,2011,35.9
+Senegal,SEN,Gini index,SI.POV.GINI,2011,40.3
+Sierra Leone,SLE,Gini index,SI.POV.GINI,2011,34.0
+El Salvador,SLV,Gini index,SI.POV.GINI,2011,42.3
+Slovak Republic,SVK,Gini index,SI.POV.GINI,2011,26.5
+Slovenia,SVN,Gini index,SI.POV.GINI,2011,24.9
+Sweden,SWE,Gini index,SI.POV.GINI,2011,27.6
+Chad,TCD,Gini index,SI.POV.GINI,2011,43.3
+Togo,TGO,Gini index,SI.POV.GINI,2011,46.0
+Thailand,THA,Gini index,SI.POV.GINI,2011,37.5
+Tanzania,TZA,Gini index,SI.POV.GINI,2011,37.8
+Ukraine,UKR,Gini index,SI.POV.GINI,2011,24.6
+Uruguay,URY,Gini index,SI.POV.GINI,2011,42.2
+United States,USA,Gini index,SI.POV.GINI,2011,40.9
+Kosovo,XKX,Gini index,SI.POV.GINI,2011,27.8
+Zimbabwe,ZWE,Gini index,SI.POV.GINI,2011,43.2
+Albania,ALB,Gini index,SI.POV.GINI,2012,29.0
+Argentina,ARG,Gini index,SI.POV.GINI,2012,41.4
+Armenia,ARM,Gini index,SI.POV.GINI,2012,29.6
+Austria,AUT,Gini index,SI.POV.GINI,2012,30.5
+Belgium,BEL,Gini index,SI.POV.GINI,2012,27.5
+Bulgaria,BGR,Gini index,SI.POV.GINI,2012,36.0
+Belarus,BLR,Gini index,SI.POV.GINI,2012,26.5
+Bolivia,BOL,Gini index,SI.POV.GINI,2012,46.6
+Brazil,BRA,Gini index,SI.POV.GINI,2012,53.4
+Bhutan,BTN,Gini index,SI.POV.GINI,2012,38.8
+Canada,CAN,Gini index,SI.POV.GINI,2012,33.5
+Switzerland,CHE,Gini index,SI.POV.GINI,2012,31.6
+China,CHN,Gini index,SI.POV.GINI,2012,42.2
+Congo, Dem. Rep.,Gini index,SI.POV.GINI,2012,42.1
+Colombia,COL,Gini index,SI.POV.GINI,2012,52.6
+Costa Rica,CRI,Gini index,SI.POV.GINI,2012,48.4
+Cyprus,CYP,Gini index,SI.POV.GINI,2012,34.3
+Czechia,CZE,Gini index,SI.POV.GINI,2012,26.1
+Germany,DEU,Gini index,SI.POV.GINI,2012,31.1
+Djibouti,DJI,Gini index,SI.POV.GINI,2012,45.1
+Denmark,DNK,Gini index,SI.POV.GINI,2012,27.8
+Dominican Republic,DOM,Gini index,SI.POV.GINI,2012,46.1
+Ecuador,ECU,Gini index,SI.POV.GINI,2012,46.1
+Egypt, Arab Rep.,Gini index,SI.POV.GINI,2012,28.3
+Spain,ESP,Gini index,SI.POV.GINI,2012,35.4
+Estonia,EST,Gini index,SI.POV.GINI,2012,32.9
+Finland,FIN,Gini index,SI.POV.GINI,2012,27.1
+France,FRA,Gini index,SI.POV.GINI,2012,33.1
+United Kingdom,GBR,Gini index,SI.POV.GINI,2012,33.1
+Georgia,GEO,Gini index,SI.POV.GINI,2012,39.0
+Ghana,GHA,Gini index,SI.POV.GINI,2012,42.4
+Guinea,GIN,Gini index,SI.POV.GINI,2012,33.7
+Greece,GRC,Gini index,SI.POV.GINI,2012,36.3
+Honduras,HND,Gini index,SI.POV.GINI,2012,53.4
+Croatia,HRV,Gini index,SI.POV.GINI,2012,32.5
+Haiti,HTI,Gini index,SI.POV.GINI,2012,41.1
+Hungary,HUN,Gini index,SI.POV.GINI,2012,30.8
+Indonesia,IDN,Gini index,SI.POV.GINI,2012,37.1
+Ireland,IRL,Gini index,SI.POV.GINI,2012,33.2
+Iran, Islamic Rep.,Gini index,SI.POV.GINI,2012,34.4
+Iraq,IRQ,Gini index,SI.POV.GINI,2012,29.5
+Iceland,ISL,Gini index,SI.POV.GINI,2012,26.8
+Israel,ISR,Gini index,SI.POV.GINI,2012,41.3
+Italy,ITA,Gini index,SI.POV.GINI,2012,35.2
+Kazakhstan,KAZ,Gini index,SI.POV.GINI,2012,28.2
+Kyrgyz Republic,KGZ,Gini index,SI.POV.GINI,2012,27.4
+Korea, Rep.,Gini index,SI.POV.GINI,2012,31.6
+Lao PDR,LAO,Gini index,SI.POV.GINI,2012,36.0
+Sri Lanka,LKA,Gini index,SI.POV.GINI,2012,38.7
+Lithuania,LTU,Gini index,SI.POV.GINI,2012,35.1
+Luxembourg,LUX,Gini index,SI.POV.GINI,2012,34.3
+Latvia,LVA,Gini index,SI.POV.GINI,2012,35.2
+Moldova,MDA,Gini index,SI.POV.GINI,2012,29.2
+Madagascar,MDG,Gini index,SI.POV.GINI,2012,42.6
+Mexico,MEX,Gini index,SI.POV.GINI,2012,49.6
+North Macedonia,MKD,Gini index,SI.POV.GINI,2012,38.1
+Malta,MLT,Gini index,SI.POV.GINI,2012,29.4
+Montenegro,MNE,Gini index,SI.POV.GINI,2012,41.2
+Mongolia,MNG,Gini index,SI.POV.GINI,2012,33.8
+Mauritius,MUS,Gini index,SI.POV.GINI,2012,38.5
+Nigeria,NGA,Gini index,SI.POV.GINI,2012,35.5
+Netherlands,NLD,Gini index,SI.POV.GINI,2012,27.6
+Norway,NOR,Gini index,SI.POV.GINI,2012,25.7
+Nauru,NRU,Gini index,SI.POV.GINI,2012,32.4
+Panama,PAN,Gini index,SI.POV.GINI,2012,51.7
+Peru,PER,Gini index,SI.POV.GINI,2012,44.4
+Philippines,PHL,Gini index,SI.POV.GINI,2012,46.5
+Poland,POL,Gini index,SI.POV.GINI,2012,33.0
+Portugal,PRT,Gini index,SI.POV.GINI,2012,36.0
+Paraguay,PRY,Gini index,SI.POV.GINI,2012,47.6
+Romania,ROU,Gini index,SI.POV.GINI,2012,36.5
+Solomon Islands,SLB,Gini index,SI.POV.GINI,2012,37.1
+El Salvador,SLV,Gini index,SI.POV.GINI,2012,41.8
+Serbia,SRB,Gini index,SI.POV.GINI,2012,39.9
+Slovak Republic,SVK,Gini index,SI.POV.GINI,2012,26.1
+Slovenia,SVN,Gini index,SI.POV.GINI,2012,25.6
+Sweden,SWE,Gini index,SI.POV.GINI,2012,27.6
+Thailand,THA,Gini index,SI.POV.GINI,2012,39.3
+Uganda,UGA,Gini index,SI.POV.GINI,2012,41.0
+Ukraine,UKR,Gini index,SI.POV.GINI,2012,24.7
+Uruguay,URY,Gini index,SI.POV.GINI,2012,39.9
+United States,USA,Gini index,SI.POV.GINI,2012,40.9
+Viet Nam,VNM,Gini index,SI.POV.GINI,2012,35.6
+Kosovo,XKX,Gini index,SI.POV.GINI,2012,29.0
+United Arab Emirates,ARE,Gini index,SI.POV.GINI,2013,32.5
+Argentina,ARG,Gini index,SI.POV.GINI,2013,41.1
+Armenia,ARM,Gini index,SI.POV.GINI,2013,30.6
+Austria,AUT,Gini index,SI.POV.GINI,2013,30.8
+Burundi,BDI,Gini index,SI.POV.GINI,2013,38.6
+Belgium,BEL,Gini index,SI.POV.GINI,2013,27.7
+Bulgaria,BGR,Gini index,SI.POV.GINI,2013,36.6
+Belarus,BLR,Gini index,SI.POV.GINI,2013,26.6
+Bolivia,BOL,Gini index,SI.POV.GINI,2013,47.6
+Brazil,BRA,Gini index,SI.POV.GINI,2013,52.7
+Canada,CAN,Gini index,SI.POV.GINI,2013,33.8
+Switzerland,CHE,Gini index,SI.POV.GINI,2013,32.5
+Chile,CHL,Gini index,SI.POV.GINI,2013,46.8
+China,CHN,Gini index,SI.POV.GINI,2013,39.7
+Colombia,COL,Gini index,SI.POV.GINI,2013,52.6
+Costa Rica,CRI,Gini index,SI.POV.GINI,2013,49.2
+Cyprus,CYP,Gini index,SI.POV.GINI,2013,37.0
+Czechia,CZE,Gini index,SI.POV.GINI,2013,26.5
+Germany,DEU,Gini index,SI.POV.GINI,2013,31.5
+Djibouti,DJI,Gini index,SI.POV.GINI,2013,44.1
+Denmark,DNK,Gini index,SI.POV.GINI,2013,28.5
+Dominican Republic,DOM,Gini index,SI.POV.GINI,2013,47.7
+Ecuador,ECU,Gini index,SI.POV.GINI,2013,46.9
+Spain,ESP,Gini index,SI.POV.GINI,2013,36.2
+Estonia,EST,Gini index,SI.POV.GINI,2013,35.1
+Finland,FIN,Gini index,SI.POV.GINI,2013,27.2
+Fiji,FJI,Gini index,SI.POV.GINI,2013,36.7
+France,FRA,Gini index,SI.POV.GINI,2013,32.5
+Micronesia, Fed. Sts.,Gini index,SI.POV.GINI,2013,40.1
+United Kingdom,GBR,Gini index,SI.POV.GINI,2013,32.7
+Georgia,GEO,Gini index,SI.POV.GINI,2013,38.6
+Greece,GRC,Gini index,SI.POV.GINI,2013,36.1
+Honduras,HND,Gini index,SI.POV.GINI,2013,50.0
+Croatia,HRV,Gini index,SI.POV.GINI,2013,32.0
+Hungary,HUN,Gini index,SI.POV.GINI,2013,31.5
+Indonesia,IDN,Gini index,SI.POV.GINI,2013,38.9
+Ireland,IRL,Gini index,SI.POV.GINI,2013,33.5
+Iran, Islamic Rep.,Gini index,SI.POV.GINI,2013,34.0
+Iceland,ISL,Gini index,SI.POV.GINI,2013,25.4
+Israel,ISR,Gini index,SI.POV.GINI,2013,39.9
+Italy,ITA,Gini index,SI.POV.GINI,2013,34.9
+Japan,JPN,Gini index,SI.POV.GINI,2013,32.9
+Kazakhstan,KAZ,Gini index,SI.POV.GINI,2013,27.1
+Kyrgyz Republic,KGZ,Gini index,SI.POV.GINI,2013,28.8
+Lithuania,LTU,Gini index,SI.POV.GINI,2013,35.3
+Luxembourg,LUX,Gini index,SI.POV.GINI,2013,32.0
+Latvia,LVA,Gini index,SI.POV.GINI,2013,35.5
+Morocco,MAR,Gini index,SI.POV.GINI,2013,39.5
+Moldova,MDA,Gini index,SI.POV.GINI,2013,28.5
+North Macedonia,MKD,Gini index,SI.POV.GINI,2013,36.2
+Malta,MLT,Gini index,SI.POV.GINI,2013,28.8
+Montenegro,MNE,Gini index,SI.POV.GINI,2013,39.0
+Malaysia,MYS,Gini index,SI.POV.GINI,2013,41.3
+Netherlands,NLD,Gini index,SI.POV.GINI,2013,28.1
+Norway,NOR,Gini index,SI.POV.GINI,2013,26.4
+Pakistan,PAK,Gini index,SI.POV.GINI,2013,29.5
+Panama,PAN,Gini index,SI.POV.GINI,2013,51.5
+Peru,PER,Gini index,SI.POV.GINI,2013,43.9
+Poland,POL,Gini index,SI.POV.GINI,2013,33.1
+Portugal,PRT,Gini index,SI.POV.GINI,2013,36.2
+Paraguay,PRY,Gini index,SI.POV.GINI,2013,47.9
+Romania,ROU,Gini index,SI.POV.GINI,2013,36.9
+Rwanda,RWA,Gini index,SI.POV.GINI,2013,45.1
+El Salvador,SLV,Gini index,SI.POV.GINI,2013,43.4
+Serbia,SRB,Gini index,SI.POV.GINI,2013,39.4
+Slovak Republic,SVK,Gini index,SI.POV.GINI,2013,28.1
+Slovenia,SVN,Gini index,SI.POV.GINI,2013,26.2
+Sweden,SWE,Gini index,SI.POV.GINI,2013,28.8
+Seychelles,SYC,Gini index,SI.POV.GINI,2013,46.8
+Thailand,THA,Gini index,SI.POV.GINI,2013,37.8
+Ukraine,UKR,Gini index,SI.POV.GINI,2013,24.6
+Uruguay,URY,Gini index,SI.POV.GINI,2013,40.5
+United States,USA,Gini index,SI.POV.GINI,2013,40.6
+Samoa,WSM,Gini index,SI.POV.GINI,2013,38.7
+Kosovo,XKX,Gini index,SI.POV.GINI,2013,26.3
+Albania,ALB,Gini index,SI.POV.GINI,2014,34.6
+Argentina,ARG,Gini index,SI.POV.GINI,2014,41.8
+Armenia,ARM,Gini index,SI.POV.GINI,2014,31.5
+Australia,AUS,Gini index,SI.POV.GINI,2014,34.4
+Austria,AUT,Gini index,SI.POV.GINI,2014,30.5
+Belgium,BEL,Gini index,SI.POV.GINI,2014,28.1
+Burkina Faso,BFA,Gini index,SI.POV.GINI,2014,35.3
+Bulgaria,BGR,Gini index,SI.POV.GINI,2014,37.4
+Belarus,BLR,Gini index,SI.POV.GINI,2014,27.2
+Bolivia,BOL,Gini index,SI.POV.GINI,2014,47.8
+Brazil,BRA,Gini index,SI.POV.GINI,2014,52.0
+Canada,CAN,Gini index,SI.POV.GINI,2014,33.2
+Switzerland,CHE,Gini index,SI.POV.GINI,2014,32.5
+China,CHN,Gini index,SI.POV.GINI,2014,39.2
+Cameroon,CMR,Gini index,SI.POV.GINI,2014,46.6
+Colombia,COL,Gini index,SI.POV.GINI,2014,52.5
+Comoros,COM,Gini index,SI.POV.GINI,2014,45.3
+Costa Rica,CRI,Gini index,SI.POV.GINI,2014,48.6
+Cyprus,CYP,Gini index,SI.POV.GINI,2014,35.6
+Czechia,CZE,Gini index,SI.POV.GINI,2014,25.9
+Germany,DEU,Gini index,SI.POV.GINI,2014,30.8
+Denmark,DNK,Gini index,SI.POV.GINI,2014,28.4
+Dominican Republic,DOM,Gini index,SI.POV.GINI,2014,44.3
+Ecuador,ECU,Gini index,SI.POV.GINI,2014,45.0
+Spain,ESP,Gini index,SI.POV.GINI,2014,36.1
+Estonia,EST,Gini index,SI.POV.GINI,2014,34.6
+Finland,FIN,Gini index,SI.POV.GINI,2014,26.8
+France,FRA,Gini index,SI.POV.GINI,2014,32.3
+United Kingdom,GBR,Gini index,SI.POV.GINI,2014,33.1
+Georgia,GEO,Gini index,SI.POV.GINI,2014,37.6
+Greece,GRC,Gini index,SI.POV.GINI,2014,35.8
+Guatemala,GTM,Gini index,SI.POV.GINI,2014,48.3
+Honduras,HND,Gini index,SI.POV.GINI,2014,49.9
+Croatia,HRV,Gini index,SI.POV.GINI,2014,32.1
+Hungary,HUN,Gini index,SI.POV.GINI,2014,30.9
+Indonesia,IDN,Gini index,SI.POV.GINI,2014,38.8
+Ireland,IRL,Gini index,SI.POV.GINI,2014,31.9
+Iran, Islamic Rep.,Gini index,SI.POV.GINI,2014,34.8
+Iceland,ISL,Gini index,SI.POV.GINI,2014,27.8
+Israel,ISR,Gini index,SI.POV.GINI,2014,39.8
+Italy,ITA,Gini index,SI.POV.GINI,2014,34.7
+Kazakhstan,KAZ,Gini index,SI.POV.GINI,2014,27.0
+Kyrgyz Republic,KGZ,Gini index,SI.POV.GINI,2014,26.8
+Korea, Rep.,Gini index,SI.POV.GINI,2014,31.2
+Liberia,LBR,Gini index,SI.POV.GINI,2014,33.2
+Lithuania,LTU,Gini index,SI.POV.GINI,2014,37.7
+Luxembourg,LUX,Gini index,SI.POV.GINI,2014,31.2
+Latvia,LVA,Gini index,SI.POV.GINI,2014,35.1
+Moldova,MDA,Gini index,SI.POV.GINI,2014,26.8
+Mexico,MEX,Gini index,SI.POV.GINI,2014,48.9
+North Macedonia,MKD,Gini index,SI.POV.GINI,2014,35.2
+Malta,MLT,Gini index,SI.POV.GINI,2014,29.0
+Montenegro,MNE,Gini index,SI.POV.GINI,2014,38.8
+Mongolia,MNG,Gini index,SI.POV.GINI,2014,32.0
+Mozambique,MOZ,Gini index,SI.POV.GINI,2014,54.0
+Mauritania,MRT,Gini index,SI.POV.GINI,2014,32.6
+Niger,NER,Gini index,SI.POV.GINI,2014,34.3
+Nicaragua,NIC,Gini index,SI.POV.GINI,2014,46.2
+Netherlands,NLD,Gini index,SI.POV.GINI,2014,28.6
+Norway,NOR,Gini index,SI.POV.GINI,2014,26.8
+Panama,PAN,Gini index,SI.POV.GINI,2014,50.5
+Peru,PER,Gini index,SI.POV.GINI,2014,43.1
+Poland,POL,Gini index,SI.POV.GINI,2014,32.8
+Portugal,PRT,Gini index,SI.POV.GINI,2014,35.6
+Paraguay,PRY,Gini index,SI.POV.GINI,2014,50.7
+Romania,ROU,Gini index,SI.POV.GINI,2014,36.0
+Russian Federation,RUS,Gini index,SI.POV.GINI,2014,36.9
+Sudan,SDN,Gini index,SI.POV.GINI,2014,34.2
+El Salvador,SLV,Gini index,SI.POV.GINI,2014,41.6
+Serbia,SRB,Gini index,SI.POV.GINI,2014,40.4
+Slovak Republic,SVK,Gini index,SI.POV.GINI,2014,26.1
+Slovenia,SVN,Gini index,SI.POV.GINI,2014,25.7
+Sweden,SWE,Gini index,SI.POV.GINI,2014,28.4
+Thailand,THA,Gini index,SI.POV.GINI,2014,37.0
+Timor-Leste,TLS,Gini index,SI.POV.GINI,2014,28.7
+Ukraine,UKR,Gini index,SI.POV.GINI,2014,24.0
+Uruguay,URY,Gini index,SI.POV.GINI,2014,40.1
+United States,USA,Gini index,SI.POV.GINI,2014,41.5
+Viet Nam,VNM,Gini index,SI.POV.GINI,2014,34.8
+Kosovo,XKX,Gini index,SI.POV.GINI,2014,27.3
+Yemen, Rep.,Gini index,SI.POV.GINI,2014,36.7
+South Africa,ZAF,Gini index,SI.POV.GINI,2014,63.0
+Albania,ALB,Gini index,SI.POV.GINI,2015,32.8
+Armenia,ARM,Gini index,SI.POV.GINI,2015,32.4
+Austria,AUT,Gini index,SI.POV.GINI,2015,30.5
+Belgium,BEL,Gini index,SI.POV.GINI,2015,27.7
+Benin,BEN,Gini index,SI.POV.GINI,2015,47.6
+Bulgaria,BGR,Gini index,SI.POV.GINI,2015,38.6
+Belarus,BLR,Gini index,SI.POV.GINI,2015,25.6
+Bolivia,BOL,Gini index,SI.POV.GINI,2015,46.7
+Brazil,BRA,Gini index,SI.POV.GINI,2015,51.9
+Botswana,BWA,Gini index,SI.POV.GINI,2015,53.3
+Canada,CAN,Gini index,SI.POV.GINI,2015,33.7
+Switzerland,CHE,Gini index,SI.POV.GINI,2015,32.3
+Chile,CHL,Gini index,SI.POV.GINI,2015,45.3
+China,CHN,Gini index,SI.POV.GINI,2015,38.6
+Cote d'Ivoire,CIV,Gini index,SI.POV.GINI,2015,41.5
+Colombia,COL,Gini index,SI.POV.GINI,2015,51.0
+Cabo Verde,CPV,Gini index,SI.POV.GINI,2015,42.4
+Costa Rica,CRI,Gini index,SI.POV.GINI,2015,48.4
+Cyprus,CYP,Gini index,SI.POV.GINI,2015,34.0
+Czechia,CZE,Gini index,SI.POV.GINI,2015,25.9
+Germany,DEU,Gini index,SI.POV.GINI,2015,31.7
+Denmark,DNK,Gini index,SI.POV.GINI,2015,28.2
+Dominican Republic,DOM,Gini index,SI.POV.GINI,2015,45.2
+Ecuador,ECU,Gini index,SI.POV.GINI,2015,46.0
+Egypt, Arab Rep.,Gini index,SI.POV.GINI,2015,31.8
+Spain,ESP,Gini index,SI.POV.GINI,2015,36.2
+Estonia,EST,Gini index,SI.POV.GINI,2015,32.7
+Ethiopia,ETH,Gini index,SI.POV.GINI,2015,35.0
+Finland,FIN,Gini index,SI.POV.GINI,2015,27.1
+France,FRA,Gini index,SI.POV.GINI,2015,32.7
+United Kingdom,GBR,Gini index,SI.POV.GINI,2015,33.3
+Georgia,GEO,Gini index,SI.POV.GINI,2015,36.5
+Gambia, The,Gini index,SI.POV.GINI,2015,35.9
+Greece,GRC,Gini index,SI.POV.GINI,2015,36.0
+Honduras,HND,Gini index,SI.POV.GINI,2015,49.2
+Croatia,HRV,Gini index,SI.POV.GINI,2015,31.1
+Hungary,HUN,Gini index,SI.POV.GINI,2015,30.4
+Indonesia,IDN,Gini index,SI.POV.GINI,2015,38.2
+India,IND,Gini index,SI.POV.GINI,2015,34.7
+Ireland,IRL,Gini index,SI.POV.GINI,2015,31.8
+Iran, Islamic Rep.,Gini index,SI.POV.GINI,2015,35.3
+Iceland,ISL,Gini index,SI.POV.GINI,2015,26.8
+Israel,ISR,Gini index,SI.POV.GINI,2015,39.7
+Italy,ITA,Gini index,SI.POV.GINI,2015,35.4
+Kazakhstan,KAZ,Gini index,SI.POV.GINI,2015,26.8
+Kenya,KEN,Gini index,SI.POV.GINI,2015,40.8
+Kyrgyz Republic,KGZ,Gini index,SI.POV.GINI,2015,29.0
+St. Lucia,LCA,Gini index,SI.POV.GINI,2015,43.7
+Lithuania,LTU,Gini index,SI.POV.GINI,2015,37.4
+Luxembourg,LUX,Gini index,SI.POV.GINI,2015,32.9
+Latvia,LVA,Gini index,SI.POV.GINI,2015,34.2
+Moldova,MDA,Gini index,SI.POV.GINI,2015,27.0
+North Macedonia,MKD,Gini index,SI.POV.GINI,2015,35.6
+Malta,MLT,Gini index,SI.POV.GINI,2015,29.4
+Myanmar,MMR,Gini index,SI.POV.GINI,2015,38.1
+Montenegro,MNE,Gini index,SI.POV.GINI,2015,39.0
+Malaysia,MYS,Gini index,SI.POV.GINI,2015,41.1
+Namibia,NAM,Gini index,SI.POV.GINI,2015,59.1
+Nigeria,NGA,Gini index,SI.POV.GINI,2015,35.9
+Netherlands,NLD,Gini index,SI.POV.GINI,2015,28.2
+Norway,NOR,Gini index,SI.POV.GINI,2015,27.5
+Pakistan,PAK,Gini index,SI.POV.GINI,2015,31.3
+Panama,PAN,Gini index,SI.POV.GINI,2015,50.8
+Peru,PER,Gini index,SI.POV.GINI,2015,43.4
+Philippines,PHL,Gini index,SI.POV.GINI,2015,44.6
+Poland,POL,Gini index,SI.POV.GINI,2015,31.8
+Portugal,PRT,Gini index,SI.POV.GINI,2015,35.5
+Paraguay,PRY,Gini index,SI.POV.GINI,2015,47.6
+Romania,ROU,Gini index,SI.POV.GINI,2015,35.9
+Russian Federation,RUS,Gini index,SI.POV.GINI,2015,36.5
+El Salvador,SLV,Gini index,SI.POV.GINI,2015,40.6
+Serbia,SRB,Gini index,SI.POV.GINI,2015,40.5
+Slovak Republic,SVK,Gini index,SI.POV.GINI,2015,26.5
+Slovenia,SVN,Gini index,SI.POV.GINI,2015,25.4
+Sweden,SWE,Gini index,SI.POV.GINI,2015,29.2
+Togo,TGO,Gini index,SI.POV.GINI,2015,43.0
+Thailand,THA,Gini index,SI.POV.GINI,2015,36.0
+Tajikistan,TJK,Gini index,SI.POV.GINI,2015,34.0
+Tonga,TON,Gini index,SI.POV.GINI,2015,33.5
+Tunisia,TUN,Gini index,SI.POV.GINI,2015,32.8
+Ukraine,UKR,Gini index,SI.POV.GINI,2015,25.5
+Uruguay,URY,Gini index,SI.POV.GINI,2015,40.1
+United States,USA,Gini index,SI.POV.GINI,2015,41.2
+Kosovo,XKX,Gini index,SI.POV.GINI,2015,26.5
+Zambia,ZMB,Gini index,SI.POV.GINI,2015,55.8
+Albania,ALB,Gini index,SI.POV.GINI,2016,33.7
+Argentina,ARG,Gini index,SI.POV.GINI,2016,42.3
+Armenia,ARM,Gini index,SI.POV.GINI,2016,32.5
+Australia,AUS,Gini index,SI.POV.GINI,2016,33.7
+Austria,AUT,Gini index,SI.POV.GINI,2016,30.8
+Belgium,BEL,Gini index,SI.POV.GINI,2016,27.6
+Bangladesh,BGD,Gini index,SI.POV.GINI,2016,32.4
+Bulgaria,BGR,Gini index,SI.POV.GINI,2016,40.6
+Belarus,BLR,Gini index,SI.POV.GINI,2016,25.3
+Bolivia,BOL,Gini index,SI.POV.GINI,2016,45.2
+Brazil,BRA,Gini index,SI.POV.GINI,2016,53.4
+Canada,CAN,Gini index,SI.POV.GINI,2016,32.7
+Switzerland,CHE,Gini index,SI.POV.GINI,2016,33.0
+China,CHN,Gini index,SI.POV.GINI,2016,38.5
+Colombia,COL,Gini index,SI.POV.GINI,2016,50.6
+Costa Rica,CRI,Gini index,SI.POV.GINI,2016,48.7
+Cyprus,CYP,Gini index,SI.POV.GINI,2016,32.9
+Czechia,CZE,Gini index,SI.POV.GINI,2016,25.4
+Germany,DEU,Gini index,SI.POV.GINI,2016,31.4
+Denmark,DNK,Gini index,SI.POV.GINI,2016,28.2
+Dominican Republic,DOM,Gini index,SI.POV.GINI,2016,45.7
+Ecuador,ECU,Gini index,SI.POV.GINI,2016,45.0
+Spain,ESP,Gini index,SI.POV.GINI,2016,35.8
+Estonia,EST,Gini index,SI.POV.GINI,2016,31.2
+Finland,FIN,Gini index,SI.POV.GINI,2016,27.1
+France,FRA,Gini index,SI.POV.GINI,2016,31.9
+United Kingdom,GBR,Gini index,SI.POV.GINI,2016,33.1
+Georgia,GEO,Gini index,SI.POV.GINI,2016,36.6
+Ghana,GHA,Gini index,SI.POV.GINI,2016,43.5
+Greece,GRC,Gini index,SI.POV.GINI,2016,35.0
+Honduras,HND,Gini index,SI.POV.GINI,2016,49.8
+Croatia,HRV,Gini index,SI.POV.GINI,2016,30.9
+Hungary,HUN,Gini index,SI.POV.GINI,2016,30.3
+Indonesia,IDN,Gini index,SI.POV.GINI,2016,36.9
+India,IND,Gini index,SI.POV.GINI,2016,34.7
+Ireland,IRL,Gini index,SI.POV.GINI,2016,32.8
+Iran, Islamic Rep.,Gini index,SI.POV.GINI,2016,35.9
+Iceland,ISL,Gini index,SI.POV.GINI,2016,27.2
+Israel,ISR,Gini index,SI.POV.GINI,2016,39.0
+Italy,ITA,Gini index,SI.POV.GINI,2016,35.2
+Kazakhstan,KAZ,Gini index,SI.POV.GINI,2016,27.2
+Kyrgyz Republic,KGZ,Gini index,SI.POV.GINI,2016,26.8
+Korea, Rep.,Gini index,SI.POV.GINI,2016,35.2
+Liberia,LBR,Gini index,SI.POV.GINI,2016,35.3
+Sri Lanka,LKA,Gini index,SI.POV.GINI,2016,39.3
+Lithuania,LTU,Gini index,SI.POV.GINI,2016,38.4
+Luxembourg,LUX,Gini index,SI.POV.GINI,2016,31.7
+Latvia,LVA,Gini index,SI.POV.GINI,2016,34.3
+Moldova,MDA,Gini index,SI.POV.GINI,2016,26.3
+Maldives,MDV,Gini index,SI.POV.GINI,2016,31.3
+Mexico,MEX,Gini index,SI.POV.GINI,2016,46.9
+North Macedonia,MKD,Gini index,SI.POV.GINI,2016,34.5
+Malta,MLT,Gini index,SI.POV.GINI,2016,29.1
+Montenegro,MNE,Gini index,SI.POV.GINI,2016,38.5
+Mongolia,MNG,Gini index,SI.POV.GINI,2016,32.3
+Malawi,MWI,Gini index,SI.POV.GINI,2016,44.7
+Netherlands,NLD,Gini index,SI.POV.GINI,2016,28.2
+Norway,NOR,Gini index,SI.POV.GINI,2016,28.5
+Panama,PAN,Gini index,SI.POV.GINI,2016,50.4
+Peru,PER,Gini index,SI.POV.GINI,2016,43.6
+Poland,POL,Gini index,SI.POV.GINI,2016,31.2
+Portugal,PRT,Gini index,SI.POV.GINI,2016,35.2
+Paraguay,PRY,Gini index,SI.POV.GINI,2016,47.9
+West Bank and Gaza,PSE,Gini index,SI.POV.GINI,2016,33.7
+Romania,ROU,Gini index,SI.POV.GINI,2016,34.4
+Russian Federation,RUS,Gini index,SI.POV.GINI,2016,36.7
+Rwanda,RWA,Gini index,SI.POV.GINI,2016,43.7
+El Salvador,SLV,Gini index,SI.POV.GINI,2016,40.0
+Serbia,SRB,Gini index,SI.POV.GINI,2016,38.8
+South Sudan,SSD,Gini index,SI.POV.GINI,2016,44.1
+Slovak Republic,SVK,Gini index,SI.POV.GINI,2016,25.2
+Slovenia,SVN,Gini index,SI.POV.GINI,2016,24.8
+Sweden,SWE,Gini index,SI.POV.GINI,2016,29.6
+Eswatini,SWZ,Gini index,SI.POV.GINI,2016,54.6
+Thailand,THA,Gini index,SI.POV.GINI,2016,36.9
+Uganda,UGA,Gini index,SI.POV.GINI,2016,42.8
+Ukraine,UKR,Gini index,SI.POV.GINI,2016,25.0
+Uruguay,URY,Gini index,SI.POV.GINI,2016,39.7
+United States,USA,Gini index,SI.POV.GINI,2016,41.1
+Viet Nam,VNM,Gini index,SI.POV.GINI,2016,35.3
+Kosovo,XKX,Gini index,SI.POV.GINI,2016,26.7
+Albania,ALB,Gini index,SI.POV.GINI,2017,33.1
+Argentina,ARG,Gini index,SI.POV.GINI,2017,41.4
+Armenia,ARM,Gini index,SI.POV.GINI,2017,33.6
+Austria,AUT,Gini index,SI.POV.GINI,2017,29.7
+Belgium,BEL,Gini index,SI.POV.GINI,2017,27.4
+Bulgaria,BGR,Gini index,SI.POV.GINI,2017,40.4
+Belarus,BLR,Gini index,SI.POV.GINI,2017,25.4
+Bolivia,BOL,Gini index,SI.POV.GINI,2017,44.6
+Brazil,BRA,Gini index,SI.POV.GINI,2017,53.3
+Bhutan,BTN,Gini index,SI.POV.GINI,2017,37.4
+Canada,CAN,Gini index,SI.POV.GINI,2017,33.3
+Switzerland,CHE,Gini index,SI.POV.GINI,2017,32.7
+Chile,CHL,Gini index,SI.POV.GINI,2017,45.3
+China,CHN,Gini index,SI.POV.GINI,2017,39.1
+Colombia,COL,Gini index,SI.POV.GINI,2017,49.7
+Costa Rica,CRI,Gini index,SI.POV.GINI,2017,48.3
+Cyprus,CYP,Gini index,SI.POV.GINI,2017,31.4
+Czechia,CZE,Gini index,SI.POV.GINI,2017,24.9
+Germany,DEU,Gini index,SI.POV.GINI,2017,31.3
+Djibouti,DJI,Gini index,SI.POV.GINI,2017,41.6
+Denmark,DNK,Gini index,SI.POV.GINI,2017,28.7
+Dominican Republic,DOM,Gini index,SI.POV.GINI,2017,42.2
+Ecuador,ECU,Gini index,SI.POV.GINI,2017,44.7
+Egypt, Arab Rep.,Gini index,SI.POV.GINI,2017,31.5
+Spain,ESP,Gini index,SI.POV.GINI,2017,34.7
+Estonia,EST,Gini index,SI.POV.GINI,2017,30.4
+Finland,FIN,Gini index,SI.POV.GINI,2017,27.4
+France,FRA,Gini index,SI.POV.GINI,2017,31.6
+Gabon,GAB,Gini index,SI.POV.GINI,2017,38.0
+United Kingdom,GBR,Gini index,SI.POV.GINI,2017,32.6
+Georgia,GEO,Gini index,SI.POV.GINI,2017,37.9
+Greece,GRC,Gini index,SI.POV.GINI,2017,34.4
+Honduras,HND,Gini index,SI.POV.GINI,2017,49.4
+Croatia,HRV,Gini index,SI.POV.GINI,2017,30.4
+Hungary,HUN,Gini index,SI.POV.GINI,2017,30.6
+Indonesia,IDN,Gini index,SI.POV.GINI,2017,36.4
+India,IND,Gini index,SI.POV.GINI,2017,35.9
+Ireland,IRL,Gini index,SI.POV.GINI,2017,31.4
+Iran, Islamic Rep.,Gini index,SI.POV.GINI,2017,36.7
+Iceland,ISL,Gini index,SI.POV.GINI,2017,26.1
+Israel,ISR,Gini index,SI.POV.GINI,2017,38.2
+Italy,ITA,Gini index,SI.POV.GINI,2017,35.9
+Kazakhstan,KAZ,Gini index,SI.POV.GINI,2017,27.5
+Kyrgyz Republic,KGZ,Gini index,SI.POV.GINI,2017,27.3
+Korea, Rep.,Gini index,SI.POV.GINI,2017,34.9
+Lesotho,LSO,Gini index,SI.POV.GINI,2017,44.9
+Lithuania,LTU,Gini index,SI.POV.GINI,2017,37.3
+Luxembourg,LUX,Gini index,SI.POV.GINI,2017,34.5
+Latvia,LVA,Gini index,SI.POV.GINI,2017,35.6
+Moldova,MDA,Gini index,SI.POV.GINI,2017,25.9
+North Macedonia,MKD,Gini index,SI.POV.GINI,2017,34.2
+Malta,MLT,Gini index,SI.POV.GINI,2017,29.2
+Myanmar,MMR,Gini index,SI.POV.GINI,2017,30.7
+Montenegro,MNE,Gini index,SI.POV.GINI,2017,36.9
+Mauritius,MUS,Gini index,SI.POV.GINI,2017,36.8
+Netherlands,NLD,Gini index,SI.POV.GINI,2017,28.5
+Norway,NOR,Gini index,SI.POV.GINI,2017,27.0
+Panama,PAN,Gini index,SI.POV.GINI,2017,49.9
+Peru,PER,Gini index,SI.POV.GINI,2017,43.3
+Poland,POL,Gini index,SI.POV.GINI,2017,29.7
+Portugal,PRT,Gini index,SI.POV.GINI,2017,33.8
+Paraguay,PRY,Gini index,SI.POV.GINI,2017,48.5
+Qatar,QAT,Gini index,SI.POV.GINI,2017,35.1
+Romania,ROU,Gini index,SI.POV.GINI,2017,36.0
+Russian Federation,RUS,Gini index,SI.POV.GINI,2017,35.5
+El Salvador,SLV,Gini index,SI.POV.GINI,2017,38.0
+Serbia,SRB,Gini index,SI.POV.GINI,2017,36.1
+Sao Tome and Principe,STP,Gini index,SI.POV.GINI,2017,40.7
+Slovak Republic,SVK,Gini index,SI.POV.GINI,2017,23.2
+Slovenia,SVN,Gini index,SI.POV.GINI,2017,24.2
+Sweden,SWE,Gini index,SI.POV.GINI,2017,28.8
+Thailand,THA,Gini index,SI.POV.GINI,2017,36.4
+Turkiye,TUR,Gini index,SI.POV.GINI,2017,43.5
+Ukraine,UKR,Gini index,SI.POV.GINI,2017,26.0
+Uruguay,URY,Gini index,SI.POV.GINI,2017,39.5
+United States,USA,Gini index,SI.POV.GINI,2017,41.2
+Kosovo,XKX,Gini index,SI.POV.GINI,2017,29.0
+Zimbabwe,ZWE,Gini index,SI.POV.GINI,2017,44.3
+Angola,AGO,Gini index,SI.POV.GINI,2018,51.3
+Albania,ALB,Gini index,SI.POV.GINI,2018,30.1
+United Arab Emirates,ARE,Gini index,SI.POV.GINI,2018,26.4
+Argentina,ARG,Gini index,SI.POV.GINI,2018,41.7
+Armenia,ARM,Gini index,SI.POV.GINI,2018,34.4
+Australia,AUS,Gini index,SI.POV.GINI,2018,34.3
+Austria,AUT,Gini index,SI.POV.GINI,2018,30.8
+Belgium,BEL,Gini index,SI.POV.GINI,2018,27.2
+Benin,BEN,Gini index,SI.POV.GINI,2018,37.9
+Burkina Faso,BFA,Gini index,SI.POV.GINI,2018,43.0
+Bulgaria,BGR,Gini index,SI.POV.GINI,2018,41.3
+Belarus,BLR,Gini index,SI.POV.GINI,2018,25.2
+Bolivia,BOL,Gini index,SI.POV.GINI,2018,42.6
+Brazil,BRA,Gini index,SI.POV.GINI,2018,53.9
+Canada,CAN,Gini index,SI.POV.GINI,2018,32.5
+Switzerland,CHE,Gini index,SI.POV.GINI,2018,33.1
+China,CHN,Gini index,SI.POV.GINI,2018,38.5
+Cote d'Ivoire,CIV,Gini index,SI.POV.GINI,2018,37.2
+Colombia,COL,Gini index,SI.POV.GINI,2018,50.4
+Costa Rica,CRI,Gini index,SI.POV.GINI,2018,48.0
+Cyprus,CYP,Gini index,SI.POV.GINI,2018,32.7
+Czechia,CZE,Gini index,SI.POV.GINI,2018,25.0
+Germany,DEU,Gini index,SI.POV.GINI,2018,31.9
+Denmark,DNK,Gini index,SI.POV.GINI,2018,28.2
+Dominican Republic,DOM,Gini index,SI.POV.GINI,2018,43.7
+Ecuador,ECU,Gini index,SI.POV.GINI,2018,45.4
+Spain,ESP,Gini index,SI.POV.GINI,2018,34.7
+Estonia,EST,Gini index,SI.POV.GINI,2018,30.3
+Finland,FIN,Gini index,SI.POV.GINI,2018,27.3
+France,FRA,Gini index,SI.POV.GINI,2018,32.4
+United Kingdom,GBR,Gini index,SI.POV.GINI,2018,33.7
+Georgia,GEO,Gini index,SI.POV.GINI,2018,36.4
+Guinea,GIN,Gini index,SI.POV.GINI,2018,29.6
+Guinea-Bissau,GNB,Gini index,SI.POV.GINI,2018,34.8
+Greece,GRC,Gini index,SI.POV.GINI,2018,32.9
+Grenada,GRD,Gini index,SI.POV.GINI,2018,43.8
+Honduras,HND,Gini index,SI.POV.GINI,2018,48.9
+Croatia,HRV,Gini index,SI.POV.GINI,2018,29.7
+Hungary,HUN,Gini index,SI.POV.GINI,2018,29.6
+Indonesia,IDN,Gini index,SI.POV.GINI,2018,36.3
+India,IND,Gini index,SI.POV.GINI,2018,34.5
+Ireland,IRL,Gini index,SI.POV.GINI,2018,30.6
+Iran, Islamic Rep.,Gini index,SI.POV.GINI,2018,37.4
+Israel,ISR,Gini index,SI.POV.GINI,2018,38.6
+Italy,ITA,Gini index,SI.POV.GINI,2018,35.2
+Jamaica,JAM,Gini index,SI.POV.GINI,2018,35.6
+Kazakhstan,KAZ,Gini index,SI.POV.GINI,2018,27.8
+Kyrgyz Republic,KGZ,Gini index,SI.POV.GINI,2018,27.7
+Korea, Rep.,Gini index,SI.POV.GINI,2018,33.7
+Lao PDR,LAO,Gini index,SI.POV.GINI,2018,38.8
+Lithuania,LTU,Gini index,SI.POV.GINI,2018,35.7
+Luxembourg,LUX,Gini index,SI.POV.GINI,2018,35.4
+Latvia,LVA,Gini index,SI.POV.GINI,2018,35.1
+Moldova,MDA,Gini index,SI.POV.GINI,2018,25.7
+Mexico,MEX,Gini index,SI.POV.GINI,2018,46.0
+North Macedonia,MKD,Gini index,SI.POV.GINI,2018,33.0
+Mali,MLI,Gini index,SI.POV.GINI,2018,36.0
+Malta,MLT,Gini index,SI.POV.GINI,2018,28.7
+Montenegro,MNE,Gini index,SI.POV.GINI,2018,36.8
+Mongolia,MNG,Gini index,SI.POV.GINI,2018,32.7
+Malaysia,MYS,Gini index,SI.POV.GINI,2018,41.2
+Niger,NER,Gini index,SI.POV.GINI,2018,37.3
+Nigeria,NGA,Gini index,SI.POV.GINI,2018,35.1
+Netherlands,NLD,Gini index,SI.POV.GINI,2018,28.1
+Norway,NOR,Gini index,SI.POV.GINI,2018,27.6
+Pakistan,PAK,Gini index,SI.POV.GINI,2018,29.6
+Panama,PAN,Gini index,SI.POV.GINI,2018,49.2
+Peru,PER,Gini index,SI.POV.GINI,2018,42.4
+Philippines,PHL,Gini index,SI.POV.GINI,2018,42.3
+Poland,POL,Gini index,SI.POV.GINI,2018,30.2
+Portugal,PRT,Gini index,SI.POV.GINI,2018,33.5
+Paraguay,PRY,Gini index,SI.POV.GINI,2018,46.0
+Romania,ROU,Gini index,SI.POV.GINI,2018,35.8
+Russian Federation,RUS,Gini index,SI.POV.GINI,2018,35.3
+Senegal,SEN,Gini index,SI.POV.GINI,2018,38.3
+Sierra Leone,SLE,Gini index,SI.POV.GINI,2018,35.7
+El Salvador,SLV,Gini index,SI.POV.GINI,2018,38.6
+Serbia,SRB,Gini index,SI.POV.GINI,2018,35.0
+Slovak Republic,SVK,Gini index,SI.POV.GINI,2018,25.0
+Slovenia,SVN,Gini index,SI.POV.GINI,2018,24.6
+Sweden,SWE,Gini index,SI.POV.GINI,2018,30.0
+Seychelles,SYC,Gini index,SI.POV.GINI,2018,32.1
+Chad,TCD,Gini index,SI.POV.GINI,2018,37.5
+Togo,TGO,Gini index,SI.POV.GINI,2018,42.5
+Thailand,THA,Gini index,SI.POV.GINI,2018,36.4
+Turkiye,TUR,Gini index,SI.POV.GINI,2018,42.4
+Tanzania,TZA,Gini index,SI.POV.GINI,2018,40.5
+Ukraine,UKR,Gini index,SI.POV.GINI,2018,26.1
+Uruguay,URY,Gini index,SI.POV.GINI,2018,39.7
+United States,USA,Gini index,SI.POV.GINI,2018,41.4
+Viet Nam,VNM,Gini index,SI.POV.GINI,2018,35.7
+Albania,ALB,Gini index,SI.POV.GINI,2019,30.1
+Argentina,ARG,Gini index,SI.POV.GINI,2019,43.3
+Armenia,ARM,Gini index,SI.POV.GINI,2019,30.0
+Austria,AUT,Gini index,SI.POV.GINI,2019,30.2
+Belgium,BEL,Gini index,SI.POV.GINI,2019,27.2
+Bulgaria,BGR,Gini index,SI.POV.GINI,2019,40.3
+Belarus,BLR,Gini index,SI.POV.GINI,2019,25.3
+Bolivia,BOL,Gini index,SI.POV.GINI,2019,41.6
+Brazil,BRA,Gini index,SI.POV.GINI,2019,53.5
+Canada,CAN,Gini index,SI.POV.GINI,2019,31.7
+Switzerland,CHE,Gini index,SI.POV.GINI,2019,34.0
+China,CHN,Gini index,SI.POV.GINI,2019,38.2
+Colombia,COL,Gini index,SI.POV.GINI,2019,51.3
+Costa Rica,CRI,Gini index,SI.POV.GINI,2019,48.2
+Cyprus,CYP,Gini index,SI.POV.GINI,2019,31.2
+Czechia,CZE,Gini index,SI.POV.GINI,2019,25.3
+Germany,DEU,Gini index,SI.POV.GINI,2019,31.8
+Denmark,DNK,Gini index,SI.POV.GINI,2019,27.7
+Dominican Republic,DOM,Gini index,SI.POV.GINI,2019,41.9
+Ecuador,ECU,Gini index,SI.POV.GINI,2019,45.7
+Egypt, Arab Rep.,Gini index,SI.POV.GINI,2019,31.9
+Spain,ESP,Gini index,SI.POV.GINI,2019,34.3
+Estonia,EST,Gini index,SI.POV.GINI,2019,30.8
+Finland,FIN,Gini index,SI.POV.GINI,2019,27.7
+Fiji,FJI,Gini index,SI.POV.GINI,2019,30.7
+France,FRA,Gini index,SI.POV.GINI,2019,31.2
+United Kingdom,GBR,Gini index,SI.POV.GINI,2019,32.8
+Georgia,GEO,Gini index,SI.POV.GINI,2019,35.9
+Greece,GRC,Gini index,SI.POV.GINI,2019,33.1
+Honduras,HND,Gini index,SI.POV.GINI,2019,48.2
+Croatia,HRV,Gini index,SI.POV.GINI,2019,28.9
+Hungary,HUN,Gini index,SI.POV.GINI,2019,30.0
+Indonesia,IDN,Gini index,SI.POV.GINI,2019,35.4
+India,IND,Gini index,SI.POV.GINI,2019,33.8
+Ireland,IRL,Gini index,SI.POV.GINI,2019,30.8
+Iran, Islamic Rep.,Gini index,SI.POV.GINI,2019,36.5
+Israel,ISR,Gini index,SI.POV.GINI,2019,38.3
+Italy,ITA,Gini index,SI.POV.GINI,2019,34.6
+Kazakhstan,KAZ,Gini index,SI.POV.GINI,2019,28.0
+Kyrgyz Republic,KGZ,Gini index,SI.POV.GINI,2019,29.7
+Kiribati,KIR,Gini index,SI.POV.GINI,2019,27.8
+Korea, Rep.,Gini index,SI.POV.GINI,2019,33.2
+Sri Lanka,LKA,Gini index,SI.POV.GINI,2019,37.7
+Lithuania,LTU,Gini index,SI.POV.GINI,2019,35.3
+Luxembourg,LUX,Gini index,SI.POV.GINI,2019,34.2
+Latvia,LVA,Gini index,SI.POV.GINI,2019,34.5
+Moldova,MDA,Gini index,SI.POV.GINI,2019,26.0
+Maldives,MDV,Gini index,SI.POV.GINI,2019,29.3
+Marshall Islands,MHL,Gini index,SI.POV.GINI,2019,35.5
+North Macedonia,MKD,Gini index,SI.POV.GINI,2019,33.5
+Malta,MLT,Gini index,SI.POV.GINI,2019,31.0
+Montenegro,MNE,Gini index,SI.POV.GINI,2019,35.7
+Mozambique,MOZ,Gini index,SI.POV.GINI,2019,50.3
+Mauritania,MRT,Gini index,SI.POV.GINI,2019,32.0
+Malawi,MWI,Gini index,SI.POV.GINI,2019,38.5
+Netherlands,NLD,Gini index,SI.POV.GINI,2019,29.2
+Norway,NOR,Gini index,SI.POV.GINI,2019,27.7
+Panama,PAN,Gini index,SI.POV.GINI,2019,49.8
+Peru,PER,Gini index,SI.POV.GINI,2019,41.5
+Poland,POL,Gini index,SI.POV.GINI,2019,28.8
+Portugal,PRT,Gini index,SI.POV.GINI,2019,32.8
+Paraguay,PRY,Gini index,SI.POV.GINI,2019,45.7
+Romania,ROU,Gini index,SI.POV.GINI,2019,34.8
+Russian Federation,RUS,Gini index,SI.POV.GINI,2019,35.7
+El Salvador,SLV,Gini index,SI.POV.GINI,2019,38.8
+Serbia,SRB,Gini index,SI.POV.GINI,2019,34.5
+Slovak Republic,SVK,Gini index,SI.POV.GINI,2019,23.2
+Slovenia,SVN,Gini index,SI.POV.GINI,2019,24.4
+Sweden,SWE,Gini index,SI.POV.GINI,2019,29.3
+Thailand,THA,Gini index,SI.POV.GINI,2019,34.9
+Turkiye,TUR,Gini index,SI.POV.GINI,2019,43.8
+Uganda,UGA,Gini index,SI.POV.GINI,2019,42.7
+Ukraine,UKR,Gini index,SI.POV.GINI,2019,26.6
+Uruguay,URY,Gini index,SI.POV.GINI,2019,39.7
+United States,USA,Gini index,SI.POV.GINI,2019,41.5
+Vanuatu,VUT,Gini index,SI.POV.GINI,2019,32.3
+Zimbabwe,ZWE,Gini index,SI.POV.GINI,2019,50.3
+Albania,ALB,Gini index,SI.POV.GINI,2020,29.4
+Argentina,ARG,Gini index,SI.POV.GINI,2020,42.7
+Armenia,ARM,Gini index,SI.POV.GINI,2020,25.1
+Austria,AUT,Gini index,SI.POV.GINI,2020,29.8
+Burundi,BDI,Gini index,SI.POV.GINI,2020,37.5
+Belgium,BEL,Gini index,SI.POV.GINI,2020,26.0
+Bulgaria,BGR,Gini index,SI.POV.GINI,2020,40.5
+Belarus,BLR,Gini index,SI.POV.GINI,2020,24.4
+Bolivia,BOL,Gini index,SI.POV.GINI,2020,43.6
+Brazil,BRA,Gini index,SI.POV.GINI,2020,48.9
+Switzerland,CHE,Gini index,SI.POV.GINI,2020,33.7
+Chile,CHL,Gini index,SI.POV.GINI,2020,47.0
+China,CHN,Gini index,SI.POV.GINI,2020,37.1
+Congo, Dem. Rep.,Gini index,SI.POV.GINI,2020,44.7
+Colombia,COL,Gini index,SI.POV.GINI,2020,53.5
+Costa Rica,CRI,Gini index,SI.POV.GINI,2020,49.2
+Cyprus,CYP,Gini index,SI.POV.GINI,2020,31.7
+Czechia,CZE,Gini index,SI.POV.GINI,2020,26.2
+Germany,DEU,Gini index,SI.POV.GINI,2020,32.4
+Denmark,DNK,Gini index,SI.POV.GINI,2020,27.5
+Dominican Republic,DOM,Gini index,SI.POV.GINI,2020,39.6
+Ecuador,ECU,Gini index,SI.POV.GINI,2020,47.3
+Spain,ESP,Gini index,SI.POV.GINI,2020,34.9
+Estonia,EST,Gini index,SI.POV.GINI,2020,30.7
+Finland,FIN,Gini index,SI.POV.GINI,2020,27.1
+France,FRA,Gini index,SI.POV.GINI,2020,30.7
+United Kingdom,GBR,Gini index,SI.POV.GINI,2020,32.6
+Georgia,GEO,Gini index,SI.POV.GINI,2020,34.5
+Gambia, The,Gini index,SI.POV.GINI,2020,38.8
+Greece,GRC,Gini index,SI.POV.GINI,2020,33.6
+Croatia,HRV,Gini index,SI.POV.GINI,2020,29.5
+Hungary,HUN,Gini index,SI.POV.GINI,2020,29.7
+Indonesia,IDN,Gini index,SI.POV.GINI,2020,35.3
+India,IND,Gini index,SI.POV.GINI,2020,33.8
+Ireland,IRL,Gini index,SI.POV.GINI,2020,29.2
+Iran, Islamic Rep.,Gini index,SI.POV.GINI,2020,35.8
+Israel,ISR,Gini index,SI.POV.GINI,2020,37.8
+Italy,ITA,Gini index,SI.POV.GINI,2020,35.2
+Kazakhstan,KAZ,Gini index,SI.POV.GINI,2020,28.7
+Kenya,KEN,Gini index,SI.POV.GINI,2020,36.2
+Kyrgyz Republic,KGZ,Gini index,SI.POV.GINI,2020,29.0
+Korea, Rep.,Gini index,SI.POV.GINI,2020,32.7
+Lithuania,LTU,Gini index,SI.POV.GINI,2020,36.0
+Luxembourg,LUX,Gini index,SI.POV.GINI,2020,33.4
+Latvia,LVA,Gini index,SI.POV.GINI,2020,35.7
+Mexico,MEX,Gini index,SI.POV.GINI,2020,44.6
+Malta,MLT,Gini index,SI.POV.GINI,2020,31.4
+Montenegro,MNE,Gini index,SI.POV.GINI,2020,35.4
+Netherlands,NLD,Gini index,SI.POV.GINI,2020,26.0
+Peru,PER,Gini index,SI.POV.GINI,2020,43.7
+Poland,POL,Gini index,SI.POV.GINI,2020,28.5
+Portugal,PRT,Gini index,SI.POV.GINI,2020,34.7
+Paraguay,PRY,Gini index,SI.POV.GINI,2020,43.5
+Romania,ROU,Gini index,SI.POV.GINI,2020,34.6
+Russian Federation,RUS,Gini index,SI.POV.GINI,2020,33.7
+Serbia,SRB,Gini index,SI.POV.GINI,2020,35.0
+Slovak Republic,SVK,Gini index,SI.POV.GINI,2020,24.2
+Slovenia,SVN,Gini index,SI.POV.GINI,2020,24.0
+Sweden,SWE,Gini index,SI.POV.GINI,2020,28.9
+Thailand,THA,Gini index,SI.POV.GINI,2020,35.0
+Turkiye,TUR,Gini index,SI.POV.GINI,2020,43.0
+Ukraine,UKR,Gini index,SI.POV.GINI,2020,25.6
+Uruguay,URY,Gini index,SI.POV.GINI,2020,40.2
+United States,USA,Gini index,SI.POV.GINI,2020,39.7
+Viet Nam,VNM,Gini index,SI.POV.GINI,2020,36.8
+Argentina,ARG,Gini index,SI.POV.GINI,2021,42.4
+Armenia,ARM,Gini index,SI.POV.GINI,2021,27.9
+Austria,AUT,Gini index,SI.POV.GINI,2021,30.7
+Belgium,BEL,Gini index,SI.POV.GINI,2021,26.6
+Benin,BEN,Gini index,SI.POV.GINI,2021,34.4
+Burkina Faso,BFA,Gini index,SI.POV.GINI,2021,37.4
+Bulgaria,BGR,Gini index,SI.POV.GINI,2021,39.0
+Bolivia,BOL,Gini index,SI.POV.GINI,2021,40.9
+Brazil,BRA,Gini index,SI.POV.GINI,2021,52.9
+Central African Republic,CAF,Gini index,SI.POV.GINI,2021,43.0
+China,CHN,Gini index,SI.POV.GINI,2021,35.7
+Cote d'Ivoire,CIV,Gini index,SI.POV.GINI,2021,35.3
+Cameroon,CMR,Gini index,SI.POV.GINI,2021,42.2
+Colombia,COL,Gini index,SI.POV.GINI,2021,55.1
+Costa Rica,CRI,Gini index,SI.POV.GINI,2021,48.7
+Cyprus,CYP,Gini index,SI.POV.GINI,2021,31.3
+Czechia,CZE,Gini index,SI.POV.GINI,2021,26.2
+Denmark,DNK,Gini index,SI.POV.GINI,2021,28.3
+Dominican Republic,DOM,Gini index,SI.POV.GINI,2021,38.5
+Ecuador,ECU,Gini index,SI.POV.GINI,2021,45.8
+Spain,ESP,Gini index,SI.POV.GINI,2021,33.9
+Estonia,EST,Gini index,SI.POV.GINI,2021,31.8
+Finland,FIN,Gini index,SI.POV.GINI,2021,27.7
+France,FRA,Gini index,SI.POV.GINI,2021,31.5
+United Kingdom,GBR,Gini index,SI.POV.GINI,2021,32.4
+Georgia,GEO,Gini index,SI.POV.GINI,2021,34.2
+Guinea-Bissau,GNB,Gini index,SI.POV.GINI,2021,33.4
+Greece,GRC,Gini index,SI.POV.GINI,2021,32.9
+Croatia,HRV,Gini index,SI.POV.GINI,2021,28.9
+Hungary,HUN,Gini index,SI.POV.GINI,2021,29.2
+Indonesia,IDN,Gini index,SI.POV.GINI,2021,35.5
+India,IND,Gini index,SI.POV.GINI,2021,32.8
+Ireland,IRL,Gini index,SI.POV.GINI,2021,30.1
+Iran, Islamic Rep.,Gini index,SI.POV.GINI,2021,35.5
+Israel,ISR,Gini index,SI.POV.GINI,2021,37.9
+Italy,ITA,Gini index,SI.POV.GINI,2021,34.8
+Jamaica,JAM,Gini index,SI.POV.GINI,2021,40.2
+Kazakhstan,KAZ,Gini index,SI.POV.GINI,2021,29.2
+Kenya,KEN,Gini index,SI.POV.GINI,2021,38.7
+Kyrgyz Republic,KGZ,Gini index,SI.POV.GINI,2021,28.8
+Korea, Rep.,Gini index,SI.POV.GINI,2021,32.9
+Lithuania,LTU,Gini index,SI.POV.GINI,2021,36.7
+Luxembourg,LUX,Gini index,SI.POV.GINI,2021,32.7
+Latvia,LVA,Gini index,SI.POV.GINI,2021,34.3
+Moldova,MDA,Gini index,SI.POV.GINI,2021,25.7
+Mali,MLI,Gini index,SI.POV.GINI,2021,35.7
+Montenegro,MNE,Gini index,SI.POV.GINI,2021,34.3
+Malaysia,MYS,Gini index,SI.POV.GINI,2021,40.7
+Niger,NER,Gini index,SI.POV.GINI,2021,32.9
+Netherlands,NLD,Gini index,SI.POV.GINI,2021,25.7
+Panama,PAN,Gini index,SI.POV.GINI,2021,50.9
+Peru,PER,Gini index,SI.POV.GINI,2021,40.1
+Philippines,PHL,Gini index,SI.POV.GINI,2021,40.7
+Poland,POL,Gini index,SI.POV.GINI,2021,28.5
+Portugal,PRT,Gini index,SI.POV.GINI,2021,34.6
+Paraguay,PRY,Gini index,SI.POV.GINI,2021,42.9
+Romania,ROU,Gini index,SI.POV.GINI,2021,33.9
+Russian Federation,RUS,Gini index,SI.POV.GINI,2021,35.1
+Senegal,SEN,Gini index,SI.POV.GINI,2021,36.2
+El Salvador,SLV,Gini index,SI.POV.GINI,2021,39.0
+Serbia,SRB,Gini index,SI.POV.GINI,2021,33.1
+Slovak Republic,SVK,Gini index,SI.POV.GINI,2021,24.1
+Slovenia,SVN,Gini index,SI.POV.GINI,2021,24.3
+Sweden,SWE,Gini index,SI.POV.GINI,2021,29.8
+Togo,TGO,Gini index,SI.POV.GINI,2021,37.9
+Thailand,THA,Gini index,SI.POV.GINI,2021,34.9
+Tonga,TON,Gini index,SI.POV.GINI,2021,27.1
+Tunisia,TUN,Gini index,SI.POV.GINI,2021,33.7
+Turkiye,TUR,Gini index,SI.POV.GINI,2021,44.4
+Uruguay,URY,Gini index,SI.POV.GINI,2021,40.8
+United States,USA,Gini index,SI.POV.GINI,2021,39.7
+Argentina,ARG,Gini index,SI.POV.GINI,2022,40.7
+Armenia,ARM,Gini index,SI.POV.GINI,2022,27.9
+Bangladesh,BGD,Gini index,SI.POV.GINI,2022,33.4
+Brazil,BRA,Gini index,SI.POV.GINI,2022,52.0
+Bhutan,BTN,Gini index,SI.POV.GINI,2022,28.5
+Chile,CHL,Gini index,SI.POV.GINI,2022,43.0
+Colombia,COL,Gini index,SI.POV.GINI,2022,54.8
+Costa Rica,CRI,Gini index,SI.POV.GINI,2022,47.2
+Dominican Republic,DOM,Gini index,SI.POV.GINI,2022,37.0
+Ecuador,ECU,Gini index,SI.POV.GINI,2022,45.5
+Georgia,GEO,Gini index,SI.POV.GINI,2022,33.5
+Indonesia,IDN,Gini index,SI.POV.GINI,2022,35.5
+Iran, Islamic Rep.,Gini index,SI.POV.GINI,2022,34.8
+Kyrgyz Republic,KGZ,Gini index,SI.POV.GINI,2022,26.4
+Mexico,MEX,Gini index,SI.POV.GINI,2022,43.5
+Mongolia,MNG,Gini index,SI.POV.GINI,2022,31.4
+Nepal,NPL,Gini index,SI.POV.GINI,2022,30.0
+Peru,PER,Gini index,SI.POV.GINI,2022,40.3
+Paraguay,PRY,Gini index,SI.POV.GINI,2022,45.1
+El Salvador,SLV,Gini index,SI.POV.GINI,2022,38.8
+Suriname,SUR,Gini index,SI.POV.GINI,2022,39.2
+Syrian Arab Republic,SYR,Gini index,SI.POV.GINI,2022,26.6
+Chad,TCD,Gini index,SI.POV.GINI,2022,37.4
+Uruguay,URY,Gini index,SI.POV.GINI,2022,40.6
+United States,USA,Gini index,SI.POV.GINI,2022,41.3
+Uzbekistan,UZB,Gini index,SI.POV.GINI,2022,31.2
+Viet Nam,VNM,Gini index,SI.POV.GINI,2022,36.1
+Zambia,ZMB,Gini index,SI.POV.GINI,2022,51.5
+Costa Rica,CRI,Gini index,SI.POV.GINI,2023,46.7
+Ecuador,ECU,Gini index,SI.POV.GINI,2023,44.6
+Indonesia,IDN,Gini index,SI.POV.GINI,2023,36.1
+Panama,PAN,Gini index,SI.POV.GINI,2023,48.9
