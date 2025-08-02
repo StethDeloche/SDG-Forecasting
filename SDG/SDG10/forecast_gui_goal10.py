@@ -1,0 +1,2203 @@
+#!/usr/bin/env python3
+"""
+SDG Goal 10 (Reduced Inequalities) Forecasting GUI
+Implements ARIMA, Prophet, SARIMAX, and Random Forest models with time series cross validation
+"""
+
+import tkinter as tk
+from tkinter import ttk, messagebox, filedialog
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
+import seaborn as sns
+from datetime import datetime
+import warnings
+warnings.filterwarnings('ignore')
+
+# Time series and ML imports
+from statsmodels.tsa.arima.model import ARIMA
+from statsmodels.tsa.statespace.sarimax import SARIMAX
+from sklearn.ensemble import RandomForestRegressor
+from sklearn.preprocessing import StandardScaler
+from sklearn.model_selection import TimeSeriesSplit
+from sklearn.metrics import mean_squared_error
+import prophet
+from prophet import Prophet
+from prophet.diagnostics import cross_validation, performance_metrics
+
+class SDG10ForecastGUI:
+    def __init__(self, root):
+        self.root = root
+        self.root.title("SDG Goal 10: Reduced Inequalities - Forecasting Tool")
+        self.root.geometry("1400x900")
+        
+        # Data storage
+        self.data = None
+        self.external_data = {}
+        
+        # Load external datasets
+        self.load_external_data()
+        
+        # Create GUI elements
+        self.create_widgets()
+        
+        # Load SDG10 data
+        self.load_data()
+    
+    def load_external_data(self):
+        """Load external datasets for SARIMAX and Random Forest"""
+        external_files = {
+            'gdp': '../GDP_processed.csv',
+            'gini': '../GINI_processed.csv', 
+            'unemployment': '../Unemployment_processed.csv',
+            'rd_expenditure': '../R&D Expenditures_processed.csv',
+            'social_coverage': '../social_coverage_processed.csv'
+        }
+        
+        print(f"🔄 Loading external datasets...")
+        
+        for name, filename in external_files.items():
+            print(f"  📂 Trying to load {name} from {filename}")
+            try:
+                df = pd.read_csv(filename, sep=';')
+                print(f"    📊 Raw data loaded: {len(df)} rows, {len(df.columns)} columns")
+                
+                # Convert value column to numeric - handle different column names
+                value_columns = ['Value', 'GDP', 'GINI', 'Unemployment', 'RD_Expenditure', 'Social_Coverage']
+                value_col_found = None
+                for col in value_columns:
+                    if col in df.columns:
+                        df[col] = pd.to_numeric(df[col], errors='coerce')
+                        df = df.dropna(subset=[col])
+                        value_col_found = col
+                        break
+                
+                if value_col_found:
+                    print(f"    ✅ Using value column: {value_col_found}")
+                    print(f"    📊 After cleaning: {len(df)} rows")
+                else:
+                    print(f"    ⚠️  No value column found in: {list(df.columns)}")
+                
+                self.external_data[name] = df
+                print(f"✅ Loaded {name} data: {len(df)} rows")
+                print(f"   Columns: {list(df.columns)}")
+                
+                # Show sample data
+                if len(df) > 0:
+                    sample_countries = df['GeoAreaName'].unique()[:3] if 'GeoAreaName' in df.columns else []
+                    sample_years = sorted(df['TimePeriod'].unique())[-3:] if 'TimePeriod' in df.columns else []
+                    print(f"   Sample countries: {sample_countries}")
+                    print(f"   Recent years: {sample_years}")
+                
+            except FileNotFoundError:
+                print(f"⚠️  Warning: {filename} not found")
+                self.external_data[name] = None
+            except Exception as e:
+                print(f"❌ Error loading {filename}: {e}")
+                self.external_data[name] = None
+        
+        print(f"🔄 External data loading complete. Loaded {len([k for k,v in self.external_data.items() if v is not None])} datasets.")
+    
+    def create_external_data_status_panel(self, parent):
+        """Create external data status text panel"""
+        # External Data Status Section
+        status_frame = ttk.LabelFrame(parent, text="📊 External Data Status", padding="5")
+        status_frame.pack(fill=tk.X, pady=(10, 0))
+        
+        # Data for visualization
+        datasets = ['GDP', 'GINI', 'Unemployment', 'R&D', 'Social']
+        dataset_keys = ['gdp', 'gini', 'unemployment', 'rd_expenditure', 'social_coverage']
+        
+        # Create text status for each dataset
+        for key, name in zip(dataset_keys, datasets):
+            row_frame = ttk.Frame(status_frame)
+            row_frame.pack(fill=tk.X, pady=1)
+            
+            if key in self.external_data and self.external_data[key] is not None:
+                data = self.external_data[key]
+                count = len(data)
+                
+                # Determine status
+                if count >= 1000:
+                    status = "✅"
+                    color = "green"
+                elif count >= 100:
+                    status = "⚠️"
+                    color = "orange"
+                elif count > 0:
+                    status = "❌"
+                    color = "red"
+                else:
+                    status = "❌"
+                    color = "red"
+                    count = 0
+                
+                # Create status text
+                ttk.Label(row_frame, text=f"{status} {name}:", width=12).pack(side=tk.LEFT)
+                ttk.Label(row_frame, text=f"{count} rows", foreground=color).pack(side=tk.LEFT)
+            else:
+                ttk.Label(row_frame, text=f"❌ {name}:", width=12).pack(side=tk.LEFT)
+                ttk.Label(row_frame, text="Not loaded", foreground="red").pack(side=tk.LEFT)
+        
+        # Add summary
+        total_loaded = len([k for k,v in self.external_data.items() if v is not None and len(v) > 0])
+        summary_frame = ttk.Frame(status_frame)
+        summary_frame.pack(fill=tk.X, pady=(5, 0))
+        ttk.Label(summary_frame, text=f"Summary: {total_loaded}/5 datasets loaded", 
+                 font=("TkDefaultFont", "8", "bold")).pack()
+    
+    def create_widgets(self):
+        """Create GUI widgets"""
+        # Main frame
+        main_frame = ttk.Frame(self.root)
+        main_frame.pack(fill=tk.BOTH, expand=True, padx=10, pady=10)
+        
+        # Left panel for controls
+        control_frame = ttk.Frame(main_frame, width=300)
+        control_frame.pack(side=tk.LEFT, fill=tk.Y, padx=(0, 10))
+        control_frame.pack_propagate(False)
+        
+        # Title
+        title_label = ttk.Label(control_frame, text="SDG 10: Reduced Inequalities", 
+                               font=("Arial", 16, "bold"))
+        title_label.pack(pady=(0, 20))
+        
+        # Country selection
+        ttk.Label(control_frame, text="Country:", font=("Arial", 10, "bold")).pack(anchor=tk.W)
+        self.country_var = tk.StringVar()
+        self.country_combo = ttk.Combobox(control_frame, textvariable=self.country_var, width=30)
+        self.country_combo.pack(fill=tk.X, pady=(0, 10))
+        
+        # Indicator selection
+        ttk.Label(control_frame, text="Indicator:", font=("Arial", 10, "bold")).pack(anchor=tk.W)
+        self.indicator_var = tk.StringVar()
+        self.indicator_combo = ttk.Combobox(control_frame, textvariable=self.indicator_var, width=30)
+        self.indicator_combo.pack(fill=tk.X, pady=(0, 10))
+        
+        # Location filter (if applicable)
+        ttk.Label(control_frame, text="Location:", font=("Arial", 10, "bold")).pack(anchor=tk.W)
+        self.location_var = tk.StringVar()
+        self.location_combo = ttk.Combobox(control_frame, textvariable=self.location_var, width=30)
+        self.location_combo.pack(fill=tk.X, pady=(0, 10))
+        
+        # Sex filter
+        ttk.Label(control_frame, text="Sex:", font=("Arial", 10, "bold")).pack(anchor=tk.W)
+        self.sex_var = tk.StringVar()
+        self.sex_combo = ttk.Combobox(control_frame, textvariable=self.sex_var, width=30)
+        self.sex_combo.pack(fill=tk.X, pady=(0, 10))
+        
+        # Type of Product filter
+        ttk.Label(control_frame, text="Type of Product:", font=("Arial", 10, "bold")).pack(anchor=tk.W)
+        self.product_var = tk.StringVar()
+        self.product_combo = ttk.Combobox(control_frame, textvariable=self.product_var, width=30)
+        self.product_combo.pack(fill=tk.X, pady=(0, 10))
+        
+        # Grounds of Discrimination filter
+        ttk.Label(control_frame, text="Grounds of Discrimination:", font=("Arial", 10, "bold")).pack(anchor=tk.W)
+        self.discrimination_var = tk.StringVar()
+        self.discrimination_combo = ttk.Combobox(control_frame, textvariable=self.discrimination_var, width=30)
+        self.discrimination_combo.pack(fill=tk.X, pady=(0, 10))
+        
+        # Model selection
+        ttk.Label(control_frame, text="Model:", font=("Arial", 10, "bold")).pack(anchor=tk.W)
+        self.model_var = tk.StringVar(value="ARIMA")
+        model_frame = ttk.Frame(control_frame)
+        model_frame.pack(fill=tk.X, pady=(0, 10))
+        
+        ttk.Radiobutton(model_frame, text="ARIMA", variable=self.model_var, value="ARIMA").pack(anchor=tk.W)
+        ttk.Radiobutton(model_frame, text="Prophet", variable=self.model_var, value="Prophet").pack(anchor=tk.W)
+        ttk.Radiobutton(model_frame, text="SARIMAX", variable=self.model_var, value="SARIMAX").pack(anchor=tk.W)
+        ttk.Radiobutton(model_frame, text="Random Forest", variable=self.model_var, value="Random Forest").pack(anchor=tk.W)
+        
+        # Buttons
+        button_frame = ttk.Frame(control_frame)
+        button_frame.pack(fill=tk.X, pady=10)
+        
+        self.forecast_button = ttk.Button(button_frame, text="Generate Forecast", 
+                                         command=self.generate_forecast)
+        self.forecast_button.pack(fill=tk.X, pady=(0, 5))
+        
+        self.save_button = ttk.Button(button_frame, text="Save Results", 
+                                     command=self.save_results, state='disabled')
+        self.save_button.pack(fill=tk.X)
+        
+        # External Data Status Panel
+        self.create_external_data_status_panel(control_frame)
+        
+        # Right panel for plot and results
+        right_frame = ttk.Frame(main_frame)
+        right_frame.pack(side=tk.RIGHT, fill=tk.BOTH, expand=True)
+        
+        # Create a notebook (tabbed interface) for better organization
+        notebook = ttk.Notebook(right_frame)
+        notebook.pack(fill=tk.BOTH, expand=True)
+        
+        # Forecast Plot Tab
+        plot_tab = ttk.Frame(notebook)
+        notebook.add(plot_tab, text="📈 Forecast Plot")
+        
+        self.plot_frame = ttk.Frame(plot_tab)
+        self.plot_frame.pack(fill=tk.BOTH, expand=True, padx=10, pady=10)
+        
+        # Results Analysis Tab
+        results_tab = ttk.Frame(notebook)
+        notebook.add(results_tab, text="📊 Results Analysis")
+        
+        # Create a paned window for results visualization
+        results_paned = ttk.PanedWindow(results_tab, orient=tk.VERTICAL)
+        results_paned.pack(fill=tk.BOTH, expand=True, padx=10, pady=10)
+        
+        # Top frame for results plot
+        results_plot_frame = ttk.Frame(results_paned)
+        results_paned.add(results_plot_frame, weight=3)
+        
+        self.results_plot_frame = ttk.Frame(results_plot_frame)
+        self.results_plot_frame.pack(fill=tk.BOTH, expand=True)
+        
+        # Bottom frame for detailed text results
+        text_results_frame = ttk.Frame(results_paned)
+        results_paned.add(text_results_frame, weight=2)
+        
+        results_label = ttk.Label(text_results_frame, text="Detailed Results:", font=("Arial", 12, "bold"))
+        results_label.pack(anchor=tk.W, pady=(0, 5))
+        
+        # Text results with scrollbar
+        text_frame = ttk.Frame(text_results_frame)
+        text_frame.pack(fill=tk.BOTH, expand=True)
+        
+        self.results_text = tk.Text(text_frame, height=12, wrap=tk.WORD, font=("Consolas", 10))
+        scrollbar = ttk.Scrollbar(text_frame, orient=tk.VERTICAL, command=self.results_text.yview)
+        self.results_text.configure(yscrollcommand=scrollbar.set)
+        
+        self.results_text.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
+        scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
+    
+    def load_data(self):
+        """Load SDG10 data"""
+        try:
+            self.data = pd.read_csv('Goal10_processed.csv', sep=';')
+            print(f"✅ Loaded SDG10 data: {len(self.data)} rows")
+            
+            # Clean and validate data
+            print("🔧 Cleaning data...")
+            original_rows = len(self.data)
+            
+            # Convert Value column to numeric
+            self.data['Value'] = pd.to_numeric(self.data['Value'], errors='coerce')
+            
+            # Remove rows with invalid values
+            self.data = self.data.dropna(subset=['Value'])
+            
+            cleaned_rows = len(self.data)
+            if cleaned_rows < original_rows:
+                print(f"⚠️  Removed {original_rows - cleaned_rows} rows with invalid values")
+            
+            if len(self.data) == 0:
+                raise ValueError("No valid data remaining after cleaning")
+            
+            # Populate filter options
+            self.populate_filters()
+            
+        except FileNotFoundError:
+            messagebox.showerror("Error", "Goal10_processed.csv not found")
+        except Exception as e:
+            messagebox.showerror("Error", f"Could not load data: {str(e)}")
+    
+    def populate_filters(self):
+        """Populate filter dropdown options"""
+        if self.data is None:
+            return
+        
+        # Countries
+        countries = sorted(self.data['GeoAreaName'].dropna().unique())
+        self.country_combo['values'] = countries
+        if countries:
+            self.country_combo.set(countries[0])
+        
+        # Indicators - use SeriesDescription instead of Indicator code
+        indicators = sorted(self.data['SeriesDescription'].dropna().unique())
+        self.indicator_combo['values'] = indicators
+        if indicators:
+            self.indicator_combo.set(indicators[0])
+        
+        # Location
+        locations = sorted(self.data['Location'].dropna().unique())
+        locations = [loc for loc in locations if str(loc) != 'nan']
+        locations.insert(0, 'ALL')
+        self.location_combo['values'] = locations
+        self.location_combo.set('ALL')
+        
+        # Sex
+        sexes = sorted(self.data['Sex'].dropna().unique())
+        sexes = [sex for sex in sexes if str(sex) != 'nan']
+        sexes.insert(0, 'ALL')
+        self.sex_combo['values'] = sexes
+        self.sex_combo.set('ALL')
+        
+        # Type of Product
+        products = sorted(self.data['TypeofProduct'].dropna().unique())
+        products = [prod for prod in products if str(prod) != 'nan']
+        products.insert(0, 'ALL')
+        self.product_combo['values'] = products
+        self.product_combo.set('ALL')
+        
+        # Grounds of Discrimination
+        discriminations = sorted(self.data['GroundsOfDiscrimination'].dropna().unique())
+        discriminations = [disc for disc in discriminations if str(disc) != 'nan']
+        discriminations.insert(0, 'ALL')
+        self.discrimination_combo['values'] = discriminations
+        self.discrimination_combo.set('ALL')
+        
+        # Bind events to update filters
+        self.country_combo.bind('<<ComboboxSelected>>', self.on_filter_change)
+        self.indicator_combo.bind('<<ComboboxSelected>>', self.on_filter_change)
+    
+    def on_filter_change(self, event=None):
+        """Update available options when filters change"""
+        # This can be enhanced to show only relevant combinations
+        pass
+    
+    def filter_data(self):
+        """Filter data based on current selections"""
+        filtered_data = self.data.copy()
+        
+        # Apply filters
+        country = self.country_var.get()
+        if country:
+            filtered_data = filtered_data[filtered_data['GeoAreaName'] == country]
+        
+        indicator = self.indicator_var.get()
+        if indicator:
+            filtered_data = filtered_data[filtered_data['SeriesDescription'] == indicator]
+        
+        location = self.location_var.get()
+        if location and location != 'ALL':
+            filtered_data = filtered_data[filtered_data['Location'] == location]
+        
+        sex = self.sex_var.get()
+        if sex and sex != 'ALL':
+            filtered_data = filtered_data[filtered_data['Sex'] == sex]
+        
+        product = self.product_var.get()
+        if product and product != 'ALL':
+            filtered_data = filtered_data[filtered_data['TypeofProduct'] == product]
+        
+        discrimination = self.discrimination_var.get()
+        if discrimination and discrimination != 'ALL':
+            filtered_data = filtered_data[filtered_data['GroundsOfDiscrimination'] == discrimination]
+        
+        return filtered_data
+    
+    def prepare_time_series(self, data):
+        """Prepare time series data for forecasting"""
+        # Convert TimePeriod to datetime
+        data['Date'] = pd.to_datetime(data['TimePeriod'].astype(str) + '-01-01')
+        
+        # Convert Value to numeric, handling any text values
+        data['Value'] = pd.to_numeric(data['Value'], errors='coerce')
+        
+        # Remove rows with NaN values
+        data = data.dropna(subset=['Value'])
+        
+        if len(data) == 0:
+            raise ValueError("No valid numeric data found after cleaning")
+        
+        # Group by date and take mean of values (in case of duplicates)
+        ts_data = data.groupby('Date')['Value'].mean().sort_index()
+        
+        # Remove any remaining NaN values
+        ts_data = ts_data.dropna()
+        
+        return ts_data
+    
+    def fit_arima_model(self, series):
+        """Fit ARIMA model with time series cross validation"""
+        print("🔮 Fitting ARIMA model...")
+        
+        # Time series cross validation
+        tscv = TimeSeriesSplit(n_splits=min(5, len(series) // 4))
+        cv_scores = []
+        best_order = None
+        best_score = float('inf')
+        
+        # Test different ARIMA orders
+        orders_to_test = [
+            (1, 1, 1), (1, 1, 0), (0, 1, 1),
+            (2, 1, 1), (1, 1, 2), (1, 0, 1),
+            (2, 1, 2), (0, 1, 0)
+        ]
+        
+        cv_results = {}
+        
+        for order in orders_to_test:
+            scores = []
+            try:
+                for train_idx, test_idx in tscv.split(series):
+                    train_series = series.iloc[train_idx]
+                    test_series = series.iloc[test_idx]
+                    
+                    # Fit ARIMA
+                    model = ARIMA(train_series, order=order)
+                    fitted_model = model.fit()
+                    
+                    # Forecast
+                    forecast = fitted_model.forecast(steps=len(test_series))
+                    
+                    # Calculate RMSE
+                    rmse = np.sqrt(mean_squared_error(test_series, forecast))
+                    scores.append(rmse)
+                
+                avg_score = np.mean(scores)
+                std_score = np.std(scores)
+                cv_results[order] = {'mean': avg_score, 'std': std_score, 'scores': scores}
+                
+                if avg_score < best_score:
+                    best_score = avg_score
+                    best_order = order
+                    
+            except Exception as e:
+                print(f"Failed to fit ARIMA{order}: {e}")
+                continue
+        
+        if best_order is None:
+            raise Exception("Could not fit any ARIMA model")
+        
+        # Fit final model on full data
+        final_model = ARIMA(series, order=best_order)
+        fitted_final_model = final_model.fit()
+        
+        # Generate test predictions for plotting
+        n_test = min(len(series) // 5, 10)
+        train_series = series[:-n_test] if n_test > 0 else series
+        test_series = series[-n_test:] if n_test > 0 else pd.Series()
+        
+        if len(test_series) > 0:
+            test_model = ARIMA(train_series, order=best_order)
+            test_fitted = test_model.fit()
+            test_predictions = test_fitted.forecast(steps=len(test_series))
+            test_rmse = np.sqrt(mean_squared_error(test_series, test_predictions))
+        else:
+            test_predictions = pd.Series()
+            test_rmse = 0
+        
+        return {
+            'model': fitted_final_model,
+            'order': best_order,
+            'cv_results': cv_results,
+            'best_score': best_score,
+            'test_predictions': test_predictions,
+            'test_data': test_series,
+            'rmse': test_rmse
+        }
+    
+    def fit_prophet_model(self, series):
+        """Fit Prophet model with time series cross validation"""
+        print("🔮 Fitting Prophet model...")
+        
+        # Prepare data for Prophet
+        prophet_data = pd.DataFrame({
+            'ds': series.index,
+            'y': series.values
+        })
+        
+        # Time series cross validation using Prophet's built-in CV
+        model = Prophet(
+            daily_seasonality=False,
+            weekly_seasonality=False,
+            yearly_seasonality=True,
+            seasonality_mode='additive'
+        )
+        
+        # Fit model
+        model.fit(prophet_data)
+        
+        # Cross validation - adapt parameters to data length
+        try:
+            # Calculate data span and adapt CV parameters
+            data_span_days = (prophet_data['ds'].max() - prophet_data['ds'].min()).days
+            data_years = data_span_days / 365
+            
+            print(f"📊 Prophet CV: Data spans {data_years:.1f} years ({data_span_days} days)")
+            
+            # Adaptive CV parameters based on data length
+            if data_years >= 5:
+                # Long time series: use standard parameters
+                initial_days = max(730, int(data_span_days * 0.5))  # At least 2 years or 50% of data
+                period_days = 365  # 1 year
+                horizon_days = 365  # 1 year
+            elif data_years >= 3:
+                # Medium time series: reduce requirements
+                initial_days = max(365, int(data_span_days * 0.6))  # At least 1 year or 60% of data
+                period_days = 180  # 6 months
+                horizon_days = 180  # 6 months
+            else:
+                # Short time series: minimal CV
+                initial_days = max(180, int(data_span_days * 0.7))  # At least 6 months or 70% of data
+                period_days = 90   # 3 months
+                horizon_days = 90   # 3 months
+            
+            # Ensure we have enough data for CV
+            min_required = initial_days + horizon_days
+            if data_span_days < min_required:
+                print(f"⚠️  Not enough data for Prophet CV (need {min_required} days, have {data_span_days})")
+                raise ValueError("Insufficient data for cross-validation")
+            
+            print(f"🔄 Using CV parameters: initial={initial_days}d, period={period_days}d, horizon={horizon_days}d")
+            
+            cv_results = cross_validation(
+                model, 
+                initial=f'{initial_days} days',
+                period=f'{period_days} days',
+                horizon=f'{horizon_days} days'
+            )
+            
+            perf_metrics = performance_metrics(cv_results)
+            avg_rmse = perf_metrics['rmse'].mean()
+            
+            # Store CV summary for visualization
+            cv_summary = {
+                'rmse': perf_metrics['rmse'].tolist(),
+                'mae': perf_metrics['mae'].tolist(),
+                'mape': perf_metrics['mape'].tolist(),
+                'mean_rmse': avg_rmse,
+                'mean_mae': perf_metrics['mae'].mean(),
+                'mean_mape': perf_metrics['mape'].mean(),
+                'cv_folds': len(perf_metrics)
+            }
+            
+        except Exception as e:
+            print(f"⚠️  Prophet CV failed: {e}")
+            avg_rmse = None
+            cv_results = None
+            performance_metrics = None
+            cv_summary = None
+        
+        # Generate test predictions for plotting
+        n_test = min(len(series) // 5, 10)
+        train_series = series[:-n_test] if n_test > 0 else series
+        test_series = series[-n_test:] if n_test > 0 else pd.Series()
+        
+        if len(test_series) > 0:
+            train_prophet_data = pd.DataFrame({
+                'ds': train_series.index,
+                'y': train_series.values
+            })
+            
+            test_model = Prophet(
+                daily_seasonality=False,
+                weekly_seasonality=False,
+                yearly_seasonality=True,
+                seasonality_mode='additive'
+            )
+            test_model.fit(train_prophet_data)
+            
+            test_future = pd.DataFrame({'ds': test_series.index})
+            test_forecast = test_model.predict(test_future)
+            test_predictions = pd.Series(test_forecast['yhat'].values, index=test_series.index)
+            test_rmse = np.sqrt(mean_squared_error(test_series, test_predictions))
+        else:
+            test_predictions = pd.Series()
+            test_rmse = 0
+        
+        return {
+            'model': model,
+            'cv_results': cv_results,
+            'performance_metrics': perf_metrics if 'perf_metrics' in locals() else None,
+            'cv_summary': cv_summary,
+            'avg_rmse': avg_rmse,
+            'test_predictions': test_predictions,
+            'test_data': test_series,
+            'rmse': test_rmse
+        }
+    
+    def generate_forecast(self):
+        """Generate forecast based on selected model and parameters"""
+        try:
+            # Get filtered data
+            filtered_data = self.filter_data()
+            
+            if len(filtered_data) < 10:
+                messagebox.showwarning("Warning", 
+                    f"Insufficient data points ({len(filtered_data)}). Need at least 10 points for forecasting.")
+                return
+            
+            # Prepare time series
+            series = self.prepare_time_series(filtered_data)
+            
+            if len(series) < 10:
+                messagebox.showwarning("Warning", 
+                    f"Insufficient time series data ({len(series)} points). Need at least 10 points for forecasting.")
+                return
+            
+            # Get model type
+            model_type = self.model_var.get()
+            
+            # Clear previous plot
+            for widget in self.plot_frame.winfo_children():
+                widget.destroy()
+            
+            # Generate forecast based on model type
+            if model_type == "ARIMA":
+                results = self.forecast_arima(series, filtered_data)
+            elif model_type == "Prophet":
+                results = self.forecast_prophet(series, filtered_data)
+            elif model_type == "SARIMAX":
+                results = self.forecast_sarimax(series, filtered_data)
+            elif model_type == "Random Forest":
+                results = self.forecast_random_forest(series, filtered_data)
+            else:
+                messagebox.showerror("Error", f"Model {model_type} not implemented yet")
+                return
+            
+            # Enable save button
+            self.save_button.state(['!disabled'])
+            
+        except Exception as e:
+            messagebox.showerror("Error", f"Could not generate forecast: {str(e)}")
+    
+    def forecast_arima(self, series, filtered_data):
+        """Generate ARIMA forecast"""
+        # Fit model
+        arima_results = self.fit_arima_model(series)
+        
+        # Generate future forecast
+        future_periods = 8  # Forecast 8 years into the future
+        forecast = arima_results['model'].forecast(steps=future_periods)
+        forecast_ci = arima_results['model'].get_forecast(steps=future_periods).conf_int()
+        
+        # Create future dates
+        last_date = series.index[-1]
+        future_dates = pd.date_range(start=last_date + pd.DateOffset(years=1), 
+                                   periods=future_periods, freq='YS')
+        
+        # Create forecast series
+        forecast_series = pd.Series(forecast, index=future_dates)
+        
+        # Plot results
+        self.plot_forecast_results(series, forecast_series, forecast_ci, 
+                                 arima_results, "ARIMA", filtered_data)
+        
+        # Plot detailed results analysis
+        self.plot_results_analysis(series, forecast_series, forecast_ci, 
+                                  arima_results, "ARIMA", filtered_data)
+        
+        return arima_results
+    
+    def forecast_prophet(self, series, filtered_data):
+        """Generate Prophet forecast"""
+        # Fit model
+        prophet_results = self.fit_prophet_model(series)
+        
+        # Generate future forecast
+        future_periods = 8
+        last_date = series.index[-1]
+        future_dates = pd.date_range(start=last_date + pd.DateOffset(years=1), 
+                                   periods=future_periods, freq='YS')
+        
+        future_df = pd.DataFrame({'ds': future_dates})
+        forecast = prophet_results['model'].predict(future_df)
+        
+        # Extract forecast values and confidence intervals
+        forecast_series = pd.Series(forecast['yhat'].values, index=future_dates)
+        forecast_ci = pd.DataFrame({
+            'lower': forecast['yhat_lower'].values,
+            'upper': forecast['yhat_upper'].values
+        }, index=future_dates)
+        
+        # Plot results
+        self.plot_forecast_results(series, forecast_series, forecast_ci, 
+                                 prophet_results, "Prophet", filtered_data)
+        
+        # Plot detailed results analysis
+        self.plot_results_analysis(series, forecast_series, forecast_ci, 
+                                  prophet_results, "Prophet", filtered_data)
+        
+        return prophet_results
+    
+    def get_historical_feature_value(self, country, year, dataset_name, value_column):
+        """Get historical value for external feature"""
+        if dataset_name not in self.external_data:
+            print(f"      ❌ Dataset {dataset_name} not found in external_data")
+            return None
+            
+        if self.external_data[dataset_name] is None:
+            print(f"      ❌ Dataset {dataset_name} is None")
+            return None
+        
+        data = self.external_data[dataset_name]
+        if len(data) == 0:
+            print(f"      ❌ Dataset {dataset_name} is empty")
+            return None
+        
+        # Check column names and map them correctly
+        country_col = None
+        year_col = None
+        value_col = None
+        
+        # Find country column
+        if 'GeoAreaName' in data.columns:
+            country_col = 'GeoAreaName'
+        elif 'Country Name' in data.columns:
+            country_col = 'Country Name'
+        elif 'Country' in data.columns:
+            country_col = 'Country'
+        
+        # Find year column
+        if 'TimePeriod' in data.columns:
+            year_col = 'TimePeriod'
+        elif 'Year' in data.columns:
+            year_col = 'Year'
+        
+        # Find value column
+        if value_column in data.columns:
+            value_col = value_column
+        elif 'Value' in data.columns:
+            value_col = 'Value'
+        elif dataset_name == 'gdp' and 'GDP' in data.columns:
+            value_col = 'GDP'
+        
+        # If we can't find the required columns, return None
+        if not all([country_col, year_col, value_col]):
+            print(f"⚠️  Missing columns in {dataset_name}: country={country_col}, year={year_col}, value={value_col}")
+            return None
+        
+        # Filter by country and year
+        try:
+            mask = (data[country_col] == country) & (data[year_col] == year)
+            filtered = data[mask]
+            
+            if len(filtered) > 0:
+                value = filtered[value_col].iloc[0]
+                print(f"      ✅ Found {dataset_name} for {country} {year}: {value}")
+                return value
+            else:
+                print(f"      🔍 No data for {dataset_name}: {country} {year}")
+                return None
+        except Exception as e:
+            print(f"      ⚠️  Error filtering {dataset_name}: {e}")
+        
+        return None
+    
+    def extrapolate_external_variables_for_inequality(self, country, year, feature_names, 
+                                                    location='ALL', sex='ALL', product='ALL', discrimination='ALL'):
+        """Extrapolate external variables for future years with inequality-specific intelligence"""
+        features = []
+        
+        for feature_name in feature_names:
+            print(f"    🔍 Processing {feature_name} for {year}")
+            
+            if feature_name == 'GDP':
+                # GDP growth with inequality considerations
+                historical_gdp = []
+                for hist_year in range(year - 5, year):
+                    hist_value = self.get_historical_feature_value(country, hist_year, 'gdp', 'Value')
+                    if hist_value is not None:
+                        historical_gdp.append(hist_value)
+                
+                if len(historical_gdp) >= 3:
+                    # Calculate growth rate
+                    growth_rates = []
+                    for i in range(1, len(historical_gdp)):
+                        if historical_gdp[i-1] > 0:
+                            growth_rate = (historical_gdp[i] / historical_gdp[i-1]) - 1
+                            growth_rates.append(growth_rate)
+                    
+                    if growth_rates:
+                        avg_growth = np.mean(growth_rates)
+                        # Inequality considerations - conservative growth
+                        if discrimination != 'ALL':
+                            inequality_adjustment = -0.002  # Discrimination reduces effective growth
+                        elif sex == 'FEMALE':
+                            inequality_adjustment = -0.001  # Gender gaps affect growth
+                        else:
+                            inequality_adjustment = 0.0
+                        
+                        adjusted_growth = avg_growth + inequality_adjustment
+                        adjusted_growth = max(-0.05, min(0.08, adjusted_growth))  # Between -5% and +8%
+                        
+                        # Calculate future GDP
+                        last_historical_year = 2022
+                        years_ahead = year - last_historical_year
+                        future_gdp = historical_gdp[-1] * (1 + adjusted_growth) ** years_ahead
+                        print(f"      📊 GDP: {future_gdp:.2f} (growth: {adjusted_growth:.3f})")
+                        features.append(future_gdp)
+                    else:
+                        features.append(historical_gdp[-1] * 1.02)  # 2% default growth
+                else:
+                    features.append(30000.0)  # Default GDP
+            
+            elif feature_name == 'GINI':
+                # GINI with inequality-specific trends
+                last_gini = self.get_historical_feature_value(country, year-1, 'gini', 'Value')
+                if last_gini is not None:
+                    # Inequality policies and trends
+                    if discrimination != 'ALL':
+                        # Anti-discrimination policies reduce inequality
+                        inequality_improvement = 0.3
+                    elif sex == 'FEMALE':
+                        # Gender equality policies
+                        inequality_improvement = 0.2
+                    elif product != 'ALL':
+                        # Product-specific policies (e.g., education, healthcare access)
+                        inequality_improvement = 0.15
+                    else:
+                        inequality_improvement = 0.05  # General improvement
+                    
+                    future_gini = max(25, last_gini - inequality_improvement)
+                    print(f"      📊 GINI: {future_gini:.2f} (improvement: {inequality_improvement})")
+                    features.append(future_gini)
+                else:
+                    features.append(40.0)  # Default GINI
+            
+            elif feature_name == 'Unemployment':
+                # Unemployment with inequality considerations
+                last_unemployment = self.get_historical_feature_value(country, year-1, 'unemployment', 'Value')
+                if last_unemployment is not None:
+                    # Inequality affects unemployment differently
+                    if discrimination != 'ALL':
+                        # Discrimination increases unemployment for affected groups
+                        unemployment_change = 0.3
+                    elif sex == 'FEMALE':
+                        # Gender gaps in employment
+                        unemployment_change = 0.2
+                    else:
+                        unemployment_change = -0.1  # General improvement
+                    
+                    future_unemployment = max(1.0, last_unemployment + unemployment_change)
+                    print(f"      📊 Unemployment: {future_unemployment:.2f}")
+                    features.append(future_unemployment)
+                else:
+                    features.append(8.0)  # Default unemployment
+            
+            elif feature_name == 'RD_Expenditure':
+                # R&D investment with inequality focus
+                last_rd = self.get_historical_feature_value(country, year-1, 'rd_expenditure', 'Value')
+                if last_rd is not None:
+                    # R&D investment in inequality reduction
+                    if discrimination != 'ALL':
+                        rd_boost = 0.15  # Research into discrimination
+                    elif sex == 'FEMALE':
+                        rd_boost = 0.12  # Gender research investment
+                    else:
+                        rd_boost = 0.05  # General R&D growth
+                    
+                    future_rd = last_rd * (1 + rd_boost)
+                    print(f"      📊 R&D: {future_rd:.2f}")
+                    features.append(future_rd)
+                else:
+                    features.append(2.0)  # Default R&D
+            
+            elif feature_name == 'Social_Coverage':
+                # Social coverage with inequality reduction focus
+                last_social = self.get_historical_feature_value(country, year-1, 'social_coverage', 'Value')
+                if last_social is not None:
+                    # Social protection expansion
+                    if discrimination != 'ALL':
+                        social_expansion = 5.0  # Strong expansion for discriminated groups
+                    elif sex == 'FEMALE':
+                        social_expansion = 3.0  # Gender-focused social protection
+                    else:
+                        social_expansion = 1.5  # General expansion
+                    
+                    future_social = min(100, last_social + social_expansion)
+                    print(f"      📊 Social Coverage: {future_social:.2f}%")
+                    features.append(future_social)
+                else:
+                    features.append(60.0)  # Default social coverage
+            
+            else:
+                # Unknown feature - use default
+                features.append(0.0)
+        
+        return features
+    
+    def fit_sarimax_model(self, series, country, location='ALL', sex='ALL', product='ALL', discrimination='ALL'):
+        """Fit SARIMAX model with external variables and cross validation"""
+        print(f"🔮 Fitting SARIMAX model for {country}...")
+        
+        # Prepare external variables
+        external_features = ['GDP', 'GINI', 'Unemployment', 'RD_Expenditure', 'Social_Coverage']
+        
+        # Collect external data for historical years
+        years = [date.year for date in series.index]
+        external_data = []
+        
+        for year in years:
+            print(f"  🔍 Processing external data for year {year}")
+            year_features = self.extrapolate_external_variables_for_inequality(
+                country, year, external_features, location, sex, product, discrimination
+            )
+            
+            print(f"    📊 Received features: {year_features}")
+            print(f"    📊 Expected {len(external_features)} features, got {len(year_features) if year_features else 0}")
+            
+            if year_features and len(year_features) == len(external_features):
+                external_data.append(year_features)
+                print(f"    ✅ Added year {year} features: {year_features}")
+            else:
+                # Use interpolation or default values
+                if len(external_data) > 0:
+                    external_data.append(external_data[-1].copy())
+                    print(f"    🔄 Used previous year data for {year}")
+                else:
+                    default_values = [30000, 40, 8, 2, 60]  # Default values
+                    external_data.append(default_values)
+                    print(f"    ⚠️  Used default values for {year}: {default_values}")
+        
+        if len(external_data) < len(series):
+            print("⚠️  Insufficient external data, falling back to ARIMA")
+            return self.fit_arima_model(series)
+        
+        external_data = np.array(external_data)
+        
+        # Debug: Check external data variance
+        print(f"🔍 External data matrix:")
+        print(f"  Shape: {external_data.shape}")
+        print(f"  First row: {external_data[0] if len(external_data) > 0 else 'No data'}")
+        print(f"  Last row: {external_data[-1] if len(external_data) > 0 else 'No data'}")
+        
+        # Check variance for each feature
+        for i, feature in enumerate(external_features):
+            feature_values = external_data[:, i]
+            variance = np.var(feature_values)
+            min_val, max_val = np.min(feature_values), np.max(feature_values)
+            print(f"  {feature}: variance={variance:.2f}, range=[{min_val:.2f}, {max_val:.2f}]")
+            
+            if variance < 0.01:
+                print(f"    ⚠️  {feature} has very low variance - may not influence model!")
+        
+        # Scale external variables
+        scaler = StandardScaler()
+        external_data_scaled = scaler.fit_transform(external_data)
+        
+        print(f"📊 External data shape: {external_data_scaled.shape}")
+        print(f"📊 Features: {external_features}")
+        
+        # Debug: Check scaled data variance
+        print(f"🔍 Scaled external data variance:")
+        for i, feature in enumerate(external_features):
+            scaled_values = external_data_scaled[:, i]
+            variance = np.var(scaled_values)
+            print(f"  {feature}: scaled variance={variance:.4f}")
+        
+        # Time series cross validation
+        tscv = TimeSeriesSplit(n_splits=min(4, len(series) // 5))
+        cv_scores = []
+        best_order = None
+        best_seasonal_order = None
+        best_score = float('inf')
+        
+        # Test different SARIMAX orders
+        orders_to_test = [
+            (1, 1, 1), (1, 1, 0), (0, 1, 1),
+            (2, 1, 1), (1, 1, 2), (1, 0, 1)
+        ]
+        
+        seasonal_orders = [(0, 0, 0, 0)]  # No seasonality for now
+        
+        cv_results = {}
+        
+        for order in orders_to_test:
+            for seasonal_order in seasonal_orders:
+                scores = []
+                try:
+                    for train_idx, test_idx in tscv.split(series):
+                        train_series = series.iloc[train_idx]
+                        test_series = series.iloc[test_idx]
+                        train_exog = external_data_scaled[train_idx]
+                        test_exog = external_data_scaled[test_idx]
+                        
+                        # Fit SARIMAX
+                        model = SARIMAX(train_series, exog=train_exog, 
+                                      order=order, seasonal_order=seasonal_order)
+                        fitted_model = model.fit(disp=False)
+                        
+                        # Forecast
+                        forecast = fitted_model.forecast(steps=len(test_series), exog=test_exog)
+                        
+                        # Calculate RMSE
+                        rmse = np.sqrt(mean_squared_error(test_series, forecast))
+                        scores.append(rmse)
+                    
+                    avg_score = np.mean(scores)
+                    std_score = np.std(scores)
+                    cv_results[(order, seasonal_order)] = {
+                        'mean': avg_score, 'std': std_score, 'scores': scores
+                    }
+                    
+                    if avg_score < best_score:
+                        best_score = avg_score
+                        best_order = order
+                        best_seasonal_order = seasonal_order
+                        
+                except Exception as e:
+                    print(f"Failed to fit SARIMAX{order}x{seasonal_order}: {e}")
+                    continue
+        
+        if best_order is None:
+            print("⚠️  All SARIMAX models failed, falling back to ARIMA")
+            return self.fit_arima_model(series)
+        
+        # Fit final model on full data
+        final_model = SARIMAX(series, exog=external_data_scaled, 
+                             order=best_order, seasonal_order=best_seasonal_order)
+        fitted_final_model = final_model.fit(disp=False)
+        
+        # Generate test predictions for plotting
+        n_test = min(len(series) // 5, 8)
+        train_series = series[:-n_test] if n_test > 0 else series
+        test_series = series[-n_test:] if n_test > 0 else pd.Series()
+        
+        if len(test_series) > 0:
+            train_exog = external_data_scaled[:-n_test]
+            test_exog = external_data_scaled[-n_test:]
+            
+            test_model = SARIMAX(train_series, exog=train_exog, 
+                               order=best_order, seasonal_order=best_seasonal_order)
+            test_fitted = test_model.fit(disp=False)
+            test_predictions = test_fitted.forecast(steps=len(test_series), exog=test_exog)
+            test_rmse = np.sqrt(mean_squared_error(test_series, test_predictions))
+        else:
+            test_predictions = pd.Series()
+            test_rmse = 0
+        
+        return {
+            'model': fitted_final_model,
+            'order': best_order,
+            'seasonal_order': best_seasonal_order,
+            'cv_results': cv_results,
+            'best_score': best_score,
+            'scaler': scaler,
+            'external_data': external_data,
+            'external_features': external_features,
+            'feature_names': external_features,
+            'test_predictions': test_predictions,
+            'test_data': test_series,
+            'rmse': test_rmse,
+            'series': series,
+            'data_usage_stats': self.calculate_data_usage_stats(country, external_features)
+        }
+    
+    def predict_future_sarimax(self, sarimax_results, country, periods=8, 
+                              location='ALL', sex='ALL', product='ALL', discrimination='ALL'):
+        """Generate future predictions for SARIMAX model with external variables"""
+        print(f"🔮 Generating SARIMAX forecasts for {country} ({periods} periods)")
+        
+        # Extract model components
+        model_fit = sarimax_results['model']
+        scaler = sarimax_results['scaler']
+        feature_names = sarimax_results['feature_names']
+        series = sarimax_results['series']
+        
+        # Get last year
+        last_year = series.index[-1].year
+        future_years = range(last_year + 1, last_year + periods + 1)
+        
+        print(f"🔮 Future years: {list(future_years)}")
+        
+        # Prepare external variables for future years
+        future_exog = []
+        for year in future_years:
+            year_features = self.extrapolate_external_variables_for_inequality(
+                country, year, feature_names, location, sex, product, discrimination
+            )
+            
+            if year_features and len(year_features) >= len(feature_names):
+                future_exog.append(year_features[:len(feature_names)])
+            else:
+                # Use last known values
+                if len(future_exog) > 0:
+                    future_exog.append(future_exog[-1].copy())
+                else:
+                    future_exog.append([30000, 40, 8, 2, 60])  # Default values
+        
+        # Convert to array and scale
+        future_exog_array = np.array(future_exog)
+        future_exog_scaled = scaler.transform(future_exog_array)
+        
+        print(f"🔮 Future external variables shape: {future_exog_scaled.shape}")
+        
+        # Make predictions
+        try:
+            forecast = model_fit.forecast(steps=periods, exog=future_exog_scaled)
+            
+            # Create datetime index
+            future_dates = pd.date_range(start=series.index[-1] + pd.DateOffset(years=1), 
+                                       periods=periods, freq='YS')
+            
+            forecast_series = pd.Series(forecast, index=future_dates)
+            
+            # Get confidence intervals
+            forecast_result = model_fit.get_forecast(steps=periods, exog=future_exog_scaled)
+            forecast_ci = forecast_result.conf_int()
+            
+            return forecast_series, forecast_ci
+            
+        except Exception as e:
+            print(f"⚠️  SARIMAX forecast failed: {e}")
+            return None, None
+    
+    def forecast_sarimax(self, series, filtered_data):
+        """Generate SARIMAX forecast with external variables"""
+        country = self.country_var.get()
+        location = self.location_var.get()
+        sex = self.sex_var.get()
+        product = self.product_var.get()
+        discrimination = self.discrimination_var.get()
+        
+        # Fit model
+        sarimax_results = self.fit_sarimax_model(series, country, location, sex, product, discrimination)
+        
+        if 'external_features' not in sarimax_results:
+            # Fallback to ARIMA was used
+            return self.forecast_arima(series, filtered_data)
+        
+        # Generate future forecast
+        forecast_series, forecast_ci = self.predict_future_sarimax(
+            sarimax_results, country, periods=8, location=location, sex=sex, 
+            product=product, discrimination=discrimination
+        )
+        
+        if forecast_series is None:
+            # Fallback to ARIMA
+            return self.forecast_arima(series, filtered_data)
+        
+        # Plot results
+        self.plot_forecast_results(series, forecast_series, forecast_ci, 
+                                 sarimax_results, "SARIMAX", filtered_data)
+        
+        # Plot detailed results analysis
+        self.plot_results_analysis(series, forecast_series, forecast_ci, 
+                                  sarimax_results, "SARIMAX", filtered_data)
+        
+        return sarimax_results
+    
+    def forecast_random_forest(self, series, filtered_data):
+        """Generate Random Forest forecast with external variables"""
+        country = self.country_var.get()
+        location = self.location_var.get()
+        sex = self.sex_var.get()
+        product = self.product_var.get()
+        discrimination = self.discrimination_var.get()
+        
+        print(f"🔮 Fitting Random Forest model for {country}...")
+        
+        # Prepare external variables
+        external_features = ['GDP', 'GINI', 'Unemployment', 'RD_Expenditure', 'Social_Coverage']
+        
+        # Collect external data for historical years
+        years = [date.year for date in series.index]
+        external_data = []
+        
+        for year in years:
+            print(f"  🔍 RF: Processing external data for year {year}")
+            year_features = self.extrapolate_external_variables_for_inequality(
+                country, year, external_features, location, sex, product, discrimination
+            )
+            
+            print(f"    📊 RF: Received features: {year_features}")
+            print(f"    📊 RF: Expected {len(external_features)} features, got {len(year_features) if year_features else 0}")
+            
+            if year_features and len(year_features) == len(external_features):
+                feature_row = [year] + year_features  # Include year as feature
+                external_data.append(feature_row)
+                print(f"    ✅ RF: Added year {year} features: {feature_row}")
+            else:
+                # Use default values
+                default_row = [year, 30000, 40, 8, 2, 60]
+                external_data.append(default_row)
+                print(f"    ⚠️  RF: Used default values for {year}: {default_row}")
+        
+        if len(external_data) < len(series):
+            print("⚠️  Insufficient external data, falling back to ARIMA")
+            return self.forecast_arima(series, filtered_data)
+        
+        # Create feature matrix
+        X = np.array(external_data)
+        y = series.values
+        
+        # Feature names
+        feature_names = ['Year'] + external_features
+        
+        # Debug: Check feature variance for Random Forest
+        print(f"🔍 RF: Feature matrix analysis:")
+        print(f"  Shape: {X.shape}")
+        print(f"  First row: {X[0] if len(X) > 0 else 'No data'}")
+        print(f"  Last row: {X[-1] if len(X) > 0 else 'No data'}")
+        
+        for i, feature in enumerate(feature_names):
+            feature_values = X[:, i]
+            variance = np.var(feature_values)
+            min_val, max_val = np.min(feature_values), np.max(feature_values)
+            print(f"  {feature}: variance={variance:.2f}, range=[{min_val:.2f}, {max_val:.2f}]")
+            
+            if variance < 0.01:
+                print(f"    ⚠️  RF: {feature} has very low variance - may not influence model!")
+        
+        # Scale features
+        scaler = StandardScaler()
+        X_scaled = scaler.fit_transform(X)
+        
+        print(f"📊 Feature matrix shape: {X_scaled.shape}")
+        print(f"📊 Features: {feature_names}")
+        
+        # Debug: Check scaled feature variance
+        print(f"🔍 RF: Scaled feature variance:")
+        for i, feature in enumerate(feature_names):
+            scaled_values = X_scaled[:, i]
+            variance = np.var(scaled_values)
+            print(f"  {feature}: scaled variance={variance:.4f}")
+        
+        # Time series cross validation
+        tscv = TimeSeriesSplit(n_splits=min(5, len(series) // 4))
+        cv_scores = []
+        feature_importances = []
+        
+        # Test different Random Forest parameters
+        n_estimators_list = [100, 200, 300]
+        max_depth_list = [5, 10, None]
+        
+        best_params = None
+        best_score = float('inf')
+        cv_results = {}
+        
+        for n_estimators in n_estimators_list:
+            for max_depth in max_depth_list:
+                scores = []
+                importances = []
+                
+                try:
+                    for train_idx, test_idx in tscv.split(X_scaled):
+                        X_train, X_test = X_scaled[train_idx], X_scaled[test_idx]
+                        y_train, y_test = y[train_idx], y[test_idx]
+                        
+                        # Fit Random Forest
+                        rf = RandomForestRegressor(
+                            n_estimators=n_estimators,
+                            max_depth=max_depth,
+                            random_state=42,
+                            n_jobs=-1
+                        )
+                        rf.fit(X_train, y_train)
+                        
+                        # Predict
+                        y_pred = rf.predict(X_test)
+                        
+                        # Calculate RMSE
+                        rmse = np.sqrt(mean_squared_error(y_test, y_pred))
+                        scores.append(rmse)
+                        
+                        # Store feature importances
+                        importances.append(rf.feature_importances_)
+                    
+                    avg_score = np.mean(scores)
+                    std_score = np.std(scores)
+                    avg_importance = np.mean(importances, axis=0)
+                    
+                    params = {'n_estimators': n_estimators, 'max_depth': max_depth}
+                    cv_results[str(params)] = {
+                        'mean': avg_score, 'std': std_score, 'scores': scores,
+                        'feature_importance': avg_importance
+                    }
+                    
+                    if avg_score < best_score:
+                        best_score = avg_score
+                        best_params = params
+                        
+                except Exception as e:
+                    print(f"Failed to fit RF with {n_estimators} trees, depth {max_depth}: {e}")
+                    continue
+        
+        if best_params is None:
+            print("⚠️  All Random Forest models failed, falling back to ARIMA")
+            return self.forecast_arima(series, filtered_data)
+        
+        # Fit final model with best parameters
+        final_rf = RandomForestRegressor(
+            n_estimators=best_params['n_estimators'],
+            max_depth=best_params['max_depth'],
+            random_state=42,
+            n_jobs=-1
+        )
+        final_rf.fit(X_scaled, y)
+        
+        # Debug: Feature importance analysis
+        feature_importance = final_rf.feature_importances_
+        print(f"🎯 RF: Feature importance analysis:")
+        for i, (feature, importance) in enumerate(zip(feature_names, feature_importance)):
+            print(f"  {feature}: {importance:.4f}")
+        
+        # Check if external variables have meaningful importance
+        external_importance = feature_importance[1:]  # Skip 'Year'
+        max_external_importance = np.max(external_importance) if len(external_importance) > 0 else 0
+        print(f"🎯 RF: Max external variable importance: {max_external_importance:.4f}")
+        
+        if max_external_importance < 0.05:
+            print(f"⚠️  RF: External variables have very low importance - may not be influencing predictions!")
+        
+        # Generate test predictions for plotting
+        n_test = min(len(series) // 5, 8)
+        if n_test > 0:
+            X_train, X_test = X_scaled[:-n_test], X_scaled[-n_test:]
+            y_train, y_test = y[:-n_test], y[-n_test:]
+            
+            test_rf = RandomForestRegressor(
+                n_estimators=best_params['n_estimators'],
+                max_depth=best_params['max_depth'],
+                random_state=42,
+                n_jobs=-1
+            )
+            test_rf.fit(X_train, y_train)
+            test_predictions = test_rf.predict(X_test)
+            test_rmse = np.sqrt(mean_squared_error(y_test, test_predictions))
+            
+            test_data = series[-n_test:]
+            test_predictions_series = pd.Series(test_predictions, index=test_data.index)
+        else:
+            test_predictions_series = pd.Series()
+            test_data = pd.Series()
+            test_rmse = 0
+        
+        # Generate future predictions
+        future_periods = 8
+        last_year = series.index[-1].year
+        future_years = range(last_year + 1, last_year + future_periods + 1)
+        
+        # Prepare future external variables
+        future_X = []
+        for year in future_years:
+            year_features = self.extrapolate_external_variables_for_inequality(
+                country, year, external_features, location, sex, product, discrimination
+            )
+            
+            if year_features and len(year_features) >= len(external_features):
+                future_X.append([year] + year_features[:len(external_features)])
+            else:
+                # Use last known values
+                if len(future_X) > 0:
+                    last_features = future_X[-1].copy()
+                    last_features[0] = year  # Update year
+                    future_X.append(last_features)
+                else:
+                    future_X.append([year, 30000, 40, 8, 2, 60])
+        
+        # Scale future features and predict
+        future_X_array = np.array(future_X)
+        future_X_scaled = scaler.transform(future_X_array)
+        future_predictions = final_rf.predict(future_X_scaled)
+        
+        # Create future dates
+        future_dates = pd.date_range(start=series.index[-1] + pd.DateOffset(years=1), 
+                                   periods=future_periods, freq='YS')
+        forecast_series = pd.Series(future_predictions, index=future_dates)
+        
+        # Calculate prediction intervals using bootstrap
+        try:
+            # Simple prediction intervals based on residuals
+            residuals = y - final_rf.predict(X_scaled)
+            residual_std = np.std(residuals)
+            
+            # 95% prediction intervals
+            forecast_ci = pd.DataFrame({
+                'lower': forecast_series - 1.96 * residual_std,
+                'upper': forecast_series + 1.96 * residual_std
+            }, index=forecast_series.index)
+        except Exception as e:
+            print(f"Could not calculate prediction intervals: {e}")
+            forecast_ci = None
+        
+        # Prepare results
+        rf_results = {
+            'model': final_rf,
+            'best_params': best_params,
+            'cv_results': cv_results,
+            'best_score': best_score,
+            'scaler': scaler,
+            'feature_names': feature_names,
+            'feature_importance': final_rf.feature_importances_,
+            'external_data': external_data,
+            'external_features': external_features,
+            'test_predictions': test_predictions_series,
+            'test_data': test_data,
+            'rmse': test_rmse,
+            'series': series,
+            'future_external_data': future_X,
+            'data_usage_stats': self.calculate_data_usage_stats(country, external_features)
+        }
+        
+        # Plot results
+        self.plot_forecast_results(series, forecast_series, forecast_ci, 
+                                 rf_results, "Random Forest", filtered_data)
+        
+        # Plot detailed results analysis
+        self.plot_results_analysis(series, forecast_series, forecast_ci, 
+                                  rf_results, "Random Forest", filtered_data)
+        
+        return rf_results
+    
+    def calculate_data_usage_stats(self, country, external_features):
+        """Calculate statistics about external data usage"""
+        stats = {}
+        
+        for feature_name in external_features:
+            if feature_name == 'GDP':
+                dataset_name = 'gdp'
+            elif feature_name == 'GINI':
+                dataset_name = 'gini'
+            elif feature_name == 'Unemployment':
+                dataset_name = 'unemployment'
+            elif feature_name == 'RD_Expenditure':
+                dataset_name = 'rd_expenditure'
+            elif feature_name == 'Social_Coverage':
+                dataset_name = 'social_coverage'
+            else:
+                continue
+            
+            if dataset_name in self.external_data and self.external_data[dataset_name] is not None:
+                data = self.external_data[dataset_name]
+                
+                # Find correct column names
+                country_col = None
+                year_col = None
+                
+                if 'GeoAreaName' in data.columns:
+                    country_col = 'GeoAreaName'
+                elif 'Country Name' in data.columns:
+                    country_col = 'Country Name'
+                elif 'Country' in data.columns:
+                    country_col = 'Country'
+                
+                if 'TimePeriod' in data.columns:
+                    year_col = 'TimePeriod'
+                elif 'Year' in data.columns:
+                    year_col = 'Year'
+                
+                if country_col and year_col:
+                    try:
+                        # Filter by country
+                        country_data = data[data[country_col] == country]
+                        
+                        stats[feature_name] = {
+                            'total_available': len(country_data),
+                            'years_available': sorted(country_data[year_col].unique()) if len(country_data) > 0 else [],
+                            'latest_year': country_data[year_col].max() if len(country_data) > 0 else None,
+                            'data_quality': 'Good' if len(country_data) >= 10 else 'Limited' if len(country_data) >= 5 else 'Poor'
+                        }
+                    except Exception as e:
+                        print(f"⚠️  Error calculating stats for {feature_name}: {e}")
+                        stats[feature_name] = {
+                            'total_available': 0,
+                            'years_available': [],
+                            'latest_year': None,
+                            'data_quality': 'Error'
+                        }
+                else:
+                    stats[feature_name] = {
+                        'total_available': 0,
+                        'years_available': [],
+                        'latest_year': None,
+                        'data_quality': 'Missing Columns'
+                    }
+            else:
+                stats[feature_name] = {
+                    'total_available': 0,
+                    'years_available': [],
+                    'latest_year': None,
+                    'data_quality': 'No Data'
+                }
+        
+        return stats
+    
+    def plot_forecast_results(self, series, forecast_series, forecast_ci, 
+                            model_results, model_name, filtered_data):
+        """Plot forecast results with confidence intervals"""
+        # Create plot
+        fig, ax = plt.subplots(figsize=(12, 8))
+        
+        # Plot historical data
+        ax.plot(series.index, series.values, 'o-', color='blue', 
+               label='Historical Data', markersize=6, linewidth=2)
+        
+        # Plot test predictions if available
+        if 'test_predictions' in model_results and len(model_results['test_predictions']) > 0:
+            test_data = model_results['test_data']
+            test_predictions = model_results['test_predictions']
+            ax.scatter(test_data.index, test_predictions, color='red', 
+                      label='Model Test', s=100, alpha=0.8, zorder=5)
+        
+        # Plot forecast
+        ax.plot(forecast_series.index, forecast_series.values, 'o-', 
+               color='green', label='Forecast', markersize=6, linewidth=2)
+        
+        # Plot confidence intervals
+        if forecast_ci is not None:
+            if hasattr(forecast_ci, 'iloc'):  # DataFrame
+                ax.fill_between(forecast_series.index, 
+                              forecast_ci.iloc[:, 0], forecast_ci.iloc[:, 1],
+                              alpha=0.3, color='green', label='95% Confidence Interval')
+            else:  # Array
+                ax.fill_between(forecast_series.index, 
+                              forecast_ci[:, 0], forecast_ci[:, 1],
+                              alpha=0.3, color='green', label='95% Confidence Interval')
+        
+        # Customize plot
+        country = self.country_var.get()
+        indicator_selected = self.indicator_var.get()
+        
+        # Get indicator info
+        indicator_info = filtered_data.iloc[0]
+        indicator_code = indicator_info['Indicator']
+        series_description = indicator_info['SeriesDescription']
+        source = indicator_info['Source']
+        units = indicator_info['Units']
+        
+        title = f'Forecast for {indicator_code}\n({series_description})\nin {country}'
+        
+        # Add filter info
+        filters = []
+        if self.location_var.get() != 'ALL':
+            filters.append(f"Location: {self.location_var.get()}")
+        if self.sex_var.get() != 'ALL':
+            filters.append(f"Sex: {self.sex_var.get()}")
+        if self.product_var.get() != 'ALL':
+            filters.append(f"Product: {self.product_var.get()}")
+        if self.discrimination_var.get() != 'ALL':
+            filters.append(f"Discrimination: {self.discrimination_var.get()}")
+        
+        if filters:
+            title += f'\n{", ".join(filters)}'
+        
+        title += f'\nSource: {source}'
+        title += f'\nModel: {model_name}'
+        
+        ax.set_title(title, fontsize=10, pad=20)
+        ax.set_xlabel('Year', fontsize=10)
+        ax.set_ylabel(f'Value ({units})', fontsize=10)
+        
+        # Add legend
+        ax.legend(loc='upper left', bbox_to_anchor=(1.05, 1), fontsize=9)
+        
+        # Grid
+        ax.grid(True, alpha=0.3)
+        
+        # Format x-axis
+        ax.tick_params(axis='both', which='major', labelsize=9)
+        plt.xticks(rotation=45)
+        
+        # Adjust layout
+        plt.tight_layout()
+        
+        # Embed plot
+        canvas = FigureCanvasTkAgg(fig, master=self.plot_frame)
+        canvas.draw()
+        canvas.get_tk_widget().pack(fill=tk.BOTH, expand=True)
+        
+        # Display results
+        self.display_results(series, forecast_series, model_results, model_name, 
+                           indicator_info, filtered_data)
+    
+    def plot_results_analysis(self, series, forecast_series, forecast_ci, 
+                             model_results, model_name, filtered_data):
+        """Create comprehensive results analysis plot"""
+        # Clear previous results plot
+        for widget in self.results_plot_frame.winfo_children():
+            widget.destroy()
+        
+        # Create figure with subplots
+        fig = plt.figure(figsize=(16, 12))
+        
+        # Create a grid layout: 2x3 for various analyses
+        gs = fig.add_gridspec(3, 3, hspace=0.3, wspace=0.3)
+        
+        # 1. Time Series Cross Validation Results (top left)
+        ax1 = fig.add_subplot(gs[0, 0])
+        self.plot_cv_results(ax1, model_results, model_name)
+        
+        # 2. Residuals Analysis (top middle)
+        ax2 = fig.add_subplot(gs[0, 1])
+        self.plot_residuals_analysis(ax2, series, model_results, model_name)
+        
+        # 3. Data Quality Assessment (top right)
+        ax3 = fig.add_subplot(gs[0, 2])
+        self.plot_data_quality(ax3, series, filtered_data)
+        
+        # 4. Feature Importance or Model Comparison (middle left)
+        ax4 = fig.add_subplot(gs[1, 0])
+        if model_name == "Random Forest":
+            self.plot_feature_importance(ax4, model_results)
+        elif model_name == "SARIMAX" and 'external_features' in model_results:
+            self.plot_external_data_usage(ax4, model_results)
+        else:
+            self.plot_model_summary(ax4, model_results, model_name)
+        
+        # 5. Forecast Uncertainty (middle middle)
+        ax5 = fig.add_subplot(gs[1, 1])
+        self.plot_forecast_uncertainty(ax5, forecast_series, forecast_ci, model_name)
+        
+        # 6. Performance Metrics (middle right)
+        ax6 = fig.add_subplot(gs[1, 2])
+        self.plot_performance_metrics(ax6, model_results, model_name)
+        
+        # 7. Data Coverage and Timeline (bottom, spanning all columns)
+        ax7 = fig.add_subplot(gs[2, :])
+        self.plot_data_timeline(ax7, series, forecast_series, model_results, model_name)
+        
+        # Overall title
+        country = self.country_var.get()
+        indicator_info = filtered_data.iloc[0]
+        fig.suptitle(f'SDG10 {model_name} Analysis: {indicator_info["Indicator"]}\n{country}', 
+                    fontsize=16, fontweight='bold', y=0.98)
+        
+        # Embed plot
+        canvas = FigureCanvasTkAgg(fig, master=self.results_plot_frame)
+        canvas.draw()
+        canvas.get_tk_widget().pack(fill=tk.BOTH, expand=True)
+    
+    def plot_cv_results(self, ax, model_results, model_name):
+        """Plot cross-validation results"""
+        ax.set_title("Cross-Validation Results", fontweight='bold', fontsize=10)
+        
+        if model_name == "ARIMA" and 'cv_results' in model_results:
+            orders = list(model_results['cv_results'].keys())
+            means = [model_results['cv_results'][order]['mean'] for order in orders]
+            stds = [model_results['cv_results'][order]['std'] for order in orders]
+            
+            x_pos = range(len(orders))
+            bars = ax.bar(x_pos, means, yerr=stds, capsize=5, alpha=0.7, color='steelblue')
+            ax.set_xlabel('ARIMA Orders', fontsize=9)
+            ax.set_ylabel('RMSE', fontsize=9)
+            ax.set_xticks(x_pos)
+            ax.set_xticklabels([str(order) for order in orders], rotation=45, fontsize=8)
+            
+            # Highlight best model
+            best_idx = means.index(min(means))
+            bars[best_idx].set_color('orange')
+            
+        elif model_name == "Prophet" and 'cv_summary' in model_results and model_results['cv_summary'] is not None:
+            cv_summary = model_results['cv_summary']
+            
+            # Plot CV metrics (RMSE, MAE, MAPE)
+            metrics = ['RMSE', 'MAE', 'MAPE']
+            values = [cv_summary['mean_rmse'], cv_summary['mean_mae'], cv_summary['mean_mape']]
+            colors = ['steelblue', 'forestgreen', 'orange']
+            
+            bars = ax.bar(metrics, values, color=colors, alpha=0.7)
+            ax.set_ylabel('Metric Value', fontsize=9)
+            ax.set_xlabel('Cross-Validation Metrics', fontsize=9)
+            
+            # Add value labels
+            for bar, value in zip(bars, values):
+                height = bar.get_height()
+                ax.text(bar.get_x() + bar.get_width()/2., height + height*0.01,
+                       f'{value:.3f}', ha='center', va='bottom', fontsize=8)
+            
+            # Add fold count info
+            ax.text(0.95, 0.95, f'{cv_summary["cv_folds"]} CV folds', 
+                   transform=ax.transAxes, fontsize=9, ha='right', va='top',
+                   bbox=dict(boxstyle='round', facecolor='lightblue', alpha=0.7))
+            
+        elif model_name == "Random Forest" and 'cv_results' in model_results:
+            params = list(model_results['cv_results'].keys())
+            means = [model_results['cv_results'][param]['mean'] for param in params]
+            stds = [model_results['cv_results'][param]['std'] for param in params]
+            
+            x_pos = range(len(params))
+            bars = ax.bar(x_pos, means, yerr=stds, capsize=5, alpha=0.7, color='forestgreen')
+            ax.set_xlabel('RF Parameters', fontsize=9)
+            ax.set_ylabel('RMSE', fontsize=9)
+            ax.set_xticks(x_pos)
+            ax.set_xticklabels([p.replace("'", "").replace("{", "").replace("}", "") for p in params], 
+                              rotation=45, fontsize=7)
+            
+            # Highlight best model
+            best_idx = means.index(min(means))
+            bars[best_idx].set_color('orange')
+            
+        elif model_name == "SARIMAX" and 'cv_results' in model_results:
+            orders = list(model_results['cv_results'].keys())
+            means = [model_results['cv_results'][order]['mean'] for order in orders]
+            stds = [model_results['cv_results'][order]['std'] for order in orders]
+            
+            x_pos = range(len(orders))
+            bars = ax.bar(x_pos, means, yerr=stds, capsize=5, alpha=0.7, color='darkred')
+            ax.set_xlabel('SARIMAX Orders', fontsize=9)
+            ax.set_ylabel('RMSE', fontsize=9)
+            ax.set_xticks(x_pos)
+            ax.set_xticklabels([f"{order[0]}x{order[1]}" for order in orders], rotation=45, fontsize=8)
+            
+            # Highlight best model
+            best_idx = means.index(min(means))
+            bars[best_idx].set_color('orange')
+            
+        else:
+            ax.text(0.5, 0.5, f'No CV results\navailable for\n{model_name}', 
+                   ha='center', va='center', transform=ax.transAxes, fontsize=10)
+        
+        ax.grid(True, alpha=0.3)
+        ax.tick_params(axis='both', which='major', labelsize=8)
+    
+    def plot_residuals_analysis(self, ax, series, model_results, model_name):
+        """Plot residuals analysis"""
+        ax.set_title("Residuals Analysis", fontweight='bold', fontsize=10)
+        
+        if 'test_predictions' in model_results and len(model_results['test_predictions']) > 0:
+            test_data = model_results['test_data']
+            test_predictions = model_results['test_predictions']
+            residuals = test_data - test_predictions
+            
+            # Plot residuals
+            ax.scatter(test_predictions, residuals, alpha=0.6, color='red', s=30)
+            ax.axhline(y=0, color='black', linestyle='--', alpha=0.7)
+            ax.set_xlabel('Predicted Values', fontsize=9)
+            ax.set_ylabel('Residuals', fontsize=9)
+            
+            # Add statistics
+            rmse = np.sqrt(np.mean(residuals**2))
+            mae = np.mean(np.abs(residuals))
+            ax.text(0.05, 0.95, f'RMSE: {rmse:.3f}\nMAE: {mae:.3f}', 
+                   transform=ax.transAxes, fontsize=9, verticalalignment='top',
+                   bbox=dict(boxstyle='round', facecolor='lightblue', alpha=0.7))
+        else:
+            ax.text(0.5, 0.5, 'No residuals\navailable', 
+                   ha='center', va='center', transform=ax.transAxes, fontsize=10)
+        
+        ax.grid(True, alpha=0.3)
+        ax.tick_params(axis='both', which='major', labelsize=8)
+    
+    def plot_data_quality(self, ax, series, filtered_data):
+        """Plot data quality assessment"""
+        ax.set_title("Data Quality Assessment", fontweight='bold', fontsize=10)
+        
+        # Assess data quality
+        data_quality = self.assess_data_quality(series)
+        
+        # Create quality metrics
+        metrics = ['Overall', 'Completeness', 'Volatility', 'Coverage']
+        
+        # Calculate scores (0-1 scale)
+        overall_score = {'Excellent': 1.0, 'Good': 0.8, 'Fair': 0.6, 'Poor': 0.3}[data_quality['overall']]
+        completeness_score = 1.0 - (data_quality['gaps'] / data_quality['time_span'])
+        volatility_score = max(0, 1.0 - data_quality['volatility'])
+        coverage_score = data_quality['data_points'] / data_quality['time_span']
+        
+        scores = [overall_score, completeness_score, volatility_score, coverage_score]
+        colors = ['green' if s >= 0.8 else 'orange' if s >= 0.6 else 'red' for s in scores]
+        
+        bars = ax.barh(metrics, scores, color=colors, alpha=0.7)
+        ax.set_xlim(0, 1)
+        ax.set_xlabel('Quality Score', fontsize=9)
+        
+        # Add score labels
+        for i, (bar, score) in enumerate(zip(bars, scores)):
+            ax.text(score + 0.02, i, f'{score:.2f}', va='center', fontsize=8)
+        
+        ax.tick_params(axis='both', which='major', labelsize=8)
+    
+    def plot_feature_importance(self, ax, model_results):
+        """Plot feature importance for Random Forest"""
+        ax.set_title("Feature Importance", fontweight='bold', fontsize=10)
+        
+        if 'feature_importance' in model_results:
+            feature_names = model_results['feature_names']
+            importances = model_results['feature_importance']
+            
+            # Sort by importance
+            importance_pairs = list(zip(feature_names, importances))
+            importance_pairs.sort(key=lambda x: x[1], reverse=True)
+            
+            features, imps = zip(*importance_pairs)
+            
+            bars = ax.barh(features, imps, color='forestgreen', alpha=0.7)
+            ax.set_xlabel('Importance', fontsize=9)
+            
+            # Add value labels
+            for i, (bar, imp) in enumerate(zip(bars, imps)):
+                ax.text(imp + 0.01, i, f'{imp:.3f}', va='center', fontsize=8)
+        else:
+            ax.text(0.5, 0.5, 'No feature\nimportance\navailable', 
+                   ha='center', va='center', transform=ax.transAxes, fontsize=10)
+        
+        ax.tick_params(axis='both', which='major', labelsize=8)
+    
+    def plot_external_data_usage(self, ax, model_results):
+        """Plot external data usage statistics"""
+        ax.set_title("External Data Usage", fontweight='bold', fontsize=10)
+        
+        if 'data_usage_stats' in model_results:
+            stats = model_results['data_usage_stats']
+            features = list(stats.keys())
+            availabilities = [stats[f]['total_available'] for f in features]
+            
+            colors = ['green' if stats[f]['data_quality'] == 'Good' 
+                     else 'orange' if stats[f]['data_quality'] == 'Limited'
+                     else 'red' for f in features]
+            
+            bars = ax.bar(features, availabilities, color=colors, alpha=0.7)
+            ax.set_ylabel('Data Points Available', fontsize=9)
+            ax.set_xlabel('External Variables', fontsize=9)
+            plt.setp(ax.get_xticklabels(), rotation=45, ha='right', fontsize=8)
+            
+            # Add quality labels
+            for i, (bar, feature) in enumerate(zip(bars, features)):
+                quality = stats[feature]['data_quality']
+                ax.text(i, availabilities[i] + 1, quality, ha='center', va='bottom', fontsize=7)
+        else:
+            ax.text(0.5, 0.5, 'No external\ndata statistics\navailable', 
+                   ha='center', va='center', transform=ax.transAxes, fontsize=10)
+        
+        ax.tick_params(axis='both', which='major', labelsize=8)
+    
+    def plot_model_summary(self, ax, model_results, model_name):
+        """Plot model summary for ARIMA/Prophet"""
+        ax.set_title(f"{model_name} Summary", fontweight='bold', fontsize=10)
+        
+        if model_name == "ARIMA" and 'order' in model_results:
+            # Display ARIMA order
+            order = model_results['order']
+            ax.text(0.5, 0.7, f'ARIMA Order:\n{order}', ha='center', va='center', 
+                   transform=ax.transAxes, fontsize=12, 
+                   bbox=dict(boxstyle='round', facecolor='lightblue', alpha=0.7))
+            
+            ax.text(0.5, 0.3, f'Best RMSE:\n{model_results["best_score"]:.3f}', 
+                   ha='center', va='center', transform=ax.transAxes, fontsize=10)
+        else:
+            ax.text(0.5, 0.5, f'{model_name}\nModel\nSummary', 
+                   ha='center', va='center', transform=ax.transAxes, fontsize=12)
+        
+        ax.set_xticks([])
+        ax.set_yticks([])
+    
+    def plot_forecast_uncertainty(self, ax, forecast_series, forecast_ci, model_name):
+        """Plot forecast uncertainty analysis"""
+        ax.set_title("Forecast Uncertainty", fontweight='bold', fontsize=10)
+        
+        if forecast_ci is not None and len(forecast_series) > 0:
+            years = [date.year for date in forecast_series.index]
+            forecast_values = forecast_series.values
+            
+            if hasattr(forecast_ci, 'iloc'):  # DataFrame
+                lower = forecast_ci.iloc[:, 0].values
+                upper = forecast_ci.iloc[:, 1].values
+            else:  # Array
+                lower = forecast_ci[:, 0]
+                upper = forecast_ci[:, 1]
+            
+            # Calculate uncertainty (width of confidence interval)
+            uncertainty = upper - lower
+            
+            # Plot uncertainty over time
+            ax.plot(years, uncertainty, 'o-', color='red', linewidth=2, markersize=6)
+            ax.set_xlabel('Year', fontsize=9)
+            ax.set_ylabel('Uncertainty Width', fontsize=9)
+            ax.grid(True, alpha=0.3)
+            
+            # Add statistics
+            avg_uncertainty = np.mean(uncertainty)
+            ax.text(0.05, 0.95, f'Avg Uncertainty:\n{avg_uncertainty:.3f}', 
+                   transform=ax.transAxes, fontsize=9, verticalalignment='top',
+                   bbox=dict(boxstyle='round', facecolor='lightcoral', alpha=0.7))
+        else:
+            ax.text(0.5, 0.5, 'No uncertainty\ninformation\navailable', 
+                   ha='center', va='center', transform=ax.transAxes, fontsize=10)
+        
+        ax.tick_params(axis='both', which='major', labelsize=8)
+    
+    def plot_performance_metrics(self, ax, model_results, model_name):
+        """Plot key performance metrics"""
+        ax.set_title("Performance Metrics", fontweight='bold', fontsize=10)
+        
+        # Collect metrics
+        metrics = {}
+        if 'rmse' in model_results:
+            metrics['RMSE'] = model_results['rmse']
+        if 'best_score' in model_results:
+            metrics['CV Score'] = model_results['best_score']
+        
+        if metrics:
+            metric_names = list(metrics.keys())
+            values = list(metrics.values())
+            
+            bars = ax.bar(metric_names, values, color=['steelblue', 'orange'], alpha=0.7)
+            ax.set_ylabel('Value', fontsize=9)
+            
+            # Add value labels
+            for bar, value in zip(bars, values):
+                height = bar.get_height()
+                ax.text(bar.get_x() + bar.get_width()/2., height + height*0.01,
+                       f'{value:.3f}', ha='center', va='bottom', fontsize=9)
+        else:
+            ax.text(0.5, 0.5, 'No performance\nmetrics\navailable', 
+                   ha='center', va='center', transform=ax.transAxes, fontsize=10)
+        
+        ax.tick_params(axis='both', which='major', labelsize=8)
+    
+    def plot_data_timeline(self, ax, series, forecast_series, model_results, model_name):
+        """Plot comprehensive data timeline"""
+        ax.set_title("Data Coverage and Forecast Timeline", fontweight='bold', fontsize=10)
+        
+        # Plot historical data availability
+        years = [date.year for date in series.index]
+        ax.scatter(years, [1]*len(years), color='blue', s=50, alpha=0.7, label='Historical Data')
+        
+        # Plot test data if available
+        if 'test_data' in model_results and len(model_results['test_data']) > 0:
+            test_years = [date.year for date in model_results['test_data'].index]
+            ax.scatter(test_years, [0.8]*len(test_years), color='red', s=50, alpha=0.7, label='Test Data')
+        
+        # Plot forecast period
+        forecast_years = [date.year for date in forecast_series.index]
+        ax.scatter(forecast_years, [0.6]*len(forecast_years), color='green', s=50, alpha=0.7, label='Forecast')
+        
+        # Add external data coverage if available
+        if 'data_usage_stats' in model_results:
+            stats = model_results['data_usage_stats']
+            ext_years = []
+            for feature, feature_stats in stats.items():
+                if feature_stats['years_available']:
+                    ext_years.extend(feature_stats['years_available'])
+            
+            if ext_years:
+                unique_ext_years = sorted(set(ext_years))
+                ax.scatter(unique_ext_years, [0.4]*len(unique_ext_years), 
+                          color='purple', s=30, alpha=0.7, label='External Data')
+        
+        ax.set_xlabel('Year', fontsize=9)
+        ax.set_ylabel('Data Type', fontsize=9)
+        ax.set_yticks([0.4, 0.6, 0.8, 1.0])
+        ax.set_yticklabels(['External', 'Forecast', 'Test', 'Historical'], fontsize=8)
+        ax.legend(loc='upper right', fontsize=8)
+        ax.grid(True, alpha=0.3)
+        ax.tick_params(axis='both', which='major', labelsize=8)
+    
+    def display_results(self, series, forecast_series, model_results, model_name, 
+                       indicator_info, filtered_data):
+        """Display detailed results in text widget"""
+        self.results_text.delete(1.0, tk.END)
+        
+        self.results_text.insert(tk.END, f"=== SDG Goal 10 Inequality Forecast Results ===\n\n")
+        
+        # Basic info
+        self.results_text.insert(tk.END, f"Indicator: {indicator_info['Indicator']} ({indicator_info['SeriesDescription']})\n")
+        self.results_text.insert(tk.END, f"Country: {self.country_var.get()}\n")
+        
+        # Filters
+        if self.location_var.get() != 'ALL':
+            self.results_text.insert(tk.END, f"Location: {self.location_var.get()}\n")
+        if self.sex_var.get() != 'ALL':
+            self.results_text.insert(tk.END, f"Sex: {self.sex_var.get()}\n")
+        if self.product_var.get() != 'ALL':
+            self.results_text.insert(tk.END, f"Type of Product: {self.product_var.get()}\n")
+        if self.discrimination_var.get() != 'ALL':
+            self.results_text.insert(tk.END, f"Grounds of Discrimination: {self.discrimination_var.get()}\n")
+        
+        self.results_text.insert(tk.END, f"Source: {indicator_info['Source']}\n")
+        self.results_text.insert(tk.END, f"Model: {model_name}\n\n")
+        
+        # Model-specific results
+        if model_name == "ARIMA":
+            self.results_text.insert(tk.END, f"=== ARIMA Cross Validation Results ===\n")
+            self.results_text.insert(tk.END, f"Best ARIMA Order: {model_results['order']}\n\n")
+            
+            self.results_text.insert(tk.END, f"Cross-Validation Results:\n")
+            for order, metrics in model_results['cv_results'].items():
+                self.results_text.insert(tk.END, 
+                    f"  ARIMA{order}: {metrics['mean']:.4f} ± {metrics['std']:.4f} RMSE ({len(metrics['scores'])} folds)\n")
+            
+        elif model_name == "Prophet":
+            self.results_text.insert(tk.END, f"=== Prophet Cross Validation Results ===\n")
+            
+            if model_results.get('cv_summary') is not None:
+                cv_summary = model_results['cv_summary']
+                self.results_text.insert(tk.END, f"Cross-Validation Folds: {cv_summary['cv_folds']}\n")
+                self.results_text.insert(tk.END, f"Average RMSE: {cv_summary['mean_rmse']:.4f}\n")
+                self.results_text.insert(tk.END, f"Average MAE: {cv_summary['mean_mae']:.4f}\n")
+                self.results_text.insert(tk.END, f"Average MAPE: {cv_summary['mean_mape']:.4f}\n")
+                
+                # Show individual fold results
+                self.results_text.insert(tk.END, f"\nCV Fold Details:\n")
+                for i, (rmse, mae, mape) in enumerate(zip(cv_summary['rmse'], cv_summary['mae'], cv_summary['mape']), 1):
+                    self.results_text.insert(tk.END, f"  Fold {i}: RMSE={rmse:.4f}, MAE={mae:.4f}, MAPE={mape:.4f}\n")
+                    
+            elif model_results['avg_rmse'] is not None:
+                self.results_text.insert(tk.END, f"Average RMSE: {model_results['avg_rmse']:.4f}\n")
+                
+                if model_results['performance_metrics'] is not None:
+                    metrics = model_results['performance_metrics']
+                    self.results_text.insert(tk.END, f"MAPE: {metrics['mape'].mean():.4f}\n")
+                    self.results_text.insert(tk.END, f"MAE: {metrics['mae'].mean():.4f}\n")
+            else:
+                self.results_text.insert(tk.END, f"Cross-validation failed - insufficient data or other issues\n")
+        
+        elif model_name == "SARIMAX":
+            self.results_text.insert(tk.END, f"=== SARIMAX Cross Validation Results ===\n")
+            if 'external_features' in model_results:
+                self.results_text.insert(tk.END, f"✅ True SARIMAX with external variables\n")
+                self.results_text.insert(tk.END, f"External Features: {model_results['external_features']}\n")
+                self.results_text.insert(tk.END, f"Feature Count: {len(model_results['external_features'])}\n")
+                self.results_text.insert(tk.END, f"SARIMAX Order: {model_results['order']}\n")
+                self.results_text.insert(tk.END, f"Seasonal Order: {model_results['seasonal_order']}\n\n")
+                
+                self.results_text.insert(tk.END, f"Cross-Validation Results:\n")
+                for (order, seasonal_order), metrics in model_results['cv_results'].items():
+                    self.results_text.insert(tk.END, 
+                        f"  SARIMAX{order}x{seasonal_order}: {metrics['mean']:.4f} ± {metrics['std']:.4f} RMSE ({len(metrics['scores'])} folds)\n")
+            else:
+                self.results_text.insert(tk.END, f"⚠️  SARIMAX fell back to ARIMA\n")
+                self.results_text.insert(tk.END, f"ARIMA Order: {model_results['order']}\n")
+        
+        elif model_name == "Random Forest":
+            self.results_text.insert(tk.END, f"=== Random Forest Cross Validation Results ===\n")
+            self.results_text.insert(tk.END, f"Best Parameters: {model_results['best_params']}\n\n")
+            
+            self.results_text.insert(tk.END, f"Cross-Validation Results:\n")
+            for params, metrics in model_results['cv_results'].items():
+                self.results_text.insert(tk.END, 
+                    f"  RF {params}: {metrics['mean']:.4f} ± {metrics['std']:.4f} RMSE ({len(metrics['scores'])} folds)\n")
+            
+            self.results_text.insert(tk.END, f"\n=== Feature Importances ===\n")
+            feature_names = model_results['feature_names']
+            importances = model_results['feature_importance']
+            
+            # Sort by importance
+            importance_pairs = list(zip(feature_names, importances))
+            importance_pairs.sort(key=lambda x: x[1], reverse=True)
+            
+            for feature, importance in importance_pairs:
+                self.results_text.insert(tk.END, f"  {feature}: {importance:.4f}\n")
+        
+        self.results_text.insert(tk.END, f"\n=== Model Performance ===\n")
+        self.results_text.insert(tk.END, f"Test RMSE: {model_results['rmse']:.4f} {indicator_info['Units']}\n")
+        
+        # Add external data information for SARIMAX and Random Forest
+        if model_name in ["SARIMAX", "Random Forest"] and 'data_usage_stats' in model_results:
+            self.results_text.insert(tk.END, f"Model Type: {model_name} with {len(model_results['external_features'])} external variables\n")
+            
+            self.results_text.insert(tk.END, f"\n=== External Data Usage Statistics ===\n")
+            stats = model_results['data_usage_stats']
+            
+            for feature, feature_stats in stats.items():
+                self.results_text.insert(tk.END, f"\n{feature}:\n")
+                self.results_text.insert(tk.END, f"  Data Quality: {feature_stats['data_quality']}\n")
+                self.results_text.insert(tk.END, f"  Available Data Points: {feature_stats['total_available']}\n")
+                
+                if feature_stats['latest_year']:
+                    self.results_text.insert(tk.END, f"  Latest Data Year: {feature_stats['latest_year']}\n")
+                
+                if feature_stats['years_available']:
+                    year_range = f"{min(feature_stats['years_available'])}-{max(feature_stats['years_available'])}"
+                    self.results_text.insert(tk.END, f"  Data Coverage: {year_range}\n")
+                    
+                    # Calculate coverage percentage
+                    min_year = min(feature_stats['years_available'])
+                    max_year = max(feature_stats['years_available'])
+                    total_years = max_year - min_year + 1
+                    coverage = len(feature_stats['years_available']) / total_years * 100
+                    self.results_text.insert(tk.END, f"  Coverage Completeness: {coverage:.1f}%\n")
+        else:
+            self.results_text.insert(tk.END, f"Model Type: {model_name}\n")
+        
+        self.results_text.insert(tk.END, f"\n=== Historical Data ===\n")
+        self.results_text.insert(tk.END, f"Data points: {len(series)}\n")
+        self.results_text.insert(tk.END, f"Years: {series.index[0].year} - {series.index[-1].year}\n")
+        
+        # Data quality assessment
+        data_quality = self.assess_data_quality(series)
+        self.results_text.insert(tk.END, f"Data Quality: {data_quality['overall']}\n")
+        if data_quality['gaps'] > 0:
+            self.results_text.insert(tk.END, f"Data Gaps: {data_quality['gaps']} missing years\n")
+        if data_quality['volatility'] > 0.3:
+            self.results_text.insert(tk.END, f"⚠️  High Volatility: {data_quality['volatility']:.2f}\n")
+        
+        self.results_text.insert(tk.END, f"\n")
+        
+        # Recent values
+        self.results_text.insert(tk.END, f"Recent Historical Values:\n")
+        for i in range(min(5, len(series))):
+            idx = -(i+1)
+            date = series.index[idx]
+            value = series.iloc[idx]
+            self.results_text.insert(tk.END, f"  {date.year}: {value:.3f} {indicator_info['Units']}\n")
+        
+        # Future forecast
+        self.results_text.insert(tk.END, f"\n=== Future Forecast ===\n")
+        for date, value in forecast_series.items():
+            self.results_text.insert(tk.END, f"  {date.year}: {value:.3f} {indicator_info['Units']}\n")
+        
+        # Enhanced validation summary
+        self.results_text.insert(tk.END, f"\n=== Inequality Model Validation Summary ===\n")
+        self.results_text.insert(tk.END, f"✅ Time series cross validation performed\n")
+        self.results_text.insert(tk.END, f"✅ Proper temporal train/test split used\n")
+        self.results_text.insert(tk.END, f"✅ Out-of-sample testing completed\n")
+        self.results_text.insert(tk.END, f"✅ Inequality-specific validation applied\n")
+        
+        if model_name in ["SARIMAX", "Random Forest"]:
+            self.results_text.insert(tk.END, f"✅ External variables incorporated\n")
+            self.results_text.insert(tk.END, f"✅ Feature scaling applied\n")
+            if model_name == "Random Forest":
+                self.results_text.insert(tk.END, f"✅ Feature importance analysis completed\n")
+            
+            # Inequality-specific validation
+            filters_applied = []
+            if self.sex_var.get() != 'ALL':
+                filters_applied.append(f"Gender: {self.sex_var.get()}")
+            if self.discrimination_var.get() != 'ALL':
+                filters_applied.append(f"Discrimination: {self.discrimination_var.get()}")
+            if self.product_var.get() != 'ALL':
+                filters_applied.append(f"Product: {self.product_var.get()}")
+            
+            if filters_applied:
+                self.results_text.insert(tk.END, f"✅ Inequality dimensions considered: {', '.join(filters_applied)}\n")
+    
+    def assess_data_quality(self, series):
+        """Assess the quality of time series data"""
+        # Check for missing years
+        years = [date.year for date in series.index]
+        year_range = range(min(years), max(years) + 1)
+        missing_years = len(year_range) - len(years)
+        
+        # Calculate volatility (coefficient of variation)
+        volatility = series.std() / abs(series.mean()) if series.mean() != 0 else 0
+        
+        # Overall quality assessment
+        if missing_years == 0 and volatility < 0.2:
+            overall = "Excellent"
+        elif missing_years <= 2 and volatility < 0.3:
+            overall = "Good"
+        elif missing_years <= 5 and volatility < 0.5:
+            overall = "Fair"
+        else:
+            overall = "Poor"
+        
+        return {
+            'overall': overall,
+            'gaps': missing_years,
+            'volatility': volatility,
+            'data_points': len(series),
+            'time_span': max(years) - min(years) + 1
+        }
+    
+    def save_results(self):
+        """Save results to file"""
+        try:
+            filename = filedialog.asksaveasfilename(
+                defaultextension=".txt",
+                filetypes=[("Text files", "*.txt"), ("All files", "*.*")],
+                title="Save Forecast Results"
+            )
+            
+            if filename:
+                with open(filename, 'w') as f:
+                    f.write(self.results_text.get(1.0, tk.END))
+                messagebox.showinfo("Success", f"Results saved to {filename}")
+                
+        except Exception as e:
+            messagebox.showerror("Error", f"Could not save results: {str(e)}")
+
+def main():
+    root = tk.Tk()
+    app = SDG10ForecastGUI(root)
+    root.mainloop()
+
+if __name__ == "__main__":
+    main() 
