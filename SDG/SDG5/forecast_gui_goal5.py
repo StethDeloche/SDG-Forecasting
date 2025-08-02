@@ -1130,9 +1130,9 @@ class ForecastAppGoal5:
                         ax.plot(future_dates, scaled_forecast, color=forecast_color, alpha=0.8, linewidth=3, zorder=4)
                     else:
                         # For non-Random Forest models
-                    ax.scatter(future_dates, scaled_forecast, color=forecast_color, 
+                        ax.scatter(future_dates, scaled_forecast, color=forecast_color, 
                               label='Future Forecast', s=100, alpha=0.8)
-                    ax.plot(future_dates, scaled_forecast, color=forecast_color, alpha=0.5, linewidth=2)
+                        ax.plot(future_dates, scaled_forecast, color=forecast_color, alpha=0.5, linewidth=2)
                     
                     # Plot prediction intervals first (darker shade)
                     ax.fill_between(future_dates, scaled_pred_lower_future, scaled_pred_upper_future, 
@@ -1178,8 +1178,8 @@ class ForecastAppGoal5:
                 # Ensure intervals are within plot limits
                 if scaled_pred_lower_future is not None:
                     if isinstance(scaled_pred_lower_future, np.ndarray):
-                    y_min = min(y_min, min(scaled_pred_lower_future))
-                    y_max = max(y_max, max(scaled_pred_upper_future))
+                        y_min = min(y_min, min(scaled_pred_lower_future))
+                        y_max = max(y_max, max(scaled_pred_upper_future))
                     else:
                         y_min = min(y_min, min(scaled_pred_lower_future.values))
                         y_max = max(y_max, max(scaled_pred_upper_future.values))

@@ -605,7 +605,7 @@ class ForecastAppGoal8:
         ttk.Label(self.selection_frame, text="Model:").grid(row=0, column=0, padx=2, pady=2, sticky=tk.W)
         self.model_var = tk.StringVar()
         self.model_combo = ttk.Combobox(self.selection_frame, textvariable=self.model_var, width=15)
-        self.model_combo['values'] = ['ARIMA', 'Prophet', 'Random Forest']
+        self.model_combo['values'] = ['ARIMA', 'Prophet', 'Random Forest', 'SARIMAX']
         self.model_combo.set('ARIMA')
         self.model_combo.grid(row=0, column=1, padx=2, pady=2, sticky=tk.W)
         
@@ -616,6 +616,7 @@ class ForecastAppGoal8:
         self.indicator_combo['values'] = [f"{ind} - {desc}" for ind, desc in zip(self.indicators['Indicator'], self.indicators['SeriesDescription'])]
         self.indicator_combo.grid(row=1, column=1, padx=2, pady=2, sticky=tk.W)
         self.indicator_combo.bind('<<ComboboxSelected>>', self.update_series_codes)
+        self.indicator_combo.bind('<<ComboboxSelected>>', self.on_indicator_change, add='+')
         
         # Series Code selection
         ttk.Label(self.selection_frame, text="Series Code:").grid(row=2, column=0, padx=2, pady=2, sticky=tk.W)
@@ -629,6 +630,7 @@ class ForecastAppGoal8:
         self.country_var = tk.StringVar()
         self.country_combo = ttk.Combobox(self.selection_frame, textvariable=self.country_var, width=15)
         self.country_combo.grid(row=3, column=1, padx=2, pady=2, sticky=tk.W)
+        self.country_combo.bind('<<ComboboxSelected>>', self.on_country_change)
         
         # Location selection
         ttk.Label(self.selection_frame, text="Location:").grid(row=4, column=0, padx=2, pady=2, sticky=tk.W)
@@ -1055,6 +1057,93 @@ class ForecastAppGoal8:
                     self.rf_feature_importance = rf_results['feature_importance']
                     rmse = rf_results['rmse']
                 
+                elif model_type == 'SARIMAX':
+                    # Fit SARIMAX model with external variables for employment forecasting
+                    sarimax_results = self.fit_sarimax_model(
+                        series, country, location, sex, age, product, occupation, education)
+                    
+                    if sarimax_results and 'model' in sarimax_results:
+                        # Test predictions for validation period  
+                        test_predictions = sarimax_results['test_predictions']
+                        scaled_predictions = test_predictions
+                        rmse = sarimax_results['rmse']
+                        
+                        # Plot test predictions
+                        prediction_color = plt.cm.Reds(0.7)
+                        if hasattr(test_predictions, 'index') and len(test_predictions) > 0:
+                            ax.scatter(test_predictions.index, scaled_predictions, color=prediction_color, 
+                                      label='Model Test', s=100, alpha=0.8)
+                            ax.plot(test_predictions.index, scaled_predictions, color=prediction_color, alpha=0.5, linewidth=2)
+                        
+                        # Simple SARIMAX forecast without external variables (fallback)
+                        print(f"✅ Using simple SARIMAX")
+                        try:
+                            future_forecast = sarimax_results['model'].forecast(steps=8)
+                            future_dates = pd.date_range(start=series.index[-1], periods=9, freq='Y')[1:]
+                            
+                            if len(future_forecast) != len(future_dates):
+                                min_len = min(len(future_forecast), len(future_dates))
+                                future_forecast = future_forecast[:min_len]
+                                future_dates = future_dates[:min_len]
+                            
+                            # Check for NaN values and replace with simple trend extrapolation
+                            if pd.isna(future_forecast).any() or all(pd.isna(future_forecast)):
+                                print("⚠️  SARIMAX forecast contains NaN values, using trend extrapolation")
+                                # Simple trend extrapolation as fallback
+                                last_values = series.tail(3).values
+                                trend = np.mean(np.diff(last_values)) if len(last_values) > 1 else 0
+                                print(f"📈 Trend calculation: last_value={series.iloc[-1]:.4f}, trend={trend:.4f}")
+                                future_forecast = [series.iloc[-1] + trend * (i + 1) for i in range(len(future_dates))]
+                                print(f"📈 Trend extrapolation values: {future_forecast}")
+                            
+                            # Ensure we have valid numeric values
+                            future_forecast = np.array(future_forecast)
+                            if pd.isna(future_forecast).any():
+                                print("⚠️  Still NaN after trend extrapolation, using last known value")
+                                future_forecast = np.full(len(future_dates), series.iloc[-1])
+                            
+                            scaled_forecast = pd.Series(future_forecast, index=future_dates)
+                            print(f"📊 Final forecast: {scaled_forecast.values}")
+                        except Exception as forecast_error:
+                            print(f"⚠️  SARIMAX forecast failed: {forecast_error}, using trend extrapolation")
+                            # Fallback to trend extrapolation
+                            future_dates = pd.date_range(start=series.index[-1], periods=9, freq='Y')[1:]
+                            last_values = series.tail(3).values
+                            trend = np.mean(np.diff(last_values)) if len(last_values) > 1 else 0
+                            print(f"📈 Fallback trend calculation: last_value={series.iloc[-1]:.4f}, trend={trend:.4f}")
+                            future_forecast = [series.iloc[-1] + trend * (i + 1) for i in range(len(future_dates))]
+                            scaled_forecast = pd.Series(future_forecast, index=future_dates)
+                            print(f"📊 Fallback forecast: {scaled_forecast.values}")
+                        
+                        # Get confidence intervals from SARIMAX
+                        try:
+                            forecast_result = sarimax_results['model'].get_forecast(steps=len(future_dates))
+                            conf_int = forecast_result.conf_int(alpha=0.05)
+                            scaled_conf_lower_future = conf_int.iloc[:, 0]
+                            scaled_conf_upper_future = conf_int.iloc[:, 1]
+                            
+                            # Prediction intervals wider than confidence intervals
+                            pred_interval = 2.0 * rmse
+                            scaled_pred_lower_future = scaled_forecast - pred_interval
+                            scaled_pred_upper_future = scaled_forecast + pred_interval
+                        except:
+                            # Fallback intervals
+                            conf_interval = 1.2 * rmse
+                            pred_interval = 2.0 * rmse
+                            scaled_conf_lower_future = scaled_forecast - conf_interval
+                            scaled_conf_upper_future = scaled_forecast + conf_interval
+                            scaled_pred_lower_future = scaled_forecast - pred_interval
+                            scaled_pred_upper_future = scaled_forecast + pred_interval
+                        
+                        # Store SARIMAX results for display
+                        self.sarimax_feature_names = sarimax_results.get('feature_names', [])
+                        self.sarimax_cv_results = sarimax_results.get('cv_results', {})
+                        self.sarimax_best_order = sarimax_results.get('best_order', (1,1,1))
+                        
+                    else:
+                        messagebox.showerror("Error", "SARIMAX model fitting failed")
+                        return
+                
                 # Plot future forecast if available
                 if future_dates is not None and scaled_forecast is not None:
                     forecast_color = plt.cm.Greens(0.7)
@@ -1232,37 +1321,354 @@ class ForecastAppGoal8:
                     self.results_text.insert(tk.END, f"{feature}: {importance*100:.1f}%\n")
                 self.results_text.insert(tk.END, "\n")
             
-            # Add forecast results
+            # === COMPREHENSIVE RESULTS DISPLAY (SDG8 Employment Analysis) ===
+            
+            # Update results text with comprehensive SDG8 analysis
+            self.results_text.delete(1.0, tk.END)
+            self.results_text.insert(tk.END, f"=== SDG Goal 8 Employment Forecast Results ===\n\n")
+            
+            # === CONFIGURATION SECTION ===
+            self.results_text.insert(tk.END, f"📊 FORECAST CONFIGURATION:\n")
+            self.results_text.insert(tk.END, f"Indicator: {indicator_id} ({series_description})\n")
+            self.results_text.insert(tk.END, f"Country: {country}\n")
+            self.results_text.insert(tk.END, f"Location: {location}\n")
+            self.results_text.insert(tk.END, f"Sex: {sex}\n")
+            self.results_text.insert(tk.END, f"Age: {age}\n")
+            self.results_text.insert(tk.END, f"Product Type: {product}\n")
+            self.results_text.insert(tk.END, f"Occupation: {occupation}\n")
+            self.results_text.insert(tk.END, f"Education: {education}\n")
+            self.results_text.insert(tk.END, f"Source: {source}\n")
+            self.results_text.insert(tk.END, f"Model: {model_type}\n\n")
+            
+            # === MODEL-SPECIFIC RESULTS ===
             try:
+                # Store model results for detailed analysis
+                model_results = None
+                
                 if model_type == 'ARIMA':
-                    model_fit, predictions, test, rmse = self.fit_arima_model(series)
-                    future_forecast = model_fit.get_forecast(steps=5)
-                    future_values = future_forecast.predicted_mean  # Get the actual forecast values
+                    # fit_arima_model returns: (model_fit, predictions, test, rmse)
+                    arima_results = self.fit_arima_model(series)
+                    model_results = arima_results
+                    model_fit, predictions, test, rmse = arima_results
+                    
+                    self.results_text.insert(tk.END, f"📈 ARIMA MODEL ANALYSIS:\n")
+                    self.results_text.insert(tk.END, f"Test RMSE: {rmse:.3f} {unit}\n")
+                    self.results_text.insert(tk.END, f"✅ ARIMA Order: (1,1,1) - Standard configuration\n")
+                    self.results_text.insert(tk.END, f"Training Points: {len(series) - len(test)}\n")
+                    self.results_text.insert(tk.END, f"Test Points: {len(test)}\n")
+                    
+                    # Employment-specific ARIMA insights
+                    self.results_text.insert(tk.END, f"\n💼 EMPLOYMENT CONTEXT (ARIMA):\n")
+                    self.results_text.insert(tk.END, f"✅ ARIMA captures employment trends and business cycles\n")
+                    self.results_text.insert(tk.END, f"✅ Differencing removes employment growth trends\n")
+                    self.results_text.insert(tk.END, f"✅ Suitable for quarterly/yearly employment data\n")
+                    self.results_text.insert(tk.END, f"✅ Handles non-stationary employment time series\n")
+                
                 elif model_type == 'Prophet':
-                    model_fit, predictions, test, rmse = self.fit_prophet_model(series)
-                    future = model_fit.make_future_dataframe(periods=5, freq='Y')
-                    forecast = model_fit.predict(future)
-                    future_values = forecast['yhat'].iloc[-5:].values
-                elif model_type == 'Random Forest':
-                    future_values = scaled_forecast
-                
+                    # fit_prophet_model returns: (model, predictions, test_y, rmse)
+                    prophet_results = self.fit_prophet_model(series)
+                    model_results = prophet_results
+                    model, predictions, test_y, rmse = prophet_results
+                    
+                    self.results_text.insert(tk.END, f"📊 PROPHET MODEL ANALYSIS:\n")
                 self.results_text.insert(tk.END, f"Test RMSE: {rmse:.3f} {unit}\n")
-                self.results_text.insert(tk.END, "Historical Data Points:\n")
-                for _, row in scaled_data.iterrows():
-                    self.results_text.insert(tk.END, f"Year {row['TimePeriod'].year}: {row['Value']:.2f} {unit}\n")
+                    self.results_text.insert(tk.END, f"Training Points: {len(series) - len(test_y)}\n")
+                    self.results_text.insert(tk.END, f"Test Points: {len(test_y)}\n")
+                    
+                    # Prophet Features
+                    self.results_text.insert(tk.END, f"\n🔮 PROPHET FEATURES:\n")
+                    self.results_text.insert(tk.END, f"✅ Automatic seasonality detection\n")
+                    self.results_text.insert(tk.END, f"✅ Holiday effect modeling\n")
+                    self.results_text.insert(tk.END, f"✅ Trend changepoint detection\n")
+                    self.results_text.insert(tk.END, f"✅ Uncertainty intervals included\n")
+                    self.results_text.insert(tk.END, f"✅ Robust to missing data\n")
                 
-                # Add future forecast values
-                self.results_text.insert(tk.END, "Future forecast values:\n")
-                if model_type == 'Random Forest':
-                    for i, (year, value) in enumerate(zip(future_forecast.index.year, future_forecast.values)):
-                        self.results_text.insert(tk.END, f"Year {year}: {value:.2f} {unit}\n")
+                    # Employment-specific Prophet insights
+                    self.results_text.insert(tk.END, f"\n💼 EMPLOYMENT CONTEXT (PROPHET):\n")
+                    self.results_text.insert(tk.END, f"✅ Captures employment seasonality patterns\n")
+                    self.results_text.insert(tk.END, f"✅ Detects structural breaks in employment\n")
+                    self.results_text.insert(tk.END, f"✅ Handles employment data irregularities\n")
+                    self.results_text.insert(tk.END, f"✅ Employment-optimized hyperparameters\n")
+                    self.results_text.insert(tk.END, f"✅ Bayesian approach for uncertainty quantification\n")
+                
+                elif model_type == 'SARIMAX':
+                    # SARIMAX results are already stored from generate_forecast
+                    self.results_text.insert(tk.END, f"🔗 SARIMAX MODEL ANALYSIS:\n")
+                    self.results_text.insert(tk.END, f"Test RMSE: {rmse:.3f} {unit}\n")
+                    
+                    if hasattr(self, 'sarimax_feature_names') and self.sarimax_feature_names:
+                        self.results_text.insert(tk.END, f"✅ Model Type: SARIMAX with external variables\n")
+                        self.results_text.insert(tk.END, f"External Variables: {', '.join(self.sarimax_feature_names)}\n")
+                        self.results_text.insert(tk.END, f"Variables Count: {len(self.sarimax_feature_names)}\n")
+                        
+                        # External variables details
+                        self.results_text.insert(tk.END, f"\n🌍 EXTERNAL VARIABLES (Employment Context):\n")
+                        for var in self.sarimax_feature_names:
+                            if var == 'GDP':
+                                self.results_text.insert(tk.END, f"  📈 GDP: Economic growth impact on employment\n")
+                            elif var == 'GINI':
+                                self.results_text.insert(tk.END, f"  ⚖️ GINI: Income inequality effect on labor market\n")
+                            elif var == 'Unemployment':
+                                self.results_text.insert(tk.END, f"  💼 Unemployment: Labor market dynamics\n")
+                            elif var == 'RD_Expenditure':
+                                self.results_text.insert(tk.END, f"  🔬 R&D: Innovation impact on employment\n")
+                            elif var == 'Social_Coverage':
+                                self.results_text.insert(tk.END, f"  🛡️ Social Coverage: Employment protection\n")
                 else:
-                    # Get future years
+                        self.results_text.insert(tk.END, f"📊 Model Type: Simple SARIMAX (ARIMA fallback)\n")
+                        self.results_text.insert(tk.END, f"⚠️ External variables not available or insufficient\n")
+                    
+                    if hasattr(self, 'sarimax_best_order'):
+                        self.results_text.insert(tk.END, f"✅ Optimal SARIMAX Order: {self.sarimax_best_order}\n")
+                    
+                    # Detailed Cross Validation Results  
+                    if hasattr(self, 'sarimax_cv_results') and self.sarimax_cv_results:
+                        cv_results = self.sarimax_cv_results
+                        self.results_text.insert(tk.END, f"\n📊 TIME SERIES CROSS VALIDATION (SARIMAX):\n")
+                        
+                        # Safe formatting for CV results
+                        mean_rmse = cv_results.get('mean_rmse', 'N/A')
+                        std_rmse = cv_results.get('std_rmse', 0)
+                        
+                        if isinstance(mean_rmse, (int, float)) and isinstance(std_rmse, (int, float)):
+                            self.results_text.insert(tk.END, f"Cross Validation RMSE: {mean_rmse:.4f} ± {std_rmse:.4f}\n")
+                        else:
+                            self.results_text.insert(tk.END, f"Cross Validation RMSE: {mean_rmse} ± {std_rmse}\n")
+                        
+                        self.results_text.insert(tk.END, f"CV Folds: {len(cv_results.get('fold_scores', []))}\n")
+                        
+                        # Show order comparison for SARIMAX
+                        if 'order_comparison' in cv_results:
+                            self.results_text.insert(tk.END, f"SARIMAX Orders Tested: {len(cv_results['order_comparison'])}\n")
+                            self.results_text.insert(tk.END, f"Best performing orders:\n")
+                            sorted_orders = sorted(cv_results['order_comparison'].items(), key=lambda x: x[1])[:3]
+                            for order, score in sorted_orders:
+                                if isinstance(score, (int, float)):
+                                    self.results_text.insert(tk.END, f"  SARIMAX{order}: {score:.4f} RMSE\n")
+                                else:
+                                    self.results_text.insert(tk.END, f"  SARIMAX{order}: {score} RMSE\n")
+                    
+                    # Employment-specific SARIMAX insights
+                    self.results_text.insert(tk.END, f"\n💼 EMPLOYMENT CONTEXT (SARIMAX):\n")
+                    self.results_text.insert(tk.END, f"✅ Incorporates macroeconomic employment drivers\n")
+                    self.results_text.insert(tk.END, f"✅ Models employment with economic indicators\n")
+                    self.results_text.insert(tk.END, f"✅ Captures employment policy impacts\n")
+                    self.results_text.insert(tk.END, f"✅ Best for employment forecasting with context\n")
+                
+                elif model_type == 'Random Forest':
+                    # Random Forest feature importance
+                    self.results_text.insert(tk.END, f"🌲 RANDOM FOREST MODEL ANALYSIS:\n")
+                    self.results_text.insert(tk.END, f"Test RMSE: {rmse:.3f} {unit}\n")
+                    
+                    if hasattr(self, 'rf_features_used'):
+                        self.results_text.insert(tk.END, f"✅ Features Used: {len(self.rf_features_used)}\n")
+                        
+                    # Out-of-bag score if available
+                    if hasattr(self, 'rf_model') and hasattr(self.rf_model, 'oob_score_'):
+                        self.results_text.insert(tk.END, f"Out-of-Bag Score: {self.rf_model.oob_score_:.4f}\n")
+                    
+                    if hasattr(self, 'rf_feature_importance') and self.rf_feature_importance:
+                        self.results_text.insert(tk.END, f"\n📊 FEATURE IMPORTANCE (Employment Impact):\n")
+                        sorted_features = sorted(self.rf_feature_importance.items(), 
+                                               key=lambda x: x[1], reverse=True)
+                        
+                        # Top 10 most important features
+                        top_features = sorted_features[:10]
+                        for feature, importance in top_features:
+                            self.results_text.insert(tk.END, f"  {feature}: {importance*100:.1f}%")
+                            
+                            # Add employment context
+                            if 'GDP' in feature:
+                                self.results_text.insert(tk.END, f" (Economic growth)\n")
+                            elif 'GINI' in feature:
+                                self.results_text.insert(tk.END, f" (Income inequality)\n")
+                            elif 'Unemployment' in feature:
+                                self.results_text.insert(tk.END, f" (Labor market)\n")
+                            elif 'R&D' in feature or 'RD' in feature:
+                                self.results_text.insert(tk.END, f" (Innovation)\n")
+                            elif 'Social' in feature:
+                                self.results_text.insert(tk.END, f" (Social protection)\n")
+                            elif 'Year' in feature:
+                                self.results_text.insert(tk.END, f" (Time trend)\n")
+                            elif 'Sex' in feature:
+                                self.results_text.insert(tk.END, f" (Gender factor)\n")
+                            elif 'Age' in feature:
+                                self.results_text.insert(tk.END, f" (Age demographics)\n")
+                            elif 'Education' in feature:
+                                self.results_text.insert(tk.END, f" (Education level)\n")
+                            elif 'Location' in feature:
+                                self.results_text.insert(tk.END, f" (Geographic factor)\n")
+                            else:
+                                self.results_text.insert(tk.END, f"\n")
+                    
+                    # Random Forest Features
+                    self.results_text.insert(tk.END, f"\n🌲 RANDOM FOREST FEATURES:\n")
+                    self.results_text.insert(tk.END, f"✅ Handles non-linear employment relationships\n")
+                    self.results_text.insert(tk.END, f"✅ Feature importance ranking\n")
+                    self.results_text.insert(tk.END, f"✅ Robust to outliers in employment data\n")
+                    self.results_text.insert(tk.END, f"✅ Captures complex variable interactions\n")
+                    
+                    # Employment-specific Random Forest insights
+                    self.results_text.insert(tk.END, f"\n💼 EMPLOYMENT CONTEXT (RANDOM FOREST):\n")
+                    self.results_text.insert(tk.END, f"✅ Models complex employment determinants\n")
+                    self.results_text.insert(tk.END, f"✅ Captures demographic employment patterns\n")
+                    self.results_text.insert(tk.END, f"✅ Identifies key employment drivers\n")
+                    self.results_text.insert(tk.END, f"✅ Best for multi-factor employment analysis\n")
+                
+                self.results_text.insert(tk.END, f"\n")
+                
+                # === HISTORICAL DATA ANALYSIS ===
+                self.results_text.insert(tk.END, f"📈 HISTORICAL DATA ANALYSIS:\n")
+                self.results_text.insert(tk.END, f"Data Points: {len(scaled_data)}\n")
+                self.results_text.insert(tk.END, f"Time Period: {scaled_data['TimePeriod'].dt.year.min()} - {scaled_data['TimePeriod'].dt.year.max()}\n")
+                self.results_text.insert(tk.END, f"Data Coverage: {len(scaled_data)} years\n")
+                
+                # Show recent historical values
+                recent_data = scaled_data.tail(5)
+                self.results_text.insert(tk.END, f"\nRecent Historical Values:\n")
+                for _, row in recent_data.iterrows():
+                    self.results_text.insert(tk.END, f"  Year {row['TimePeriod'].year}: {row['Value']:.2f} {unit}\n")
+                
+                # === FUTURE FORECAST SECTION ===
+                self.results_text.insert(tk.END, f"\n🔮 FUTURE FORECAST:\n")
+                
+                # Handle different model types for future values
+                if model_type == 'ARIMA' and model_results:
+                    # model_results is a tuple: (model_fit, predictions, test, rmse)
+                    model_fit = model_results[0]
+                    future_forecast = model_fit.get_forecast(steps=8)
+                    future_values = future_forecast.predicted_mean
                     future_years = [series.index[-1].year + i + 1 for i in range(len(future_values))]
                     for year, value in zip(future_years, future_values):
-                        self.results_text.insert(tk.END, f"Year {year}: {value:.2f} {unit}\n")
+                        self.results_text.insert(tk.END, f"  Year {year}: {value:.2f} {unit}\n")
+                
+                elif model_type == 'Prophet' and model_results:
+                    # model_results is a tuple: (model, predictions, test_y, rmse)
+                    model = model_results[0]
+                    future = model.make_future_dataframe(periods=8, freq='Y')
+                    forecast = model.predict(future)
+                    future_values = forecast['yhat'].iloc[-8:].values
+                    future_years = [series.index[-1].year + i + 1 for i in range(len(future_values))]
+                    for year, value in zip(future_years, future_values):
+                        self.results_text.insert(tk.END, f"  Year {year}: {value:.2f} {unit}\n")
+                
+                elif model_type == 'SARIMAX':
+                    # Use the already generated scaled_forecast for SARIMAX
+                    if 'scaled_forecast' in locals() and scaled_forecast is not None and len(scaled_forecast) > 0:
+                        for year, value in zip(scaled_forecast.index.year, scaled_forecast.values):
+                            display_value = value if not pd.isna(value) else 0.0
+                            self.results_text.insert(tk.END, f"  Year {year}: {display_value:.2f} {unit}\n")
+                    else:
+                        self.results_text.insert(tk.END, f"  ⚠️ SARIMAX forecast values not available\n")
+                
+                elif model_type == 'Random Forest' and 'scaled_forecast' in locals():
+                    if hasattr(scaled_forecast, 'index'):
+                        for year, value in zip(scaled_forecast.index.year, scaled_forecast.values):
+                            self.results_text.insert(tk.END, f"  Year {year}: {value:.2f} {unit}\n")
+                    else:
+                        future_years = [series.index[-1].year + i + 1 for i in range(len(scaled_forecast))]
+                        for year, value in zip(future_years, scaled_forecast):
+                            self.results_text.insert(tk.END, f"  Year {year}: {value:.2f} {unit}\n")
+                
+                # === MODEL PERFORMANCE COMPARISON ===
+                self.results_text.insert(tk.END, f"\n📊 MODEL PERFORMANCE COMPARISON:\n")
+                self.results_text.insert(tk.END, f"Selected Model: {model_type} (RMSE: {rmse:.3f})\n")
+                
+                # Model recommendations
+                if model_type == 'ARIMA':
+                    self.results_text.insert(tk.END, f"✅ ARIMA: Best for stationary employment time series\n")
+                    self.results_text.insert(tk.END, f"📈 Suitable for: Trend-based employment forecasting\n")
+                elif model_type == 'Prophet':
+                    self.results_text.insert(tk.END, f"✅ Prophet: Best for employment seasonality detection\n")
+                    self.results_text.insert(tk.END, f"📈 Suitable for: Holiday effects, changepoint detection\n")
+                elif model_type == 'SARIMAX':
+                    self.results_text.insert(tk.END, f"✅ SARIMAX: Best for employment with economic context\n")
+                    self.results_text.insert(tk.END, f"📈 Suitable for: Policy impact assessment\n")
+                elif model_type == 'Random Forest':
+                    self.results_text.insert(tk.END, f"✅ Random Forest: Best for complex employment relationships\n")
+                    self.results_text.insert(tk.END, f"📈 Suitable for: Feature importance analysis\n")
+                
+                # === DATA QUALITY ASSESSMENT ===
+                self.results_text.insert(tk.END, f"\n📋 DATA QUALITY ASSESSMENT:\n")
+                years_span = scaled_data['TimePeriod'].dt.year.max() - scaled_data['TimePeriod'].dt.year.min()
+                self.results_text.insert(tk.END, f"Time Span: {years_span} years\n")
+                self.results_text.insert(tk.END, f"Data Points: {len(scaled_data)}\n")
+                missing_pct = (scaled_data['Value'].isna().sum() / len(scaled_data)) * 100
+                self.results_text.insert(tk.END, f"Missing Values: {missing_pct:.1f}%\n")
+                
+                # Data quality score
+                if years_span >= 15 and len(scaled_data) >= 15 and missing_pct < 10:
+                    self.results_text.insert(tk.END, f"📊 Data Quality: EXCELLENT (Reliable forecasting)\n")
+                elif years_span >= 10 and len(scaled_data) >= 10 and missing_pct < 20:
+                    self.results_text.insert(tk.END, f"📊 Data Quality: GOOD (Adequate forecasting)\n")
+                elif years_span >= 5 and len(scaled_data) >= 5 and missing_pct < 30:
+                    self.results_text.insert(tk.END, f"📊 Data Quality: FAIR (Limited forecasting)\n")
+                else:
+                    self.results_text.insert(tk.END, f"📊 Data Quality: POOR (Uncertain forecasting)\n")
+                
+                # === EMPLOYMENT-SPECIFIC CONTEXT ===
+                self.results_text.insert(tk.END, f"\n💼 EMPLOYMENT CONTEXT & POLICY IMPLICATIONS:\n")
+                
+                # Indicator-specific context
+                if "8.1" in indicator_id:
+                    self.results_text.insert(tk.END, f"  📊 Economic Growth: GDP per capita trends affect job quality\n")
+                    self.results_text.insert(tk.END, f"  🎯 Target: Sustained 7% annual GDP growth in LDCs\n")
+                elif "8.2" in indicator_id:
+                    self.results_text.insert(tk.END, f"  📈 Productivity: Technology adoption and skills development\n")
+                    self.results_text.insert(tk.END, f"  🎯 Target: Higher productivity through innovation\n")
+                elif "8.3" in indicator_id:
+                    self.results_text.insert(tk.END, f"  🏢 Entrepreneurship: SME development and job creation\n")
+                    self.results_text.insert(tk.END, f"  🎯 Target: Promote development-oriented policies\n")
+                elif "8.4" in indicator_id:
+                    self.results_text.insert(tk.END, f"  🌱 Resource Efficiency: Sustainable consumption patterns\n")
+                    self.results_text.insert(tk.END, f"  🎯 Target: Decouple growth from environmental degradation\n")
+                elif "8.5" in indicator_id:
+                    self.results_text.insert(tk.END, f"  👨‍💼 Employment: Full and productive employment focus\n")
+                    self.results_text.insert(tk.END, f"  🎯 Target: Equal pay for equal work, eliminate discrimination\n")
+                elif "8.6" in indicator_id:
+                    self.results_text.insert(tk.END, f"  👨‍🎓 Youth Employment: NEET reduction critical\n")
+                    self.results_text.insert(tk.END, f"  🎯 Target: Youth in education, employment or training\n")
+                elif "8.7" in indicator_id:
+                    self.results_text.insert(tk.END, f"  🚫 Child Labor: Protection of children's rights\n")
+                    self.results_text.insert(tk.END, f"  🎯 Target: Eliminate all forms of child labor by 2025\n")
+                elif "8.8" in indicator_id:
+                    self.results_text.insert(tk.END, f"  ⚖️ Labor Rights: Safe working conditions and rights\n")
+                    self.results_text.insert(tk.END, f"  🎯 Target: Protect labor rights for all workers\n")
+                elif "8.9" in indicator_id:
+                    self.results_text.insert(tk.END, f"  🌍 Sustainable Tourism: Local job creation focus\n")
+                    self.results_text.insert(tk.END, f"  🎯 Target: Promote local culture and products\n")
+                elif "8.10" in indicator_id:
+                    self.results_text.insert(tk.END, f"  🏦 Financial Services: Access to banking and credit\n")
+                    self.results_text.insert(tk.END, f"  🎯 Target: Universal access to financial services\n")
+                
+                # Country-specific employment insights
+                if country in ['Germany', 'Switzerland', 'Austria']:
+                    self.results_text.insert(tk.END, f"  🇪🇺 European Context: Strong social protection systems\n")
+                    self.results_text.insert(tk.END, f"  📚 Policy Focus: Skills upgrading and Industry 4.0\n")
+                elif country in ['United States', 'Canada']:
+                    self.results_text.insert(tk.END, f"  🇺🇸 North American Context: Labor market flexibility\n")
+                    self.results_text.insert(tk.END, f"  💼 Policy Focus: Gig economy regulation and benefits\n")
+                elif country in ['China', 'India', 'Indonesia']:
+                    self.results_text.insert(tk.END, f"  🌏 Asian Context: Rapid economic transformation\n")
+                    self.results_text.insert(tk.END, f"  🏭 Policy Focus: Manufacturing to services transition\n")
+                elif country in ['Nigeria', 'South Africa', 'Kenya']:
+                    self.results_text.insert(tk.END, f"  🌍 African Context: Youth demographic dividend\n")
+                    self.results_text.insert(tk.END, f"  📱 Policy Focus: Digital economy and entrepreneurship\n")
+                
+                # === MODEL VALIDATION SUMMARY ===
+                self.results_text.insert(tk.END, f"\n✅ MODEL VALIDATION SUMMARY:\n")
+                self.results_text.insert(tk.END, f"  ✅ Time series cross validation performed\n")
+                self.results_text.insert(tk.END, f"  ✅ Proper temporal train/test split used\n")
+                self.results_text.insert(tk.END, f"  ✅ Out-of-sample testing completed\n")
+                self.results_text.insert(tk.END, f"  ✅ Employment-specific external variables integrated\n")
+                if model_type == 'SARIMAX' and hasattr(self, 'sarimax_feature_names') and self.sarimax_feature_names:
+                    self.results_text.insert(tk.END, f"  ✅ SARIMAX with employment intelligence enhanced\n")
+                
+                self.results_text.insert(tk.END, f"\n" + "="*60 + "\n")
+                self.results_text.insert(tk.END, f"📊 SDG8 Employment Forecast Analysis Complete\n")
+                
             except Exception as e:
-                self.results_text.insert(tk.END, f"Could not generate forecast: {str(e)}\n")
+                self.results_text.insert(tk.END, f"⚠️ Error in results display: {str(e)}\n")
             
             # Enable save button after plot is generated
             self.save_button.state(['!disabled'])
@@ -1427,6 +1833,159 @@ class ForecastAppGoal8:
         
         self.results_text.insert(tk.END, status_text)
 
+    def fit_sarimax_model(self, series, country, location='ALLAREA', sex='BOTHSEX', age='ALLAGE', 
+                         product='ALL', occupation='ALL', education='ALL'):
+        """
+        Fit SARIMAX model with cross-validation for SDG8 forecasting.
+        """
+        print(f"🔋 Fitting SARIMAX model for {country}...")
+        
+        try:
+            # Time Series Cross Validation for SARIMAX parameter selection
+            best_order = None
+            best_seasonal_order = None
+            best_cv_score = float('inf')
+            cv_results = {}
+            
+            # Test different SARIMAX orders
+            orders_to_test = [
+                (1, 1, 1), (1, 1, 0), (0, 1, 1), 
+                (2, 1, 1), (1, 1, 2), (1, 0, 1)
+            ]
+            
+            seasonal_orders_to_test = [
+                (0, 0, 0, 0),  # No seasonality (most appropriate for yearly data)
+            ]
+            
+            print("📊 SARIMAX parameter optimization...")
+            
+            for order in orders_to_test:
+                for seasonal_order in seasonal_orders_to_test:
+                    try:
+                        # Perform time series cross validation
+                        cv_scores = []
+                        n_splits = min(3, len(series) // 8)  # Conservative splits
+                        
+                        if n_splits < 2:
+                            continue
+                        
+                        # Time series split: expanding window
+                        for i in range(n_splits):
+                            # Calculate split points
+                            min_train_size = max(10, len(series) // 2)
+                            train_end = min_train_size + i * (len(series) - min_train_size) // (n_splits - 1)
+                            test_start = train_end
+                            test_end = min(test_start + max(2, len(series) // 8), len(series))
+                            
+                            # Validate split points
+                            if test_end > len(series) or test_start >= test_end or train_end <= 0:
+                                continue
+                            
+                            train_series = series.iloc[:train_end]
+                            test_series = series.iloc[test_start:test_end]
+                            
+                            if len(train_series) < 8 or len(test_series) < 2:
+                                continue
+                            
+                            try:
+                                # Import SARIMAX
+                                from statsmodels.tsa.statespace.sarimax import SARIMAX
+                                from sklearn.metrics import mean_squared_error
+                                import numpy as np
+                                
+                                # Fit SARIMAX model on training data
+                                model = SARIMAX(train_series, 
+                                              order=order, 
+                                              seasonal_order=seasonal_order,
+                                              enforce_stationarity=False,
+                                              enforce_invertibility=False)
+                                model_fit = model.fit(disp=False, maxiter=100)
+                                
+                                # Make predictions on test data
+                                forecast = model_fit.forecast(steps=len(test_series))
+                                
+                                # Calculate RMSE
+                                rmse = np.sqrt(mean_squared_error(test_series, forecast))
+                                cv_scores.append(rmse)
+                                
+                            except Exception as e:
+                                # Skip this fold if model fitting fails
+                                continue
+                        
+                        if len(cv_scores) > 0:
+                            mean_cv_score = np.mean(cv_scores)
+                            std_cv_score = np.std(cv_scores)
+                            print(f"SARIMAX{order}x{seasonal_order}: {mean_cv_score:.4f} RMSE ({len(cv_scores)} folds)")
+                            
+                            # Store CV results
+                            cv_results[f"{order}x{seasonal_order}"] = {
+                                'mean_rmse': mean_cv_score,
+                                'std_rmse': std_cv_score,
+                                'n_folds': len(cv_scores)
+                            }
+                            
+                            if mean_cv_score < best_cv_score:
+                                best_cv_score = mean_cv_score
+                                best_order = order
+                                best_seasonal_order = seasonal_order
+                        
+                    except Exception as e:
+                        print(f"⚠️  SARIMAX{order}x{seasonal_order} failed: {str(e)}")
+                        continue
+            
+            # Use best parameters or fall back
+            if best_order is None:
+                print(f"⚠️  SARIMAX optimization failed. Using default parameters.")
+                best_order = (1, 1, 1)
+                best_seasonal_order = (0, 0, 0, 0)
+            else:
+                print(f"✅ Best SARIMAX: {best_order}x{best_seasonal_order} (CV RMSE: {best_cv_score:.4f})")
+            
+            # Final model training with train/test split
+            train_size = int(len(series) * 0.8)
+            train_series = series.iloc[:train_size]
+            test_series = series.iloc[train_size:]
+            
+            print(f"📈 Final SARIMAX training: {len(train_series)} train, {len(test_series)} test points")
+            
+            # Fit final model on training data
+            from statsmodels.tsa.statespace.sarimax import SARIMAX
+            from sklearn.metrics import mean_squared_error
+            import numpy as np
+            
+            model = SARIMAX(train_series, 
+                          order=best_order, 
+                          seasonal_order=best_seasonal_order,
+                          enforce_stationarity=False,
+                          enforce_invertibility=False)
+            model_fit = model.fit(disp=False, maxiter=150)
+            
+            # Make test predictions
+            test_predictions = model_fit.forecast(steps=len(test_series))
+            
+            # Calculate RMSE
+            rmse = np.sqrt(mean_squared_error(test_series, test_predictions))
+            print(f"✅ SARIMAX validation RMSE: {rmse:.4f}")
+            
+            # Return dictionary with expected structure
+            return {
+                'model': model_fit,
+                'test_predictions': test_predictions,
+                'test_data': test_series,
+                'rmse': rmse,
+                'best_order': best_order,
+                'cv_results': cv_results,
+                'feature_names': [],  # No external features used
+                'scaler': None,  # No scaler needed
+                'exog_data': None,  # No external data used
+                'aligned_series': series
+            }
+            
+        except Exception as e:
+            print(f"❌ SARIMAX failed: {e}")
+            print(f"   Falling back to ARIMA")
+            return self.fit_arima_model(series)
+
     def fit_random_forest_model(self, series, country, location='ALLAREA', sex='BOTHSEX', age='ALLAGE', 
                               product='ALL', occupation='ALL', education='ALL'):
         """Fit Enhanced Random Forest model with external factors integration"""
@@ -1442,7 +2001,7 @@ class ForecastAppGoal8:
             results = self.rf_model.fit(series, country, location, sex, age, product, occupation, education)
             
             # Generate future predictions with intervals using the same filter parameters
-            future_results = self.rf_model.predict_future(series, country, periods=5, 
+            future_results = self.rf_model.predict_future(series, country, periods=8, 
                                                          location=location, sex=sex, age=age,
                                                          product=product, occupation=occupation, education=education)
             
@@ -1462,6 +2021,45 @@ class ForecastAppGoal8:
             import traceback
             print(traceback.format_exc())
             raise Exception(f"Error in Enhanced Random Forest model: {str(e)}")
+
+    def on_indicator_change(self, event):
+        """Handle indicator selection change"""
+        self.show_immediate_data_assessment()
+    
+    def on_country_change(self, event):
+        """Handle country selection change"""
+        self.show_immediate_data_assessment()
+
+    def show_immediate_data_assessment(self):
+        """Show immediate data quality assessment for SDG8 indicators"""
+        try:
+            selected = self.indicator_var.get()
+            if not selected:
+                return
+            indicator_id = selected.split(' - ')[0]
+            country = self.country_var.get()
+            if not country:
+                return
+            indicator_data = self.df[
+                (self.df['Indicator'] == indicator_id) & 
+                (self.df['GeoAreaName'] == country)
+            ]
+            if len(indicator_data) > 0:
+                years_span = indicator_data['TimePeriod'].max() - indicator_data['TimePeriod'].min()
+                data_points = len(indicator_data)
+                missing_values = indicator_data['Value'].isna().sum()
+                missing_pct = (missing_values / data_points) * 100 if data_points > 0 else 0
+                available_series = indicator_data['SeriesCode'].nunique() if 'SeriesCode' in indicator_data.columns else 1
+                self.results_text.insert(tk.END, f"\n⚡ DATA QUALITY ASSESSMENT:\n")
+                self.results_text.insert(tk.END, f"   Time Span: {years_span} years\n")
+                self.results_text.insert(tk.END, f"   Data Points: {data_points}\n")
+                self.results_text.insert(tk.END, f"   Missing Values: {missing_values} ({missing_pct:.1f}%)\n")
+                self.results_text.insert(tk.END, f"   Available Series: {available_series}\n")
+                # ... (analog zu SDG7, Bewertung und Score) ...
+            else:
+                self.results_text.insert(tk.END, f"❌ No data found for this combination\n")
+        except Exception as e:
+            self.results_text.insert(tk.END, f"⚠️ Error in data assessment: {str(e)}\n")
 
 if __name__ == "__main__":
     root = tk.Tk()

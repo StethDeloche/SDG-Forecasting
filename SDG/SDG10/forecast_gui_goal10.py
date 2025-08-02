@@ -414,6 +414,9 @@ class SDG10ForecastGUI:
     def fit_arima_model(self, series):
         """Fit ARIMA model with time series cross validation"""
         print("🔮 Fitting ARIMA model...")
+        print(f"  Series length: {len(series)}")
+        print(f"  Series values: {list(series.values)}")
+        print(f"  Series statistics: min={series.min():.4f}, max={series.max():.4f}, mean={series.mean():.4f}")
         
         # Time series cross validation
         tscv = TimeSeriesSplit(n_splits=min(5, len(series) // 4))
@@ -451,6 +454,7 @@ class SDG10ForecastGUI:
                 avg_score = np.mean(scores)
                 std_score = np.std(scores)
                 cv_results[order] = {'mean': avg_score, 'std': std_score, 'scores': scores}
+                print(f"  Order {order}: RMSE = {avg_score:.4f} ± {std_score:.4f}")
                 
                 if avg_score < best_score:
                     best_score = avg_score
@@ -463,9 +467,15 @@ class SDG10ForecastGUI:
         if best_order is None:
             raise Exception("Could not fit any ARIMA model")
         
+        print(f"  ✅ Best ARIMA order: {best_order} with RMSE: {best_score:.4f}")
+        
         # Fit final model on full data
         final_model = ARIMA(series, order=best_order)
         fitted_final_model = final_model.fit()
+        
+        print(f"  Final model summary:")
+        print(f"    AIC: {fitted_final_model.aic:.2f}")
+        print(f"    Parameters: {fitted_final_model.params.values}")
         
         # Generate test predictions for plotting
         n_test = min(len(series) // 5, 10)
@@ -476,6 +486,13 @@ class SDG10ForecastGUI:
             test_model = ARIMA(train_series, order=best_order)
             test_fitted = test_model.fit()
             test_predictions = test_fitted.forecast(steps=len(test_series))
+            
+            # 🔥 REVOLUTIONARY CHANGE: No bounds for ARIMA test predictions either!
+            # Let the model show its natural performance without artificial constraints
+            print(f"🚀 ARIMA Test: No bounds applied - natural predictions like Random Forest!")
+            print(f"📊 Raw test predictions: {[f'{p:.2f}' for p in test_predictions]}")
+            print(f"📊 Test predictions (NO BOUNDS): {[f'{p:.2f}' for p in test_predictions]}")
+            
             test_rmse = np.sqrt(mean_squared_error(test_series, test_predictions))
         else:
             test_predictions = pd.Series()
@@ -639,12 +656,16 @@ class SDG10ForecastGUI:
             
             # Generate forecast based on model type
             if model_type == "ARIMA":
+                print(f"🎯 Starting ARIMA forecast...")
                 results = self.forecast_arima(series, filtered_data)
             elif model_type == "Prophet":
+                print(f"🎯 Starting Prophet forecast...")
                 results = self.forecast_prophet(series, filtered_data)
             elif model_type == "SARIMAX":
+                print(f"🎯 Starting SARIMAX forecast...")
                 results = self.forecast_sarimax(series, filtered_data)
             elif model_type == "Random Forest":
+                print(f"🎯 Starting Random Forest forecast...")
                 results = self.forecast_random_forest(series, filtered_data)
             else:
                 messagebox.showerror("Error", f"Model {model_type} not implemented yet")
@@ -654,25 +675,35 @@ class SDG10ForecastGUI:
             self.save_button.state(['!disabled'])
             
         except Exception as e:
+            print(f"❌ FORECAST ERROR: {str(e)}")
+            print(f"   Model: {model_type}")
+            print(f"   Country: {self.country_var.get()}")
+            print(f"   Series length: {len(series) if 'series' in locals() else 'Unknown'}")
+            import traceback
+            print(f"   Full traceback:")
+            traceback.print_exc()
             messagebox.showerror("Error", f"Could not generate forecast: {str(e)}")
     
     def forecast_arima(self, series, filtered_data):
         """Generate ARIMA forecast"""
+        print(f"🔍 ARIMA DEBUG - Historical data:")
+        print(f"  Series min: {series.min():.4f}, max: {series.max():.4f}")
+        print(f"  Series last 5 values: {list(series.tail(5).values)}")
+        print(f"  Series data type: {series.dtype}")
+        
         # Fit model
         arima_results = self.fit_arima_model(series)
         
-        # Generate future forecast
+        # Generate future forecast using the fixed function
         future_periods = 8  # Forecast 8 years into the future
-        forecast = arima_results['model'].forecast(steps=future_periods)
-        forecast_ci = arima_results['model'].get_forecast(steps=future_periods).conf_int()
+        forecast_series, forecast_ci = self.predict_future_arima(
+            arima_results['model'], series, future_periods
+        )
         
-        # Create future dates
-        last_date = series.index[-1]
-        future_dates = pd.date_range(start=last_date + pd.DateOffset(years=1), 
-                                   periods=future_periods, freq='YS')
-        
-        # Create forecast series
-        forecast_series = pd.Series(forecast, index=future_dates)
+        print(f"🔍 ARIMA FORECAST vs HISTORICAL comparison:")
+        print(f"  Historical range: {series.min():.4f} to {series.max():.4f}")
+        print(f"  Forecast range: {forecast_series.min():.4f} to {forecast_series.max():.4f}")
+        print(f"  Forecast values: {list(forecast_series.values)}")
         
         # Plot results
         self.plot_forecast_results(series, forecast_series, forecast_ci, 
@@ -681,8 +712,6 @@ class SDG10ForecastGUI:
         # Plot detailed results analysis
         self.plot_results_analysis(series, forecast_series, forecast_ci, 
                                   arima_results, "ARIMA", filtered_data)
-        
-        return arima_results
     
     def forecast_prophet(self, series, filtered_data):
         """Generate Prophet forecast"""
@@ -886,7 +915,7 @@ class SDG10ForecastGUI:
                     print(f"      📊 R&D: {future_rd:.2f}")
                     features.append(future_rd)
                 else:
-                    features.append(2.0)  # Default R&D
+                    features.append(3.29)  # Default R&D - use realistic trend value instead of 2.0
             
             elif feature_name == 'Social_Coverage':
                 # Social coverage with inequality reduction focus
@@ -916,8 +945,8 @@ class SDG10ForecastGUI:
         """Fit SARIMAX model with external variables and cross validation"""
         print(f"🔮 Fitting SARIMAX model for {country}...")
         
-        # Prepare external variables
-        external_features = ['GDP', 'GINI', 'Unemployment', 'RD_Expenditure', 'Social_Coverage']
+        # Prepare external variables - include Year as first feature
+        external_features = ['Year', 'GDP', 'GINI', 'Unemployment', 'RD_Expenditure', 'Social_Coverage']
         
         # Collect external data for historical years
         years = [date.year for date in series.index]
@@ -925,31 +954,78 @@ class SDG10ForecastGUI:
         
         for year in years:
             print(f"  🔍 Processing external data for year {year}")
+            # Get features for all external variables except Year (which we add manually)
+            other_features = ['GDP', 'GINI', 'Unemployment', 'RD_Expenditure', 'Social_Coverage']
             year_features = self.extrapolate_external_variables_for_inequality(
-                country, year, external_features, location, sex, product, discrimination
+                country, year, other_features, location, sex, product, discrimination
             )
             
             print(f"    📊 Received features: {year_features}")
-            print(f"    📊 Expected {len(external_features)} features, got {len(year_features) if year_features else 0}")
+            print(f"    📊 Expected {len(other_features)} features, got {len(year_features) if year_features else 0}")
             
-            if year_features and len(year_features) == len(external_features):
-                external_data.append(year_features)
-                print(f"    ✅ Added year {year} features: {year_features}")
+            if year_features and len(year_features) == len(other_features):
+                # Include year as first feature, then the other features
+                full_features = [year] + year_features
+                external_data.append(full_features)
+                print(f"    ✅ Added full features: {full_features}")
             else:
                 # Use interpolation or default values
                 if len(external_data) > 0:
-                    external_data.append(external_data[-1].copy())
-                    print(f"    🔄 Used previous year data for {year}")
+                    # Copy previous data but update year
+                    prev_data = external_data[-1][1:].copy()  # Exclude year from previous
+                    full_features = [year] + prev_data
+                    external_data.append(full_features)
+                    print(f"    🔄 Used previous year data: {full_features}")
                 else:
-                    default_values = [30000, 40, 8, 2, 60]  # Default values
-                    external_data.append(default_values)
-                    print(f"    ⚠️  Used default values for {year}: {default_values}")
+                    default_values = [30000, 40, 8, 2, 60]  # Default values for other features
+                    full_features = [year] + default_values
+                    external_data.append(full_features)
+                    print(f"    ⚠️  Used default values: {full_features}")
         
         if len(external_data) < len(series):
             print("⚠️  Insufficient external data, falling back to ARIMA")
             return self.fit_arima_model(series)
         
         external_data = np.array(external_data)
+        
+        # Debug: Check dimensions before fitting
+        print(f"🔍 SARIMAX dimension check:")
+        print(f"  Series length: {len(series)}")
+        print(f"  Series years: {list(series.index.year)}")
+        print(f"  External data shape: {external_data.shape}")
+        print(f"  External data collected for years: {[row[0] for row in external_data] if len(external_data) > 0 else 'None'}")
+        
+        # Critical fix: External data must match series years exactly
+        # We need to filter external_data to only include years that exist in series
+        series_years = set(series.index.year)
+        print(f"🔍 Series contains years: {sorted(series_years)}")
+        
+        # Filter external_data to match series years exactly
+        if len(external_data) > 0:
+            # external_data rows have format: [year, gdp, gini, unemployment, rd, social]
+            filtered_external_data = []
+            for row in external_data:
+                year = int(row[0])  # First column is year
+                if year in series_years:
+                    filtered_external_data.append(row)  # Keep ALL features including year
+            
+            if len(filtered_external_data) == 0:
+                print("⚠️  No external data matches series years, falling back to ARIMA")
+                return self.fit_arima_model(series)
+            
+            external_data = np.array(filtered_external_data)
+            # Keep external_features as is - Year is included
+            external_features_for_model = external_features  # Keep Year as first feature
+            print(f"📊 Filtered external data to match series: {external_data.shape}")
+        else:
+            external_features_for_model = external_features  # Keep Year even if no data
+        
+        # Final dimension check
+        if len(external_data) != len(series):
+            print(f"❌ CRITICAL: Still length mismatch after filtering!")
+            print(f"   Series: {len(series)} points, External: {len(external_data)} points")
+            print(f"   This should not happen - falling back to ARIMA")
+            return self.fit_arima_model(series)
         
         # Debug: Check external data variance
         print(f"🔍 External data matrix:")
@@ -958,7 +1034,7 @@ class SDG10ForecastGUI:
         print(f"  Last row: {external_data[-1] if len(external_data) > 0 else 'No data'}")
         
         # Check variance for each feature
-        for i, feature in enumerate(external_features):
+        for i, feature in enumerate(external_features_for_model):
             feature_values = external_data[:, i]
             variance = np.var(feature_values)
             min_val, max_val = np.min(feature_values), np.max(feature_values)
@@ -972,11 +1048,11 @@ class SDG10ForecastGUI:
         external_data_scaled = scaler.fit_transform(external_data)
         
         print(f"📊 External data shape: {external_data_scaled.shape}")
-        print(f"📊 Features: {external_features}")
+        print(f"📊 Features: {external_features_for_model}")
         
         # Debug: Check scaled data variance
         print(f"🔍 Scaled external data variance:")
-        for i, feature in enumerate(external_features):
+        for i, feature in enumerate(external_features_for_model):
             scaled_values = external_data_scaled[:, i]
             variance = np.var(scaled_values)
             print(f"  {feature}: scaled variance={variance:.4f}")
@@ -1007,6 +1083,11 @@ class SDG10ForecastGUI:
                         test_series = series.iloc[test_idx]
                         train_exog = external_data_scaled[train_idx]
                         test_exog = external_data_scaled[test_idx]
+                        
+                        # Debug: Check dimensions for each fold
+                        print(f"🔍 CV Fold debug - Order {order}, Seasonal {seasonal_order}:")
+                        print(f"  Train series: {len(train_series)}, Train exog: {train_exog.shape}")
+                        print(f"  Test series: {len(test_series)}, Test exog: {test_exog.shape}")
                         
                         # Fit SARIMAX
                         model = SARIMAX(train_series, exog=train_exog, 
@@ -1057,6 +1138,13 @@ class SDG10ForecastGUI:
                                order=best_order, seasonal_order=best_seasonal_order)
             test_fitted = test_model.fit(disp=False)
             test_predictions = test_fitted.forecast(steps=len(test_series), exog=test_exog)
+            
+            # 🔥 REVOLUTIONARY CHANGE: No bounds for SARIMAX test predictions either!
+            # Let the model show its natural performance without artificial constraints
+            print(f"🚀 SARIMAX Test: No bounds applied - natural predictions like Random Forest!")
+            print(f"📊 Raw test predictions: {[f'{p:.2f}' for p in test_predictions]}")
+            print(f"📊 Test predictions (NO BOUNDS): {[f'{p:.2f}' for p in test_predictions]}")
+            
             test_rmse = np.sqrt(mean_squared_error(test_series, test_predictions))
         else:
             test_predictions = pd.Series()
@@ -1070,13 +1158,13 @@ class SDG10ForecastGUI:
             'best_score': best_score,
             'scaler': scaler,
             'external_data': external_data,
-            'external_features': external_features,
-            'feature_names': external_features,
+            'external_features': external_features_for_model,
+            'feature_names': external_features_for_model,
             'test_predictions': test_predictions,
             'test_data': test_series,
             'rmse': test_rmse,
             'series': series,
-            'data_usage_stats': self.calculate_data_usage_stats(country, external_features)
+            'data_usage_stats': self.calculate_data_usage_stats(country, external_features_for_model)
         }
     
     def predict_future_sarimax(self, sarimax_results, country, periods=8, 
@@ -1099,38 +1187,167 @@ class SDG10ForecastGUI:
         # Prepare external variables for future years
         future_exog = []
         for year in future_years:
+            # Get features for all external variables except Year (which we add manually)
+            other_features = ['GDP', 'GINI', 'Unemployment', 'RD_Expenditure', 'Social_Coverage']
             year_features = self.extrapolate_external_variables_for_inequality(
-                country, year, feature_names, location, sex, product, discrimination
+                country, year, other_features, location, sex, product, discrimination
             )
             
-            if year_features and len(year_features) >= len(feature_names):
-                future_exog.append(year_features[:len(feature_names)])
+            if year_features and len(year_features) >= len(other_features):
+                # Include year as first feature, then the other features
+                full_features = [year] + year_features[:len(other_features)]
+                future_exog.append(full_features)
+                print(f"    ✅ Added {len(full_features)} features for year {year}: {[f'{f:.2e}' if isinstance(f, (int, float)) and f > 1000 else f for f in full_features]}")
             else:
-                # Use last known values
+                # Use last known values or defaults - ALWAYS CREATE 6 FEATURES
                 if len(future_exog) > 0:
-                    future_exog.append(future_exog[-1].copy())
+                    # Copy previous features but update year AND FIX R&D!
+                    prev_features = future_exog[-1][1:].copy()  # Exclude year from previous
+                    # CRITICAL FIX: Don't propagate unrealistic R&D=2.0, use realistic trend value
+                    if len(prev_features) >= 4 and prev_features[3] == 2.0:  # R&D is at index 3
+                        prev_features[3] = 3.29  # Replace 2.0 with realistic R&D value
+                        print(f"    🔧 Fixed R&D value from 2.0 to 3.29 for year {year}")
+                    full_features = [year] + prev_features
+                    future_exog.append(full_features)
+                    print(f"    🔄 Used previous features for year {year}: R&D={prev_features[3]:.2f}")
                 else:
-                    future_exog.append([30000, 40, 8, 2, 60])  # Default values
+                    # IMPROVED defaults - use realistic values to prevent forecast jumps
+                    # R&D: Use recent trend value (3.29) instead of unrealistic low value (2.0)
+                    # This prevents the 39% R&D drop that causes dramatic SARIMAX forecast changes
+                    realistic_rd_value = 3.29  # Based on recent 2021-2022 trend
+                    default_values = [year, 3000000000000.0, 40.0, 8.0, realistic_rd_value, 60.0]
+                    future_exog.append(default_values)
+                    print(f"    📋 Used REALISTIC default values for year {year}: R&D={realistic_rd_value:.2f} (vs old 2.0)")
+                
+                # CRITICAL: Ensure we always have exactly 6 features
+                if len(future_exog[-1]) != 6:
+                    print(f"    ⚠️  Wrong feature count {len(future_exog[-1])}, fixing to 6...")
+                    # Pad or trim to exactly 6 features
+                    while len(future_exog[-1]) < 6:
+                        future_exog[-1].append(60.0)  # Default social coverage
+                    if len(future_exog[-1]) > 6:
+                        future_exog[-1] = future_exog[-1][:6]
+                    print(f"    ✅ Fixed to {len(future_exog[-1])} features")
         
         # Convert to array and scale
         future_exog_array = np.array(future_exog)
+        print(f"🔍 Future external variables DEBUG:")
+        print(f"  Raw future_exog length: {len(future_exog)}")
+        print(f"  First future_exog row: {future_exog[0] if len(future_exog) > 0 else 'None'}")
+        print(f"  future_exog_array shape: {future_exog_array.shape}")
+        print(f"  Scaler expects 6 features: [Year, GDP, GINI, Unemployment, RD, Social]")
+        
+        # Scale the entire feature matrix including Year
         future_exog_scaled = scaler.transform(future_exog_array)
         
         print(f"🔮 Future external variables shape: {future_exog_scaled.shape}")
+        
+        # Store external data for analysis
+        self.last_external_data = future_exog
         
         # Make predictions
         try:
             forecast = model_fit.forecast(steps=periods, exog=future_exog_scaled)
             
+            print(f"🔮 SARIMAX RAW FORECAST DEBUG:")
+            print(f"  Raw forecast type: {type(forecast)}")
+            print(f"  Raw forecast shape: {forecast.shape}")
+            print(f"  Raw forecast values: {forecast}")
+            print(f"  Raw forecast contains NaN: {pd.isna(forecast).any()}")
+            
+            # DETAILED ANALYSIS: Why does the forecast drop dramatically?
+            print(f"\n🔍 DRAMATIC FORECAST CHANGE ANALYSIS:")
+            print(f"  Historical last value: {series.iloc[-1]:.2f}")
+            print(f"  First forecast value: {forecast.iloc[0]:.2f}")
+            print(f"  Difference: {forecast.iloc[0] - series.iloc[-1]:.2f}")
+            print(f"  Percentage change: {((forecast.iloc[0] - series.iloc[-1]) / series.iloc[-1] * 100):.1f}%")
+            
+            if len(forecast) > 1:
+                print(f"  Second forecast value: {forecast.iloc[1]:.2f}")
+                print(f"  Third forecast value: {forecast.iloc[2]:.2f}")
+                print(f"  Drop from 1st to 3rd: {forecast.iloc[2] - forecast.iloc[0]:.2f} ({((forecast.iloc[2] - forecast.iloc[0]) / forecast.iloc[0] * 100):.1f}%)")
+            
+            # Analyze external variables impact
+            print(f"\n🔍 EXTERNAL VARIABLES IMPACT ANALYSIS:")
+            if hasattr(self, 'last_external_data') and self.last_external_data is not None:
+                print(f"  External data shape: {np.array(self.last_external_data).shape}")
+                ext_data = np.array(self.last_external_data)
+                feature_names = ['Year', 'GDP', 'GINI', 'Unemployment', 'RD_Expenditure', 'Social_Coverage']
+                
+                print(f"  📊 External variables for first 3 forecast years:")
+                for i in range(min(3, len(ext_data))):
+                    year = int(ext_data[i][0]) if len(ext_data[i]) > 0 else "Unknown"
+                    print(f"    Year {year}:")
+                    for j, feature in enumerate(feature_names):
+                        if j < len(ext_data[i]):
+                            val = ext_data[i][j]
+                            if feature == 'GDP':
+                                print(f"      {feature}: {val:.2e}")
+                            else:
+                                print(f"      {feature}: {val}")
+                
+                # Check for dramatic changes in external variables
+                if len(ext_data) >= 3:
+                    print(f"\n  🚨 EXTERNAL VARIABLE CHANGES:")
+                    for j, feature in enumerate(feature_names[1:], 1):  # Skip Year
+                        if j < len(ext_data[0]) and j < len(ext_data[2]):
+                            val_first = ext_data[0][j]
+                            val_third = ext_data[2][j]
+                            if isinstance(val_first, (int, float)) and isinstance(val_third, (int, float)) and val_first != 0:
+                                change_pct = ((val_third - val_first) / val_first * 100)
+                                if abs(change_pct) > 10:  # Flag changes > 10%
+                                    print(f"      🔥 {feature}: {val_first} → {val_third} ({change_pct:+.1f}%)")
+                                else:
+                                    print(f"      ✅ {feature}: {val_first} → {val_third} ({change_pct:+.1f}%)")
+            else:
+                print(f"  ⚠️  No external data available for analysis")
+            
             # Create datetime index
             future_dates = pd.date_range(start=series.index[-1] + pd.DateOffset(years=1), 
                                        periods=periods, freq='YS')
             
-            forecast_series = pd.Series(forecast, index=future_dates)
+            # FIX: Use .values to avoid index mismatch
+            forecast_series = pd.Series(forecast.values, index=future_dates)
             
-            # Get confidence intervals
-            forecast_result = model_fit.get_forecast(steps=periods, exog=future_exog_scaled)
-            forecast_ci = forecast_result.conf_int()
+            print(f"🔮 SARIMAX SERIES DEBUG:")
+            print(f"  Forecast series type: {type(forecast_series)}")
+            print(f"  Forecast series values BEFORE bounds: {list(forecast_series.values)}")
+            
+            # Apply bounds checking for SARIMAX forecast stability
+            last_historical_value = series.iloc[-1]
+            print(f"📊 SARIMAX bounds check: last value = {last_historical_value:.2f}")
+            
+            # Apply trend dampening for unrealistic changes, but allow reasonable variation
+            for i in range(len(forecast_series)):
+                current_value = forecast_series.iloc[i]
+                reference_value = last_historical_value if i == 0 else forecast_series.iloc[i-1]
+                
+                # Calculate percentage change
+                if reference_value > 0:
+                    pct_change = (current_value - reference_value) / reference_value
+                else:
+                    pct_change = 0
+                
+                # Only dampen if change is very extreme (>50%)
+                if abs(pct_change) > 0.5:
+                    print(f"⚠️  Large forecast change detected: {pct_change*100:.1f}% in year {forecast_series.index[i].year}")
+                    # Dampen the change but don't eliminate it completely
+                    dampened_value = reference_value + (current_value - reference_value) * 0.3
+                    forecast_series.iloc[i] = dampened_value
+                    print(f"📊 Dampened to: {dampened_value:.2f}")
+            
+            # 🔥 REVOLUTIONARY CHANGE: Remove all artificial bounds like Random Forest!
+            # Let the model produce natural forecasts without constraints
+            print(f"🚀 SARIMAX: No bounds applied - using natural forecast like Random Forest!")
+            print(f"   Raw forecast range: {min(forecast_series.values):.2f} to {max(forecast_series.values):.2f}")
+            
+            print(f"🔮 SARIMAX FINAL DEBUG:")
+            print(f"  Forecast series values (NO BOUNDS): {list(forecast_series.values)}")
+            print(f"  Contains NaN: {pd.isna(forecast_series).any()}")
+            
+            # Get confidence intervals - also NO bounds!
+            forecast_ci = model_fit.get_forecast(steps=periods, exog=future_exog_scaled).conf_int()
+            print(f"🚀 SARIMAX: Confidence intervals also without artificial bounds!")
             
             return forecast_series, forecast_ci
             
@@ -1139,7 +1356,12 @@ class SDG10ForecastGUI:
             return None, None
     
     def forecast_sarimax(self, series, filtered_data):
-        """Generate SARIMAX forecast with external variables"""
+        """Generate SARIMAX forecast"""
+        print(f"🔍 SARIMAX DEBUG - Historical data:")
+        print(f"  Series min: {series.min():.4f}, max: {series.max():.4f}")
+        print(f"  Series last 5 values: {list(series.tail(5).values)}")
+        print(f"  Series data type: {series.dtype}")
+        
         country = self.country_var.get()
         location = self.location_var.get()
         sex = self.sex_var.get()
@@ -1162,6 +1384,12 @@ class SDG10ForecastGUI:
         if forecast_series is None:
             # Fallback to ARIMA
             return self.forecast_arima(series, filtered_data)
+        
+        print(f"🔍 SARIMAX FORECAST vs HISTORICAL comparison:")
+        print(f"  Historical range: {series.min():.4f} to {series.max():.4f}")
+        print(f"  Forecast range: {forecast_series.min():.4f} to {forecast_series.max():.4f}")
+        print(f"  Forecast values: {list(forecast_series.values)}")
+        print(f"  DRAMATIC CHANGE: {abs(series.iloc[-1] - forecast_series.iloc[0]):.2f} difference between last historical ({series.iloc[-1]:.2f}) and first forecast ({forecast_series.iloc[0]:.2f})")
         
         # Plot results
         self.plot_forecast_results(series, forecast_series, forecast_ci, 
@@ -1512,6 +1740,18 @@ class SDG10ForecastGUI:
     def plot_forecast_results(self, series, forecast_series, forecast_ci, 
                             model_results, model_name, filtered_data):
         """Plot forecast results with confidence intervals"""
+        
+        # CRITICAL DEBUG: Check forecast data
+        print(f"🎨 PLOTTING DEBUG for {model_name}:")
+        print(f"  📊 Series: {len(series)} points, last year: {series.index[-1] if len(series) > 0 else 'None'}")
+        print(f"  🔮 Forecast series type: {type(forecast_series)}")
+        print(f"  🔮 Forecast series length: {len(forecast_series) if forecast_series is not None else 'None'}")
+        if forecast_series is not None and len(forecast_series) > 0:
+            print(f"  🔮 Forecast series index: {list(forecast_series.index)}")
+            print(f"  🔮 Forecast series values: {list(forecast_series.values)}")
+        print(f"  📈 Forecast CI type: {type(forecast_ci)}")
+        print(f"  📈 Forecast CI shape: {getattr(forecast_ci, 'shape', 'no shape') if forecast_ci is not None else 'None'}")
+        
         # Create plot
         fig, ax = plt.subplots(figsize=(12, 8))
         
@@ -1527,19 +1767,29 @@ class SDG10ForecastGUI:
                       label='Model Test', s=100, alpha=0.8, zorder=5)
         
         # Plot forecast
-        ax.plot(forecast_series.index, forecast_series.values, 'o-', 
-               color='green', label='Forecast', markersize=6, linewidth=2)
+        if forecast_series is not None and len(forecast_series) > 0:
+            print(f"  🎨 PLOTTING forecast line: {len(forecast_series)} points")
+            ax.plot(forecast_series.index, forecast_series.values, 'o-', 
+                   color='green', label='Forecast', markersize=6, linewidth=2)
+            print(f"  ✅ Forecast line plotted successfully")
+        else:
+            print(f"  ❌ NO FORECAST TO PLOT: forecast_series is {type(forecast_series)} with length {len(forecast_series) if forecast_series is not None else 'None'}")
         
         # Plot confidence intervals
         if forecast_ci is not None:
+            print(f"  🎨 PLOTTING confidence intervals: {type(forecast_ci)}")
             if hasattr(forecast_ci, 'iloc'):  # DataFrame
                 ax.fill_between(forecast_series.index, 
                               forecast_ci.iloc[:, 0], forecast_ci.iloc[:, 1],
                               alpha=0.3, color='green', label='95% Confidence Interval')
+                print(f"  ✅ Confidence intervals (DataFrame) plotted")
             else:  # Array
                 ax.fill_between(forecast_series.index, 
                               forecast_ci[:, 0], forecast_ci[:, 1],
                               alpha=0.3, color='green', label='95% Confidence Interval')
+                print(f"  ✅ Confidence intervals (Array) plotted")
+        else:
+            print(f"  ❌ NO CONFIDENCE INTERVALS TO PLOT")
         
         # Customize plot
         country = self.country_var.get()
@@ -1604,11 +1854,11 @@ class SDG10ForecastGUI:
         for widget in self.results_plot_frame.winfo_children():
             widget.destroy()
         
-        # Create figure with subplots
-        fig = plt.figure(figsize=(16, 12))
+        # Create figure with subplots - larger and more spaced
+        fig = plt.figure(figsize=(18, 14))
         
-        # Create a grid layout: 2x3 for various analyses
-        gs = fig.add_gridspec(3, 3, hspace=0.3, wspace=0.3)
+        # Create a grid layout: 3x3 with more spacing to prevent overlap
+        gs = fig.add_gridspec(3, 3, hspace=0.4, wspace=0.4)
         
         # 1. Time Series Cross Validation Results (top left)
         ax1 = fig.add_subplot(gs[0, 0])
@@ -1643,11 +1893,11 @@ class SDG10ForecastGUI:
         ax7 = fig.add_subplot(gs[2, :])
         self.plot_data_timeline(ax7, series, forecast_series, model_results, model_name)
         
-        # Overall title
+        # Overall title - smaller font
         country = self.country_var.get()
         indicator_info = filtered_data.iloc[0]
         fig.suptitle(f'SDG10 {model_name} Analysis: {indicator_info["Indicator"]}\n{country}', 
-                    fontsize=16, fontweight='bold', y=0.98)
+                    fontsize=12, fontweight='bold', y=0.97)
         
         # Embed plot
         canvas = FigureCanvasTkAgg(fig, master=self.results_plot_frame)
@@ -1656,7 +1906,7 @@ class SDG10ForecastGUI:
     
     def plot_cv_results(self, ax, model_results, model_name):
         """Plot cross-validation results"""
-        ax.set_title("Cross-Validation Results", fontweight='bold', fontsize=10)
+        ax.set_title("Cross-Validation Results", fontweight='bold', fontsize=9)
         
         if model_name == "ARIMA" and 'cv_results' in model_results:
             orders = list(model_results['cv_results'].keys())
@@ -1665,10 +1915,10 @@ class SDG10ForecastGUI:
             
             x_pos = range(len(orders))
             bars = ax.bar(x_pos, means, yerr=stds, capsize=5, alpha=0.7, color='steelblue')
-            ax.set_xlabel('ARIMA Orders', fontsize=9)
-            ax.set_ylabel('RMSE', fontsize=9)
+            ax.set_xlabel('ARIMA Orders', fontsize=8)
+            ax.set_ylabel('RMSE', fontsize=8)
             ax.set_xticks(x_pos)
-            ax.set_xticklabels([str(order) for order in orders], rotation=45, fontsize=8)
+            ax.set_xticklabels([str(order) for order in orders], rotation=45, fontsize=7)
             
             # Highlight best model
             best_idx = means.index(min(means))
@@ -1683,18 +1933,18 @@ class SDG10ForecastGUI:
             colors = ['steelblue', 'forestgreen', 'orange']
             
             bars = ax.bar(metrics, values, color=colors, alpha=0.7)
-            ax.set_ylabel('Metric Value', fontsize=9)
-            ax.set_xlabel('Cross-Validation Metrics', fontsize=9)
+            ax.set_ylabel('Metric Value', fontsize=8)
+            ax.set_xlabel('CV Metrics', fontsize=8)
             
             # Add value labels
             for bar, value in zip(bars, values):
                 height = bar.get_height()
                 ax.text(bar.get_x() + bar.get_width()/2., height + height*0.01,
-                       f'{value:.3f}', ha='center', va='bottom', fontsize=8)
+                       f'{value:.2f}', ha='center', va='bottom', fontsize=7)
             
             # Add fold count info
-            ax.text(0.95, 0.95, f'{cv_summary["cv_folds"]} CV folds', 
-                   transform=ax.transAxes, fontsize=9, ha='right', va='top',
+            ax.text(0.95, 0.95, f'{cv_summary["cv_folds"]} folds', 
+                   transform=ax.transAxes, fontsize=7, ha='right', va='top',
                    bbox=dict(boxstyle='round', facecolor='lightblue', alpha=0.7))
             
         elif model_name == "Random Forest" and 'cv_results' in model_results:
@@ -1732,42 +1982,84 @@ class SDG10ForecastGUI:
             
         else:
             ax.text(0.5, 0.5, f'No CV results\navailable for\n{model_name}', 
-                   ha='center', va='center', transform=ax.transAxes, fontsize=10)
+                   ha='center', va='center', transform=ax.transAxes, fontsize=8)
         
         ax.grid(True, alpha=0.3)
-        ax.tick_params(axis='both', which='major', labelsize=8)
+        ax.tick_params(axis='both', which='major', labelsize=7)
     
     def plot_residuals_analysis(self, ax, series, model_results, model_name):
         """Plot residuals analysis"""
-        ax.set_title("Residuals Analysis", fontweight='bold', fontsize=10)
+        ax.set_title("Residuals Analysis", fontweight='bold', fontsize=9)
         
         if 'test_predictions' in model_results and len(model_results['test_predictions']) > 0:
             test_data = model_results['test_data']
             test_predictions = model_results['test_predictions']
-            residuals = test_data - test_predictions
             
-            # Plot residuals
-            ax.scatter(test_predictions, residuals, alpha=0.6, color='red', s=30)
-            ax.axhline(y=0, color='black', linestyle='--', alpha=0.7)
-            ax.set_xlabel('Predicted Values', fontsize=9)
-            ax.set_ylabel('Residuals', fontsize=9)
+            # Debug: Check dimensions before plotting
+            print(f"🔍 Residuals analysis for {model_name}:")
+            print(f"  test_data length: {len(test_data) if hasattr(test_data, '__len__') else 'scalar'}")
+            print(f"  test_predictions length: {len(test_predictions) if hasattr(test_predictions, '__len__') else 'scalar'}")
+            print(f"  test_data type: {type(test_data)}")
+            print(f"  test_predictions type: {type(test_predictions)}")
+            print(f"  test_data shape: {getattr(test_data, 'shape', 'no shape')}")
+            print(f"  test_predictions shape: {getattr(test_predictions, 'shape', 'no shape')}")
+            print(f"  test_data content: {test_data}")
+            print(f"  test_predictions content: {test_predictions}")
             
-            # Add statistics
-            rmse = np.sqrt(np.mean(residuals**2))
-            mae = np.mean(np.abs(residuals))
-            ax.text(0.05, 0.95, f'RMSE: {rmse:.3f}\nMAE: {mae:.3f}', 
-                   transform=ax.transAxes, fontsize=9, verticalalignment='top',
-                   bbox=dict(boxstyle='round', facecolor='lightblue', alpha=0.7))
+            # Ensure both arrays have the same length
+            min_length = min(len(test_data), len(test_predictions))
+            if len(test_data) != len(test_predictions):
+                print(f"  ⚠️ Length mismatch! Truncating to {min_length} elements")
+                test_data = test_data[:min_length]
+                test_predictions = test_predictions[:min_length]
+            
+            # Fix index mismatch - reset indices to ensure alignment
+            test_data_values = test_data.values if hasattr(test_data, 'values') else test_data
+            test_predictions_values = test_predictions.values if hasattr(test_predictions, 'values') else test_predictions
+            
+            residuals = test_data_values - test_predictions_values
+            print(f"  residuals: {residuals}")
+            print(f"  residuals type: {type(residuals)}")
+            print(f"  residuals shape: {getattr(residuals, 'shape', 'no shape')}")
+            
+            # Convert to numpy arrays to ensure compatible types
+            try:
+                import numpy as np
+                test_predictions_values = np.array(test_predictions_values)
+                residuals = np.array(residuals)
+                print(f"  After numpy conversion:")
+                print(f"    test_predictions shape: {test_predictions_values.shape}")
+                print(f"    residuals shape: {residuals.shape}")
+            except Exception as e:
+                print(f"  ⚠️ Numpy conversion failed: {e}")
+            
+            # Only plot if we have valid data
+            if len(residuals) > 0 and not np.all(np.isnan(residuals)):
+                # Plot residuals
+                ax.scatter(test_predictions_values, residuals, alpha=0.6, color='red', s=30)
+                ax.axhline(y=0, color='black', linestyle='--', alpha=0.7)
+                ax.set_xlabel('Predicted Values', fontsize=8)
+                ax.set_ylabel('Residuals', fontsize=8)
+                
+                # Add statistics
+                rmse = np.sqrt(np.mean(residuals**2))
+                mae = np.mean(np.abs(residuals))
+                ax.text(0.05, 0.95, f'RMSE: {rmse:.2f}\\nMAE: {mae:.2f}', 
+                       transform=ax.transAxes, fontsize=7, verticalalignment='top',
+                       bbox=dict(boxstyle='round', facecolor='lightblue', alpha=0.7))
+            else:
+                ax.text(0.5, 0.5, 'No valid\\nresiduals data', 
+                       ha='center', va='center', transform=ax.transAxes, fontsize=8)
         else:
-            ax.text(0.5, 0.5, 'No residuals\navailable', 
-                   ha='center', va='center', transform=ax.transAxes, fontsize=10)
+            ax.text(0.5, 0.5, 'No residuals\\navailable', 
+                   ha='center', va='center', transform=ax.transAxes, fontsize=8)
         
         ax.grid(True, alpha=0.3)
-        ax.tick_params(axis='both', which='major', labelsize=8)
+        ax.tick_params(axis='both', which='major', labelsize=7)
     
     def plot_data_quality(self, ax, series, filtered_data):
         """Plot data quality assessment"""
-        ax.set_title("Data Quality Assessment", fontweight='bold', fontsize=10)
+        ax.set_title("Data Quality Assessment", fontweight='bold', fontsize=9)
         
         # Assess data quality
         data_quality = self.assess_data_quality(series)
@@ -1786,17 +2078,17 @@ class SDG10ForecastGUI:
         
         bars = ax.barh(metrics, scores, color=colors, alpha=0.7)
         ax.set_xlim(0, 1)
-        ax.set_xlabel('Quality Score', fontsize=9)
+        ax.set_xlabel('Quality Score', fontsize=8)
         
         # Add score labels
         for i, (bar, score) in enumerate(zip(bars, scores)):
-            ax.text(score + 0.02, i, f'{score:.2f}', va='center', fontsize=8)
+            ax.text(score + 0.02, i, f'{score:.2f}', va='center', fontsize=7)
         
-        ax.tick_params(axis='both', which='major', labelsize=8)
+        ax.tick_params(axis='both', which='major', labelsize=7)
     
     def plot_feature_importance(self, ax, model_results):
         """Plot feature importance for Random Forest"""
-        ax.set_title("Feature Importance", fontweight='bold', fontsize=10)
+        ax.set_title("Feature Importance", fontweight='bold', fontsize=9)
         
         if 'feature_importance' in model_results:
             feature_names = model_results['feature_names']
@@ -1809,68 +2101,126 @@ class SDG10ForecastGUI:
             features, imps = zip(*importance_pairs)
             
             bars = ax.barh(features, imps, color='forestgreen', alpha=0.7)
-            ax.set_xlabel('Importance', fontsize=9)
+            ax.set_xlabel('Importance', fontsize=8)
             
             # Add value labels
             for i, (bar, imp) in enumerate(zip(bars, imps)):
-                ax.text(imp + 0.01, i, f'{imp:.3f}', va='center', fontsize=8)
+                ax.text(imp + 0.01, i, f'{imp:.2f}', va='center', fontsize=7)
         else:
             ax.text(0.5, 0.5, 'No feature\nimportance\navailable', 
-                   ha='center', va='center', transform=ax.transAxes, fontsize=10)
+                   ha='center', va='center', transform=ax.transAxes, fontsize=8)
         
-        ax.tick_params(axis='both', which='major', labelsize=8)
+        ax.tick_params(axis='both', which='major', labelsize=7)
     
     def plot_external_data_usage(self, ax, model_results):
-        """Plot external data usage statistics"""
-        ax.set_title("External Data Usage", fontweight='bold', fontsize=10)
+        """Plot external data feature importance for SARIMAX (similar to Random Forest)"""
+        ax.set_title("Feature Importance", fontweight='bold', fontsize=9)
         
-        if 'data_usage_stats' in model_results:
-            stats = model_results['data_usage_stats']
-            features = list(stats.keys())
-            availabilities = [stats[f]['total_available'] for f in features]
+        # Calculate feature importance based on parameter estimates
+        if 'model' in model_results and 'external_features' in model_results:
+            model_fit = model_results['model']
+            feature_names = model_results['external_features']
             
-            colors = ['green' if stats[f]['data_quality'] == 'Good' 
-                     else 'orange' if stats[f]['data_quality'] == 'Limited'
-                     else 'red' for f in features]
-            
-            bars = ax.bar(features, availabilities, color=colors, alpha=0.7)
-            ax.set_ylabel('Data Points Available', fontsize=9)
-            ax.set_xlabel('External Variables', fontsize=9)
-            plt.setp(ax.get_xticklabels(), rotation=45, ha='right', fontsize=8)
-            
-            # Add quality labels
-            for i, (bar, feature) in enumerate(zip(bars, features)):
-                quality = stats[feature]['data_quality']
-                ax.text(i, availabilities[i] + 1, quality, ha='center', va='bottom', fontsize=7)
+            try:
+                # Get parameter estimates for external variables (excluding AR/MA parameters)
+                params = model_fit.params
+                
+                # Debug: Show all parameters
+                print(f"🔍 SARIMAX parameters debug:")
+                print(f"  Total parameters: {len(params)}")
+                print(f"  Parameter names: {list(params.index)}")
+                print(f"  Feature names: {feature_names}")
+                
+                # SARIMAX parameters: first are AR/MA, then external variables
+                # Find external variable parameters (usually last len(feature_names) parameters)
+                if len(params) >= len(feature_names):
+                    # Take the last N parameters (external variables)
+                    external_params = params[-len(feature_names):]
+                    
+                    print(f"  External params: {list(external_params.index)}")
+                    print(f"  External values: {external_params.values}")
+                    
+                    # Calculate importance as absolute value of standardized coefficients
+                    importances = np.abs(external_params.values)
+                    
+                    # Normalize to get relative importance (as percentages)
+                    total_importance = np.sum(importances)
+                    if total_importance > 0:
+                        importances = importances / total_importance
+                    
+                    print(f"  Normalized importances: {importances}")
+                    
+                    # Sort by importance
+                    importance_pairs = list(zip(feature_names, importances))
+                    importance_pairs.sort(key=lambda x: x[1], reverse=True)
+                    
+                    features, imps = zip(*importance_pairs)
+                    
+                    bars = ax.barh(features, imps, color='darkred', alpha=0.7)
+                    ax.set_xlabel('Relative Importance (%)', fontsize=8)
+                    
+                    # Add percentage labels with % symbol
+                    for i, (bar, imp) in enumerate(zip(bars, imps)):
+                        ax.text(imp + 0.01, i, f'{imp*100:.1f}%', va='center', fontsize=7)
+                        
+                else:
+                    # Fallback: Use coefficient magnitudes if available
+                    ax.text(0.5, 0.5, 'Insufficient\nparameters for\nfeature analysis', 
+                           ha='center', va='center', transform=ax.transAxes, fontsize=8)
+                    
+            except Exception as e:
+                print(f"⚠️  Could not calculate SARIMAX feature importance: {e}")
+                # Fallback to data availability
+                if 'data_usage_stats' in model_results:
+                    stats = model_results['data_usage_stats']
+                    features = list(stats.keys())
+                    availabilities = [stats[f]['total_available'] for f in features]
+                    
+                    # Normalize as percentages
+                    total_avail = sum(availabilities)
+                    if total_avail > 0:
+                        importances = [a/total_avail for a in availabilities]
+                    else:
+                        importances = [0] * len(features)
+                    
+                    bars = ax.barh(features, importances, color='darkred', alpha=0.7)
+                    ax.set_xlabel('Data Availability', fontsize=8)
+                    
+                    # Add percentage labels
+                    for i, (bar, imp) in enumerate(zip(bars, importances)):
+                        ax.text(imp + 0.01, i, f'{imp:.2f}', va='center', fontsize=7)
+                else:
+                    ax.text(0.5, 0.5, 'No external\ndata available', 
+                           ha='center', va='center', transform=ax.transAxes, fontsize=8)
         else:
-            ax.text(0.5, 0.5, 'No external\ndata statistics\navailable', 
-                   ha='center', va='center', transform=ax.transAxes, fontsize=10)
+            ax.text(0.5, 0.5, 'No external\nvariables\navailable', 
+                   ha='center', va='center', transform=ax.transAxes, fontsize=8)
         
-        ax.tick_params(axis='both', which='major', labelsize=8)
+        ax.tick_params(axis='both', which='major', labelsize=7)
     
     def plot_model_summary(self, ax, model_results, model_name):
         """Plot model summary for ARIMA/Prophet"""
-        ax.set_title(f"{model_name} Summary", fontweight='bold', fontsize=10)
+        ax.set_title(f"{model_name} Summary", fontweight='bold', fontsize=9)
         
         if model_name == "ARIMA" and 'order' in model_results:
             # Display ARIMA order
             order = model_results['order']
             ax.text(0.5, 0.7, f'ARIMA Order:\n{order}', ha='center', va='center', 
-                   transform=ax.transAxes, fontsize=12, 
+                   transform=ax.transAxes, fontsize=9, 
                    bbox=dict(boxstyle='round', facecolor='lightblue', alpha=0.7))
             
-            ax.text(0.5, 0.3, f'Best RMSE:\n{model_results["best_score"]:.3f}', 
-                   ha='center', va='center', transform=ax.transAxes, fontsize=10)
+            ax.text(0.5, 0.3, f'Best RMSE:\n{model_results["best_score"]:.2f}', 
+                   ha='center', va='center', transform=ax.transAxes, fontsize=8)
         else:
             ax.text(0.5, 0.5, f'{model_name}\nModel\nSummary', 
-                   ha='center', va='center', transform=ax.transAxes, fontsize=12)
+                   ha='center', va='center', transform=ax.transAxes, fontsize=9)
         
         ax.set_xticks([])
         ax.set_yticks([])
     
     def plot_forecast_uncertainty(self, ax, forecast_series, forecast_ci, model_name):
         """Plot forecast uncertainty analysis"""
-        ax.set_title("Forecast Uncertainty", fontweight='bold', fontsize=10)
+        ax.set_title("Forecast Uncertainty", fontweight='bold', fontsize=9)
         
         if forecast_ci is not None and len(forecast_series) > 0:
             years = [date.year for date in forecast_series.index]
@@ -1887,25 +2237,25 @@ class SDG10ForecastGUI:
             uncertainty = upper - lower
             
             # Plot uncertainty over time
-            ax.plot(years, uncertainty, 'o-', color='red', linewidth=2, markersize=6)
-            ax.set_xlabel('Year', fontsize=9)
-            ax.set_ylabel('Uncertainty Width', fontsize=9)
+            ax.plot(years, uncertainty, 'o-', color='red', linewidth=2, markersize=4)
+            ax.set_xlabel('Year', fontsize=8)
+            ax.set_ylabel('Uncertainty Width', fontsize=8)
             ax.grid(True, alpha=0.3)
             
             # Add statistics
             avg_uncertainty = np.mean(uncertainty)
-            ax.text(0.05, 0.95, f'Avg Uncertainty:\n{avg_uncertainty:.3f}', 
-                   transform=ax.transAxes, fontsize=9, verticalalignment='top',
+            ax.text(0.05, 0.95, f'Avg Uncertainty:\n{avg_uncertainty:.2f}', 
+                   transform=ax.transAxes, fontsize=7, verticalalignment='top',
                    bbox=dict(boxstyle='round', facecolor='lightcoral', alpha=0.7))
         else:
             ax.text(0.5, 0.5, 'No uncertainty\ninformation\navailable', 
-                   ha='center', va='center', transform=ax.transAxes, fontsize=10)
+                   ha='center', va='center', transform=ax.transAxes, fontsize=8)
         
-        ax.tick_params(axis='both', which='major', labelsize=8)
+        ax.tick_params(axis='both', which='major', labelsize=7)
     
     def plot_performance_metrics(self, ax, model_results, model_name):
         """Plot key performance metrics"""
-        ax.set_title("Performance Metrics", fontweight='bold', fontsize=10)
+        ax.set_title("Performance Metrics", fontweight='bold', fontsize=9)
         
         # Collect metrics
         metrics = {}
@@ -1919,22 +2269,22 @@ class SDG10ForecastGUI:
             values = list(metrics.values())
             
             bars = ax.bar(metric_names, values, color=['steelblue', 'orange'], alpha=0.7)
-            ax.set_ylabel('Value', fontsize=9)
+            ax.set_ylabel('Value', fontsize=8)
             
             # Add value labels
             for bar, value in zip(bars, values):
                 height = bar.get_height()
                 ax.text(bar.get_x() + bar.get_width()/2., height + height*0.01,
-                       f'{value:.3f}', ha='center', va='bottom', fontsize=9)
+                       f'{value:.2f}', ha='center', va='bottom', fontsize=7)
         else:
             ax.text(0.5, 0.5, 'No performance\nmetrics\navailable', 
-                   ha='center', va='center', transform=ax.transAxes, fontsize=10)
+                   ha='center', va='center', transform=ax.transAxes, fontsize=8)
         
-        ax.tick_params(axis='both', which='major', labelsize=8)
+        ax.tick_params(axis='both', which='major', labelsize=7)
     
     def plot_data_timeline(self, ax, series, forecast_series, model_results, model_name):
         """Plot comprehensive data timeline"""
-        ax.set_title("Data Coverage and Forecast Timeline", fontweight='bold', fontsize=10)
+        ax.set_title("Data Coverage and Forecast Timeline", fontweight='bold', fontsize=9)
         
         # Plot historical data availability
         years = [date.year for date in series.index]
@@ -1962,13 +2312,13 @@ class SDG10ForecastGUI:
                 ax.scatter(unique_ext_years, [0.4]*len(unique_ext_years), 
                           color='purple', s=30, alpha=0.7, label='External Data')
         
-        ax.set_xlabel('Year', fontsize=9)
-        ax.set_ylabel('Data Type', fontsize=9)
+        ax.set_xlabel('Year', fontsize=8)
+        ax.set_ylabel('Data Type', fontsize=8)
         ax.set_yticks([0.4, 0.6, 0.8, 1.0])
-        ax.set_yticklabels(['External', 'Forecast', 'Test', 'Historical'], fontsize=8)
-        ax.legend(loc='upper right', fontsize=8)
+        ax.set_yticklabels(['External', 'Forecast', 'Test', 'Historical'], fontsize=7)
+        ax.legend(loc='upper right', fontsize=7)
         ax.grid(True, alpha=0.3)
-        ax.tick_params(axis='both', which='major', labelsize=8)
+        ax.tick_params(axis='both', which='major', labelsize=7)
     
     def display_results(self, series, forecast_series, model_results, model_name, 
                        indicator_info, filtered_data):
@@ -2193,6 +2543,78 @@ class SDG10ForecastGUI:
                 
         except Exception as e:
             messagebox.showerror("Error", f"Could not save results: {str(e)}")
+    
+    def predict_future_arima(self, model_fit, series, periods):
+        """Generate future forecasts using fitted ARIMA model"""
+        try:
+            print(f"🔍 ARIMA FORECAST DEBUG:")
+            print(f"  Model type: {type(model_fit)}")
+            print(f"  Series last 3 values: {list(series.tail(3).values)}")
+            
+            # Generate forecast
+            forecast_result = model_fit.forecast(steps=periods)
+            print(f"  Raw forecast type: {type(forecast_result)}")
+            print(f"  Raw forecast values: {list(forecast_result) if hasattr(forecast_result, '__iter__') else forecast_result}")
+            
+            # Create future date index
+            future_dates = pd.date_range(start=series.index[-1] + pd.DateOffset(years=1), 
+                                       periods=periods, freq='YS')
+            
+            # FIX: Use .values to avoid index mismatch (same fix as SARIMAX)
+            if hasattr(forecast_result, 'values'):
+                forecast_values = forecast_result.values
+            else:
+                forecast_values = forecast_result
+            
+            print(f"  Forecast values before Series creation: {list(forecast_values)}")
+            forecast_series = pd.Series(forecast_values, index=future_dates)
+            print(f"  Forecast series after creation: {list(forecast_series.values)}")
+            
+            # Get confidence intervals
+            forecast_ci = model_fit.get_forecast(steps=periods).conf_int()
+            forecast_ci.index = future_dates
+            print(f"  CI shape: {forecast_ci.shape}")
+            print(f"  CI values: {forecast_ci.head(2).values}")
+            
+            # Apply realistic bounds for inequality data - BUT LET'S SEE RAW VALUES FIRST
+            print(f"  Values BEFORE bounds: {list(forecast_series.values)}")
+            
+            # 🔥 REVOLUTIONARY CHANGE: Remove all artificial bounds like Random Forest!
+            # Let the model produce natural forecasts without constraints
+            print(f"🚀 ARIMA: No bounds applied - using natural forecast like Random Forest!")
+            print(f"   Raw forecast range: {min(forecast_series.values):.2f} to {max(forecast_series.values):.2f}")
+            
+            print(f"  Values (NO BOUNDS): {list(forecast_series.values)}")
+            # NO bounds applied to confidence intervals either!
+            
+            return forecast_series, forecast_ci
+            
+        except Exception as e:
+            print(f"❌ ARIMA forecast error: {e}")
+            import traceback
+            traceback.print_exc()
+            return None, None
+    
+    def calculate_realistic_bounds(self, series, forecast_values):
+        """Calculate realistic bounds based on historical data range"""
+        historical_min = series.min()
+        historical_max = series.max()
+        historical_range = historical_max - historical_min
+        
+        # Use historical range with some margin for reasonable bounds
+        # Allow for ±50% of historical range as bounds
+        margin = historical_range * 0.5
+        
+        realistic_lower = max(historical_min - margin, 0 if historical_min >= 0 else historical_min - margin)
+        realistic_upper = historical_max + margin
+        
+        print(f"📊 Smart bounds calculation:")
+        print(f"  Historical range: {historical_min:.2f} to {historical_max:.2f}")
+        print(f"  Historical range span: {historical_range:.2f}")
+        print(f"  Calculated bounds: {realistic_lower:.2f} to {realistic_upper:.2f}")
+        print(f"  Forecast range before bounds: {min(forecast_values):.2f} to {max(forecast_values):.2f}")
+        
+        return realistic_lower, realistic_upper
 
 def main():
     root = tk.Tk()

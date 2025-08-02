@@ -2114,9 +2114,10 @@ class ForecastAppGoal3:
                                   color='palegreen', alpha=0.8, label='68% Confidence Interval', zorder=3)
                     
                     # Plot the forecast line on top of intervals
-                ax.scatter(future_dates, scaled_forecast, color=forecast_color, 
+                    ax.scatter(future_dates, scaled_forecast, color=forecast_color, 
                               label=f'Series {series_code} (Future Forecast)', s=100, alpha=1.0, zorder=4)
                     ax.plot(future_dates, scaled_forecast, color=forecast_color, alpha=0.8, linewidth=3, zorder=4)
+                
                 else:
                     # For ALL other models (ARIMA, Prophet, SARIMAX) - same beautiful intervals!
                     # Plot prediction intervals first (widest, darkest shade)
@@ -2327,7 +2328,7 @@ class ForecastAppGoal3:
                             self.results_text.insert(tk.END, f"  {year}: {value:.3f} {unit}\n")
                         else:
                             self.results_text.insert(tk.END, f"  {year}: N/A {unit} (NaN detected)\n")
-            except Exception as e:
+                except Exception as e:
                     self.results_text.insert(tk.END, f"Error displaying forecast values: {str(e)}\n")
             else:
                 self.results_text.insert(tk.END, "No forecast values available\n")

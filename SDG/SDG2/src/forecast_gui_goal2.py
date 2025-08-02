@@ -1770,7 +1770,7 @@ class ForecastAppGoal2:
                         future = model_fit.make_future_dataframe(periods=periods_to_2030, freq='Y')
                         # Ensure we only get future dates
                         future = future[future['ds'] > last_date]
-                    forecast = model_fit.predict(future)
+                        forecast = model_fit.predict(future)
                         
                         # Get future forecast values
                         scaled_forecast = forecast['yhat'].values / scale_factor
@@ -2189,7 +2189,7 @@ class ForecastAppGoal2:
             
             # Add model performance
             self.results_text.insert(tk.END, f"=== Model Performance ===\n")
-                if model_type == 'ARIMA':
+            if model_type == 'ARIMA':
                 self.results_text.insert(tk.END, f"Test RMSE: {arima_results['rmse']/scale_factor:.4f} {unit}\n")
             elif model_type == 'SARIMAX':
                 self.results_text.insert(tk.END, f"Test RMSE: {sarimax_results['rmse']/scale_factor:.4f} {unit}\n")
@@ -2243,7 +2243,7 @@ class ForecastAppGoal2:
                         else:
                             self.results_text.insert(tk.END, f"  {year}: N/A {unit} (NaN detected)\n")
                     print("✅ Forecast values displayed successfully")
-            except Exception as e:
+                except Exception as e:
                     error_msg = f"Error displaying forecast values: {str(e)}"
                     print(f"❌ {error_msg}")
                     self.results_text.insert(tk.END, f"{error_msg}\n")

@@ -1,0 +1,5 @@
+# Large CSV files - generated locally
+*_processed.csv
+SDG*/src/*_processed.csv
+SDG*/*_processed.csv
+*.csv

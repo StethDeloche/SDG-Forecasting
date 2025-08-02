@@ -290,7 +290,7 @@ class SDGRandomForestModel:
                     target_gini = 28.0  # Nordic/European target
                 elif 'United States' in country_name:
                     target_gini = 35.0  # US target
-            else:
+                else:
                     target_gini = 32.0  # General developed country target
                 
                 # Mean reversion with some randomness
@@ -313,7 +313,7 @@ class SDGRandomForestModel:
                     natural_rate = 6.0
                 elif 'United States' in country_name:
                     natural_rate = 4.5
-            else:
+                else:
                     natural_rate = 5.0  # General OECD average
                 
                 # Convergence to natural rate
@@ -370,7 +370,7 @@ class SDGRandomForestModel:
                 
                 return max(0.0, min(extrapolated_value, 100.0))
             
-                        else:
+            else:
                 # Generic: Simple dampened trend with noise
                 if len(recent_values) >= 2:
                     slope = np.polyfit(recent_years, recent_values, 1)[0]
@@ -381,7 +381,7 @@ class SDGRandomForestModel:
                     # Add some noise
                     noise = np.random.normal(0, np.std(recent_values) * 0.1)
                     return extrapolated_value + noise
-                    else:
+                else:
                     return last_value
         
         # Add GDP data if available
@@ -446,10 +446,10 @@ class SDGRandomForestModel:
         print(f"\nFitting Enhanced Random Forest model for {country}")
         
         # Convert series index to years if needed
-            if not all(isinstance(x, (int, np.integer)) for x in series.index):
+        if not all(isinstance(x, (int, np.integer)) for x in series.index):
             # Store the original datetime index
             original_index = series.index
-                series.index = pd.to_datetime(series.index).year
+            series.index = pd.to_datetime(series.index).year
         else:
             # Create datetime index from years
             original_index = pd.to_datetime([f"{year}-01-01" for year in series.index])
@@ -619,8 +619,8 @@ class SDGRandomForestModel:
         trend_predictions = np.array(trend_predictions)
         
         # STEP 2: Calculate feature-based predictions
-            future_features = []
-            for year in future_years:
+        future_features = []
+        for year in future_years:
             features, _ = self.prepare_features_for_country_year(country, year)
             future_features.append(features)
         
@@ -853,7 +853,8 @@ class ForecastApp:
                                     external_data['GINI'] = data
                                     print(f"GINI data processed successfully: {len(data)} records")
                             else:
-                                    print("Could not find GINI index column")
+                                print("Could not find GINI index column")
+                        
                         elif data_name == 'UNEMPLOYMENT':
                             # Unemployment data should have Country Name, Year, and unemployment column
                             if 'Country Name' in data.columns and 'Year' in data.columns and 'Unemployment' in data.columns:
@@ -864,7 +865,7 @@ class ForecastApp:
                                 
                                 external_data['UNEMPLOYMENT'] = data
                                 print(f"Unemployment data processed successfully: {len(data)} records")
-                        else:
+                            else:
                                 print(f"Unemployment data has unexpected columns: {data.columns.tolist()}")
                         
                         elif data_name == 'RD':
@@ -904,8 +905,8 @@ class ForecastApp:
                                 print(f"Social coverage data processed successfully: {len(data)} records")
                             else:
                                 print(f"Social coverage data has unexpected columns: {data.columns.tolist()}")
-        
-        except Exception as e:
+                    
+                    except Exception as e:
                         print(f"Error loading {data_name}: {str(e)}")
                 else:
                     print(f"Processed file not found: {file_path}")
@@ -1090,12 +1091,12 @@ class ForecastApp:
         print(f"Using order: {best_order}")
         
         try:
-        # Fit model on training data for evaluation
+            # Fit model on training data for evaluation
             eval_model = ARIMA(train, order=best_order)
-        eval_model_fit = eval_model.fit()
+            eval_model_fit = eval_model.fit()
         
-        # Make predictions for test period
-        predictions = eval_model_fit.forecast(steps=len(test))
+            # Make predictions for test period
+            predictions = eval_model_fit.forecast(steps=len(test))
             
             # Ensure predictions and test are the same length
             if len(predictions) != len(test):
@@ -1107,16 +1108,16 @@ class ForecastApp:
             
             # Calculate RMSE only if we have test data
             if len(test) > 0:
-        rmse = np.sqrt(mean_squared_error(test, predictions))
+                rmse = np.sqrt(mean_squared_error(test, predictions))
             else:
                 rmse = 0.0
                 
             # Create predictions series with correct index
             test_predictions = pd.Series(predictions, index=test.index)
         
-        # Fit new model on all data for future predictions
+            # Fit new model on all data for future predictions
             full_model = ARIMA(series, order=best_order)
-        full_model_fit = full_model.fit()
+            full_model_fit = full_model.fit()
         
             print(f"✅ ARIMA model fitted successfully. Test RMSE: {rmse:.4f}")
             
@@ -2060,7 +2061,7 @@ class ForecastApp:
                     
                     # Plot predictions for test period (red)
                     if len(test_predictions) > 0:
-                    prediction_color = plt.cm.Reds(0.7)
+                        prediction_color = plt.cm.Reds(0.7)
                         ax.scatter(test_predictions.index, scaled_test_predictions, color=prediction_color, 
                               label=f'Series {series_code} (Model Test)', s=100, alpha=0.8)
                         ax.plot(test_predictions.index, scaled_test_predictions, color=prediction_color, alpha=0.5, linewidth=2)
@@ -2250,7 +2251,7 @@ class ForecastApp:
                         })
                         
                         # Lass Prophet die Vorhersagen machen
-                    forecast = model_fit.predict(future)
+                        forecast = model_fit.predict(future)
                         
                         # Extrahiere die relevanten Werte
                         future_forecast = forecast['yhat'].values
@@ -2427,10 +2428,10 @@ class ForecastApp:
                 
                 # Plot future forecast (green) - nur für nicht-Random Forest Modelle
                 if model_type != 'Random Forest':
-                forecast_color = plt.cm.Greens(0.7)
-                ax.scatter(future_dates, scaled_forecast, color=forecast_color, 
+                    forecast_color = plt.cm.Greens(0.7)
+                    ax.scatter(future_dates, scaled_forecast, color=forecast_color, 
                           label=f'Series {series_code} (Future Forecast)', s=100, alpha=0.8)
-                ax.plot(future_dates, scaled_forecast, color=forecast_color, alpha=0.5, linewidth=2)
+                    ax.plot(future_dates, scaled_forecast, color=forecast_color, alpha=0.5, linewidth=2)
                     print(f"Future forecast plotted for {model_type}: {len(future_dates)} points")
                 
                 # Add text annotation for the last historical data point
@@ -2631,7 +2632,7 @@ class ForecastApp:
                     self.results_text.insert(tk.END, f"⚠️  No external variables used (fell back to ARIMA)\n")
                     self.results_text.insert(tk.END, f"Test RMSE: {rmse:.4f}\n")
             
-                elif model_type == 'Prophet':
+            elif model_type == 'Prophet':
                 # Prophet: Show basic validation information
                 self.results_text.insert(tk.END, f"\n=== Prophet Time Series Model ===\n")
                 self.results_text.insert(tk.END, f"Test RMSE: {rmse:.4f}\n")
@@ -2672,7 +2673,7 @@ class ForecastApp:
                     year = date.year if hasattr(date, 'year') else date
                     self.results_text.insert(tk.END, f"{year}: [{lower:.4f}, {upper:.4f}]\n")
             
-                elif model_type == 'Random Forest':
+            elif model_type == 'Random Forest':
                 self.results_text.insert(tk.END, "\n68% Confidence Intervals:\n")
                 for i, (date, lower, upper) in enumerate(zip(future_dates, scaled_conf_lower_68, scaled_conf_upper_68)):
                     year = date.year if hasattr(date, 'year') else date

@@ -18,103 +18,55 @@ warnings.filterwarnings('ignore')
 
 class SDGRandomForestModel:
     """
-    Enhanced Random Forest model specifically designed for SDG6 indicators
+    Enhanced Random Forest model specifically designed for SDG6 water/sanitation indicators
     that incorporates external factors for water and sanitation forecasting
     """
     
-    def __init__(self, external_data=None):
-        self.external_data = external_data if external_data is not None else {}
+    def __init__(self, external_data):
+        self.external_data = external_data
         self.model = RandomForestRegressor(n_estimators=100, random_state=42)
         self.scaler = StandardScaler()
         self.feature_names = []
         
-    def prepare_features_for_country_year(self, country, year, location='ALLAREA', level='ALL', activity='ALL'):
-        """Prepare feature vector for a specific country and year with SDG6-specific filters"""
+    def prepare_features_for_country_year(self, country, year):
+        """Prepare feature vector for a specific country and year with SDG6-specific context"""
         features = [year]  # Time feature
         feature_names = ['Year']
         
-        # Add SDG6-specific filter features with higher weights for water/sanitation context
-        weight_factor = 300.0  # Strong influence for water/sanitation filters
-        
-        # Location features (critical for water access)
-        location_urban = 0.0
-        location_rural = 0.0
-        
-        if location == 'URBAN':
-            location_urban = 1.0 * weight_factor
-        elif location == 'RURAL':
-            location_rural = 1.0 * weight_factor
-        
-        features.append(location_urban)
-        features.append(location_rural)
-        feature_names.append('Location_URBAN')
-        feature_names.append('Location_RURAL')
-            
-        # Level feature (water infrastructure level)
-        if level != 'ALL':
-            features.append(1.0 * weight_factor)
-            feature_names.append(f'Level_{level}')
-        else:
-            features.append(0.0)
-            feature_names.append('Level_SPECIFIC')
-            
-        # Activity feature (water/sanitation type)
-        if activity != 'ALL':
-            features.append(1.0 * weight_factor)
-            feature_names.append(f'Activity_{activity}')
-        else:
-            features.append(0.0)
-            feature_names.append('Activity_SPECIFIC')
-            
-        # Water-specific interaction terms
-        if location == 'URBAN':
-            features.append(year * location_urban * 0.01)
-            feature_names.append('Year_x_URBAN')
-        elif location == 'RURAL':
-            features.append(year * location_rural * 0.01)
-            feature_names.append('Year_x_RURAL')
-        else:
-            features.append(0.0)
-            feature_names.append('Year_x_Location')
-        
         # Helper function to find data for a country and year
-        def get_country_year_value(data_df, country_name, year, feature_name):
-            try:
-                # Try exact match first
-                country_data = data_df[
-                    (data_df['Country Name'].str.strip().str.lower() == country_name.strip().lower()) &
-                    (data_df['Year'] == year)
-                ]
-                
-                if not country_data.empty:
-                    return float(country_data['Value'].iloc[0])
-                
-                # Try contains match
-                country_data = data_df[
-                    data_df['Country Name'].str.contains(country_name, case=False, na=False) &
-                    (data_df['Year'] == year)
-                ]
-                
-                if not country_data.empty:
-                    return float(country_data['Value'].iloc[0])
-                
-                # Try to find the most recent value for this country
-                country_data = data_df[
-                    data_df['Country Name'].str.contains(country_name, case=False, na=False)
-                ]
-                
-                if not country_data.empty:
-                    # Get the most recent year with data that's <= current year
-                    recent_data = country_data[country_data['Year'] <= year].sort_values('Year')
-                    if not recent_data.empty:
-                        return float(recent_data['Value'].iloc[-1])
-                
-                # Return 0.0 if no match found
-                print(f"No {feature_name} data found for {country_name} in year {year}")
-                return 0.0
-            except Exception as e:
-                print(f"Error getting {feature_name} data for {country_name} in year {year}: {str(e)}")
-                return 0.0
+        def get_country_year_value(data_df, country_name, year, value_column):
+            # Try exact match first
+            country_data = data_df[
+                (data_df['Country Name'].str.strip().str.lower() == country_name.strip().lower()) &
+                (data_df['Year'] == year)
+            ]
+            
+            if not country_data.empty:
+                return float(country_data[value_column].iloc[0])
+            
+            # Try contains match
+            country_data = data_df[
+                data_df['Country Name'].str.contains(country_name, case=False, na=False) &
+                (data_df['Year'] == year)
+            ]
+            
+            if not country_data.empty:
+                return float(country_data[value_column].iloc[0])
+            
+            # Try to find the most recent value for this country
+            country_data = data_df[
+                data_df['Country Name'].str.contains(country_name, case=False, na=False)
+            ]
+            
+            if not country_data.empty:
+                # Get the most recent year with data that's <= current year
+                recent_data = country_data[country_data['Year'] <= year].sort_values('Year')
+                if not recent_data.empty:
+                    return float(recent_data[value_column].iloc[-1])
+            
+            # Return 0.0 if no match found
+            print(f"No {value_column} data found for {country_name} in year {year}")
+            return 0.0
         
         # External data availability flags
         gdp_available = False
@@ -123,37 +75,37 @@ class SDGRandomForestModel:
         rd_available = False
         social_available = False
         
-        # Add GDP data if available (important for water infrastructure investment)
+        # Add GDP data if available (critical for water infrastructure investment)
         if 'gdp' in self.external_data:
-            gdp_value = get_country_year_value(self.external_data['gdp'], country, year, 'GDP') * 100
+            gdp_value = get_country_year_value(self.external_data['gdp'], country, year, 'Value')
             features.append(gdp_value)
             feature_names.append('GDP')
             gdp_available = (gdp_value != 0.0)
         
         # Add GINI data if available (inequality affects water access)
         if 'gini' in self.external_data:
-            gini_value = get_country_year_value(self.external_data['gini'], country, year, 'GINI')
+            gini_value = get_country_year_value(self.external_data['gini'], country, year, 'Value')
             features.append(gini_value)
             feature_names.append('GINI')
             gini_available = (gini_value != 0.0)
         
         # Add Unemployment data if available (economic conditions affect sanitation)
         if 'unemployment' in self.external_data:
-            unemployment_value = get_country_year_value(self.external_data['unemployment'], country, year, 'Unemployment')
+            unemployment_value = get_country_year_value(self.external_data['unemployment'], country, year, 'Value')
             features.append(unemployment_value)
             feature_names.append('Unemployment')
             unemployment_available = (unemployment_value != 0.0)
         
         # Add R&D Expenditure data if available (innovation in water technology)
         if 'rd_expenditure' in self.external_data:
-            rd_value = get_country_year_value(self.external_data['rd_expenditure'], country, year, 'R&D Expenditure')
+            rd_value = get_country_year_value(self.external_data['rd_expenditure'], country, year, 'Value')
             features.append(rd_value)
             feature_names.append('R&D Expenditure')
             rd_available = (rd_value != 0.0)
         
         # Add Social Coverage data if available (public services including water)
         if 'social_coverage' in self.external_data:
-            social_value = get_country_year_value(self.external_data['social_coverage'], country, year, 'Social Coverage')
+            social_value = get_country_year_value(self.external_data['social_coverage'], country, year, 'Value')
             features.append(social_value)
             feature_names.append('Social Coverage')
             social_available = (social_value != 0.0)
@@ -162,16 +114,11 @@ class SDGRandomForestModel:
         if not any([gdp_available, gini_available, unemployment_available, rd_available, social_available]):
             print(f"Warning: No external data found for {country} in year {year}. Using only year as feature.")
         
-        print(f"Features for {country}, year {year}, location {location}, level {level}, activity {activity}:")
-        for i, (name, value) in enumerate(zip(feature_names, features)):
-            print(f"  {name}: {value}")
-        
         return features, feature_names
     
-    def fit(self, series, country, location='ALLAREA', level='ALL', activity='ALL'):
-        """Fit the Random Forest model with SDG6-specific filter parameters"""
-        print(f"\nFitting Enhanced Random Forest model for {country} with SDG6 filters:")
-        print(f"  Location: {location}, Level: {level}, Activity: {activity}")
+    def fit(self, series, country):
+        """Fit the Random Forest model for water/sanitation indicators"""
+        print(f"\nFitting Enhanced Random Forest model for {country} (SDG6 Water & Sanitation)")
         
         # Convert series index to years if needed
         if not all(isinstance(x, (int, np.integer)) for x in series.index):
@@ -187,20 +134,8 @@ class SDGRandomForestModel:
         targets = []
         years_list = []
         
-        # Optimized Random Forest parameters for water/sanitation indicators
-        self.model = RandomForestRegressor(
-            n_estimators=100,
-            min_samples_split=2,
-            min_samples_leaf=1,
-            max_features='sqrt',
-            bootstrap=True,
-            max_depth=None,
-            random_state=42
-        )
-        
         for year in sorted(series.index):
             try:
-                # Check if series.loc[year] is a Series or a single value
                 value = series.loc[year]
                 
                 # If value is a Series, take the mean
@@ -208,8 +143,7 @@ class SDGRandomForestModel:
                     value = value.mean()
                 
                 if pd.notna(value):
-                    features, feature_names = self.prepare_features_for_country_year(
-                        country, year, location, level, activity)
+                    features, feature_names = self.prepare_features_for_country_year(country, year)
                     features_list.append(features)
                     targets.append(value)
                     years_list.append(year)
@@ -217,11 +151,10 @@ class SDGRandomForestModel:
                 print(f"Error processing year {year}: {e}")
                 continue
         
-        # Debug output
         print(f"Processed {len(series)} years, created {len(features_list)} feature vectors")
         
         if len(features_list) == 0:
-            raise ValueError("No valid training data available. Please check if there's enough historical data for this series.")
+            raise ValueError("No valid training data available. Please check if there's enough historical data for this water/sanitation series.")
         
         self.feature_names = feature_names
         X = np.array(features_list)
@@ -234,7 +167,8 @@ class SDGRandomForestModel:
         
         # If we have very few samples, adjust the number of estimators
         n_estimators = min(100, max(10, len(X) * 2))
-        self.model.n_estimators = n_estimators
+        self.model = RandomForestRegressor(n_estimators=n_estimators, min_samples_leaf=1, 
+                                           min_samples_split=2, random_state=42)
         
         # Sequential time-based split instead of random split
         if len(X) >= 8:  # Need at least 8 points for meaningful split
@@ -269,13 +203,6 @@ class SDGRandomForestModel:
         # Create train predictions
         train_predictions = self.model.predict(X_train_scaled)
         
-        # Debug output: Feature Importance
-        print("\nFeature Importance:")
-        importances = {}
-        for name, importance in zip(self.feature_names, self.model.feature_importances_):
-            importances[name] = importance
-            print(f"  {name}: {importance:.4f}")
-        
         # Calculate simple linear trend for later use in prediction
         slope, intercept = np.polyfit(years_array, y, 1)
         self.trend_params = {
@@ -284,104 +211,227 @@ class SDGRandomForestModel:
             'last_year': years_array[-1],
             'last_value': y[-1]
         }
-        print(f"Trend calculation: slope={slope:.4f}, intercept={intercept:.4f}")
+        print(f"Water trend calculation: slope={slope:.4f}, intercept={intercept:.4f}")
         
         return {
             'train_predictions': pd.Series(train_predictions, index=train_datetime_indices),
             'test_predictions': pd.Series(test_predictions, index=test_datetime_indices),
             'rmse': rmse,
-            'feature_importance': importances
+            'feature_importance': dict(zip(self.feature_names, self.model.feature_importances_))
         }
     
-    def predict_future(self, series, country, periods=7, location='ALLAREA', level='ALL', activity='ALL'):
-        """Make future predictions for water/sanitation indicators with confidence intervals"""
-        print(f"\nMaking future predictions for {country} with SDG6 filters:")
-        print(f"  Location: {location}, Level: {level}, Activity: {activity}")
-        
+    def predict_future(self, series, country, periods=5):
+        """Make future predictions with confidence and prediction intervals for water/sanitation indicators"""
         # Get the last year from the series
         if not all(isinstance(x, (int, np.integer)) for x in series.index):
             last_year = pd.to_datetime(series.index).year.max()
         else:
             last_year = max(series.index)
             
+        # Only forecast future years
         future_years = range(last_year + 1, last_year + periods + 1)
         
-        # STEP 1: Calculate trend-based predictions
+        print(f"🔮 Water/Sanitation Random Forest forecasting from {last_year + 1} to {last_year + periods} ({periods} periods)")
+        
+        # STEP 1: Enhanced trend analysis for water indicators
         slope = self.trend_params['slope']
         intercept = self.trend_params['intercept']
-        last_year = self.trend_params['last_year']
+        last_year_trend = self.trend_params['last_year']
         last_value = self.trend_params['last_value']
         
+        # Get historical data for advanced analysis
+        years_hist = pd.to_datetime(series.index).year.values if not all(isinstance(x, (int, np.integer)) for x in series.index) else series.index.values
+        values_hist = series.values
+        
+        # STEP 2: Water-specific intelligent feature extrapolation
+        future_features_enhanced = []
+        for i, year in enumerate(future_years):
+            period = i + 1
+            enhanced_features = []
+            
+            # Get base features for this FUTURE year only
+            base_features, feature_names = self.prepare_features_for_country_year(country, year)
+            
+            if len(base_features) >= 3:  # We have external data
+                # GDP: Water infrastructure investment capacity
+                if 'GDP' in str(feature_names) or len(base_features) > 0:
+                    last_gdp = base_features[0] if len(base_features) > 0 else 50000
+                    # Water infrastructure follows economic cycles
+                    business_cycle = np.sin(2 * np.pi * period / 7) * 0.03
+                    base_growth = 0.025  # 2.5% base growth
+                    dampening = (0.98 ** period)
+                    growth_rate = (base_growth * dampening) + business_cycle
+                    
+                    if growth_rate > 0.06:  # Cap at 6%
+                        growth_rate = 0.06 - (growth_rate - 0.06) * 0.5
+                    
+                    future_gdp = last_gdp * ((1 + growth_rate) ** period)
+                    enhanced_features.append(future_gdp)
+                
+                # GINI: Water access inequality patterns
+                if len(base_features) > 1:
+                    last_gini = base_features[1]
+                    # Water access improvements can reduce inequality
+                    country_targets = {
+                        'germany': 28, 'france': 32, 'italy': 35, 'spain': 36,
+                        'united states': 37, 'brazil': 45, 'china': 42,
+                        'world': 35, 'europe': 31, 'africa': 42
+                    }
+                    
+                    target_gini = 35  # Default
+                    for country_key, target in country_targets.items():
+                        if country_key in country.lower():
+                            target_gini = target
+                            break
+                    
+                    # Water policy cycles affect inequality
+                    policy_cycle = np.sin(2 * np.pi * period / 12) * 2.0
+                    reversion_speed = 0.08
+                    future_gini = last_gini + (target_gini - last_gini) * reversion_speed * period + policy_cycle
+                    future_gini = max(15, min(60, future_gini))
+                    enhanced_features.append(future_gini)
+                
+                # Unemployment: Affects sanitation affordability
+                if len(base_features) > 2:
+                    last_unemployment = base_features[2]
+                    structural_rates = {
+                        'germany': 4.5, 'france': 8.5, 'italy': 9.5, 'spain': 12.0,
+                        'united states': 5.5, 'brazil': 11.0, 'china': 4.0,
+                        'world': 7.0, 'europe': 7.5, 'africa': 12.0
+                    }
+                    
+                    structural_rate = 7.0
+                    for country_key, rate in structural_rates.items():
+                        if country_key in country.lower():
+                            structural_rate = rate
+                            break
+                    
+                    gdp_effect = -business_cycle * 0.8
+                    mean_reversion = (structural_rate - last_unemployment) * 0.15 * period
+                    future_unemployment = last_unemployment + mean_reversion + gdp_effect
+                    future_unemployment = max(1, min(25, future_unemployment))
+                    enhanced_features.append(future_unemployment)
+                
+                # R&D: Water technology innovation
+                if len(base_features) > 3:
+                    last_rd = base_features[3]
+                    # Water tech innovation waves
+                    innovation_wave = np.sin(2 * np.pi * period / 10) * 0.15
+                    base_rd_growth = 0.03
+                    future_rd = last_rd * ((1 + base_rd_growth) ** period) + innovation_wave
+                    future_rd = max(0.1, min(5.0, future_rd))
+                    enhanced_features.append(future_rd)
+                
+                # Social Coverage: Water service delivery
+                if len(base_features) > 4:
+                    last_social = base_features[4]
+                    # Water service expansion cycles
+                    policy_cycle = np.sin(2 * np.pi * period / 15) * 3.0
+                    improvement_rate = 0.015  # Water access improvements
+                    future_social = last_social * (1 + improvement_rate * period) + policy_cycle
+                    future_social = max(10, min(100, future_social))
+                    enhanced_features.append(future_social)
+                
+                # Pad with remaining features if needed
+                while len(enhanced_features) < len(base_features):
+                    enhanced_features.append(base_features[len(enhanced_features)])
+                    
+                future_features_enhanced.append(enhanced_features[:len(base_features)])
+            else:
+                # Fallback to original features if no external data
+                future_features_enhanced.append(base_features)
+        
+        # STEP 3: Model predictions with enhanced water-specific features
+        if len(future_features_enhanced) > 0 and len(future_features_enhanced[0]) > 0:
+            future_features = np.array(future_features_enhanced)
+            future_features_scaled = self.scaler.transform(future_features)
+            
+            # Get predictions from all trees for uncertainty estimation
+            tree_predictions = []
+            for tree in self.model.estimators_:
+                tree_pred = tree.predict(future_features_scaled)
+                tree_predictions.append(tree_pred)
+            
+            tree_predictions = np.array(tree_predictions)
+            model_predictions = np.mean(tree_predictions, axis=0)
+            prediction_std = np.std(tree_predictions, axis=0)
+            
+            print(f"Enhanced water features used for {len(future_features)} future periods")
+            print(f"Model prediction std: {np.mean(prediction_std):.4f}")
+        else:
+            # Fallback to trend if no features available
+            model_predictions = np.array([last_value + slope * period for period in range(1, periods + 1)])
+            prediction_std = np.ones_like(model_predictions) * abs(last_value) * 0.1
+            print("Using trend-based predictions (no external features)")
+        
+        # STEP 4: Enhanced trend predictions with water infrastructure realism
         trend_predictions = []
-        for year in future_years:
-            # Calculate trend prediction
-            years_since_last = year - last_year
-            trend_prediction = last_value + (slope * years_since_last)
+        for i, year in enumerate(future_years):
+            period = i + 1
+            years_since_last = period
             
-            # Add a small random variation to avoid identical predictions
-            random_factor = 1.0 + (np.random.random() * 0.02 - 0.01)  # ±1%
-            prediction = trend_prediction * random_factor
+            # Base trend for water indicators
+            base_trend = last_value + (slope * years_since_last)
             
-            trend_predictions.append(prediction)
-            print(f"Year {year}: Trend prediction = {trend_prediction:.2f}, with variation = {prediction:.2f}")
+            # Add water-specific cycles and volatility
+            # Long-term water infrastructure cycle (8-year)
+            long_cycle = np.sin(2 * np.pi * period / 8) * abs(last_value) * 0.05
+            
+            # Short-term policy cycle (3 year)
+            short_cycle = np.sin(2 * np.pi * period / 3) * abs(last_value) * 0.02
+            
+            # Trend dampening for extreme water access changes
+            if abs(slope) > abs(last_value) * 0.1:
+                dampening_factor = 0.95 ** period
+                dampened_slope = slope * dampening_factor
+                trend_prediction = last_value + (dampened_slope * years_since_last)
+            else:
+                trend_prediction = base_trend
+            
+            # Add cycles
+            trend_prediction += long_cycle + short_cycle
+            
+            trend_predictions.append(trend_prediction)
+            print(f"Year {year}: Enhanced water trend = {trend_prediction:.2f} (base: {base_trend:.2f})")
         
         trend_predictions = np.array(trend_predictions)
         
-        # STEP 2: Calculate feature-based predictions
-        future_features = []
-        for year in future_years:
-            features, _ = self.prepare_features_for_country_year(country, year, location, level, activity)
-            future_features.append(features)
-        
-        future_features = np.array(future_features)
-        future_features_scaled = self.scaler.transform(future_features)
-        
-        # Make predictions with all trees to get uncertainty estimates
-        tree_predictions = []
-        for tree in self.model.estimators_:
-            tree_pred = tree.predict(future_features_scaled)
-            tree_predictions.append(tree_pred)
-        
-        tree_predictions = np.array(tree_predictions)
-        
-        # Calculate mean prediction and standard deviation
-        model_predictions = np.mean(tree_predictions, axis=0)
-        prediction_std = np.std(tree_predictions, axis=0)
-        
-        # STEP 3: Combine trend and model predictions (60% RF, 40% trend)
-        if np.std(model_predictions) < 0.01 * np.mean(model_predictions):
-            print("Model predictions are too similar - using trend prediction only")
+        # STEP 5: Intelligent combination for water indicators
+        if np.std(model_predictions) < 0.005 * np.mean(np.abs(model_predictions)):
+            print("⚠️  Model predictions too similar - using enhanced water trend predictions")
             future_predictions = trend_predictions
+            combination_weights = "100% Enhanced Water Trend"
         else:
-            # Combine predictions with weight 40% trend, 60% model
-            future_predictions = np.zeros_like(trend_predictions)
-            for i in range(len(future_predictions)):
-                future_predictions[i] = 0.4 * trend_predictions[i] + 0.6 * model_predictions[i]
-            print("Combined trend and model predictions (60% Random Forest, 40% Trend)")
+            # Dynamic weighting for water indicators
+            model_consistency = 1.0 / (1.0 + np.std(model_predictions) / np.mean(np.abs(model_predictions)))
+            trend_weight = 0.3 + (1.0 - model_consistency) * 0.4
+            model_weight = 1.0 - trend_weight
+            
+            future_predictions = trend_weight * trend_predictions + model_weight * model_predictions
+            combination_weights = f"{model_weight*100:.0f}% Enhanced RF, {trend_weight*100:.0f}% Enhanced Water Trend"
+            print(f"Combined water predictions: {combination_weights}")
         
-        # Add a minimum standard deviation to ensure visible intervals
-        min_std = np.abs(future_predictions) * 0.05  # At least 5% of the prediction value
-        prediction_std = np.maximum(prediction_std, min_std)
+        # STEP 6: Water-specific uncertainty estimation
+        # Base uncertainty from model
+        base_std = np.maximum(prediction_std, np.abs(future_predictions) * 0.03)
         
-        # Calculate confidence intervals (68% and 95%)
-        confidence_interval_68 = 1.0 * prediction_std
-        confidence_interval_95 = 2.0 * prediction_std
+        # Add uncertainty from water infrastructure cycles and external shocks
+        cycle_uncertainty = np.abs(future_predictions) * 0.02 * np.sqrt(np.arange(1, periods + 1))
+        water_shock_uncertainty = np.abs(future_predictions) * 0.04  # Water crisis/drought effects
         
-        # Calculate prediction intervals (wider than confidence intervals)
-        prediction_interval_95 = 3.0 * prediction_std
+        total_uncertainty = np.sqrt(base_std**2 + cycle_uncertainty**2 + water_shock_uncertainty**2)
+        
+        # Calculate realistic confidence and prediction intervals
+        confidence_interval_68 = 1.0 * total_uncertainty
+        confidence_interval_95 = 2.0 * total_uncertainty
+        prediction_interval_95 = 2.8 * total_uncertainty
+        
+        print(f"Enhanced water uncertainty: base={np.mean(base_std):.3f}, cycle={np.mean(cycle_uncertainty):.3f}, water_shock={np.mean(water_shock_uncertainty):.3f}")
+        print(f"Water predictions range: {np.min(future_predictions):.2f} to {np.max(future_predictions):.2f}")
+        print(f"✅ Generated {len(future_predictions)} water predictions for years {min(future_years)}-{max(future_years)}")
         
         # Create datetime index for future predictions
         future_datetime_index = pd.to_datetime([f"{year}-01-01" for year in future_years])
-        
-        # Print out future predictions for debugging
-        print("\nFuture predictions for each year:")
-        for year, pred, ci_lower, ci_upper in zip(
-            future_years, 
-            future_predictions, 
-            future_predictions - confidence_interval_95,
-            future_predictions + confidence_interval_95
-        ):
-            print(f"  Year {year}: {pred:.2f} (95% CI: {ci_lower:.2f} - {ci_upper:.2f})")
         
         return {
             'predictions': pd.Series(future_predictions, index=future_datetime_index),
@@ -396,8 +446,8 @@ class SDGRandomForestModel:
 class ForecastAppGoal6:
     def __init__(self, root):
         self.root = root
-        self.root.title("SDG 6 Indicator Forecast - Water and Sanitation")
-        self.root.geometry("1400x900")  # Increased window size
+        self.root.title("SDG Goal 6 Indicator Forecast with Multiple External Factors (GDP, GINI, Unemployment, R&D, Social Coverage) - Water & Sanitation")
+        self.root.geometry("1400x900")
         
         # Get current directory
         self.current_dir = os.path.dirname(os.path.abspath(__file__))
@@ -412,33 +462,35 @@ class ForecastAppGoal6:
         # Load external data
         self.external_data = self.load_external_data()
         
+        # Initialize Random Forest model
+        self.rf_model = SDGRandomForestModel(self.external_data)
+        
         # Create main frame
-        self.main_frame = ttk.Frame(root, padding="10")
+        self.main_frame = ttk.Frame(self.root, padding="10")
         self.main_frame.grid(row=0, column=0, sticky=(tk.W, tk.E, tk.N, tk.S))
         
-        # Configure grid weights for main frame
-        root.grid_rowconfigure(0, weight=1)
-        root.grid_columnconfigure(0, weight=1)
+        # Configure grid weights
+        self.root.grid_rowconfigure(0, weight=1)
+        self.root.grid_columnconfigure(0, weight=1)
         self.main_frame.grid_columnconfigure(0, weight=1)
-        self.main_frame.grid_rowconfigure(1, weight=1)  # PanedWindow gets all remaining space
+        self.main_frame.grid_rowconfigure(1, weight=1)
         
-        # Create selection frame
-        self.selection_frame = ttk.LabelFrame(self.main_frame, text="SDG6 Water & Sanitation Selection", padding="10")
+        # Create frames
+        self.selection_frame = ttk.LabelFrame(self.main_frame, text="Model Selection & Parameters - Water & Sanitation", padding="10")
         self.selection_frame.grid(row=0, column=0, sticky=(tk.W, tk.E), pady=5)
         
         # Create a PanedWindow for resizable plot and results areas
         self.paned_window = ttk.PanedWindow(self.main_frame, orient=tk.VERTICAL)
         self.paned_window.grid(row=1, column=0, sticky=(tk.W, tk.E, tk.N, tk.S), pady=5)
         
-        # Create plot frame and results frame within the PanedWindow
         self.plot_frame = ttk.LabelFrame(self.paned_window, text="Water & Sanitation Forecast Plot", padding="10")
-        self.results_frame = ttk.LabelFrame(self.paned_window, text="Forecast Results & Analysis", padding="10")
+        self.results_frame = ttk.LabelFrame(self.paned_window, text="Results & Water Feature Analysis", padding="10")
         
         # Add frames to PanedWindow
-        self.paned_window.add(self.plot_frame, weight=3)  # Plot gets more initial space
-        self.paned_window.add(self.results_frame, weight=2)  # Results gets less initial space
+        self.paned_window.add(self.plot_frame, weight=3)
+        self.paned_window.add(self.results_frame, weight=2)
         
-        # Configure grid weights for frames
+        # Configure frame grid weights for proper resizing
         self.plot_frame.grid_columnconfigure(0, weight=1)
         self.plot_frame.grid_rowconfigure(0, weight=1)
         self.results_frame.grid_columnconfigure(0, weight=1)
@@ -453,28 +505,28 @@ class ForecastAppGoal6:
         self.save_button.grid(row=0, column=0, padx=5)
         self.save_button.state(['disabled'])  # Disable until plot is generated
         
-        # Initialize plot and results
+        # Initialize components
         self.canvas = None
         self.current_fig = None  # Store the current figure
-        self.results_text = tk.Text(self.results_frame, height=12, width=100)  # Increased height
+        self.results_text = tk.Text(self.results_frame, height=8, width=100, wrap=tk.WORD)
         self.results_text.grid(row=0, column=0, sticky=(tk.W, tk.E, tk.N, tk.S))
         
-        # Add scrollbar to results text
+        # Add scrollbar for results text
         scrollbar = ttk.Scrollbar(self.results_frame, orient="vertical", command=self.results_text.yview)
         scrollbar.grid(row=0, column=1, sticky=(tk.N, tk.S))
         self.results_text.configure(yscrollcommand=scrollbar.set)
         
-        # Create selection widgets
-        self.create_selection_widgets()
+        # Configure results frame grid for scrollbar
+        self.results_frame.grid_columnconfigure(1, weight=0)
         
-        # Initialize Random Forest model
-        self.rf_model = SDGRandomForestModel(self.external_data)
+        # Create widgets
+        self.create_selection_widgets()
         
         # Show external data status
         self.show_external_data_status()
         
     def load_data(self):
-        """Load the processed SDG6 data"""
+        """Load the processed SDG6 water/sanitation data"""
         try:
             file_path = os.path.join(self.current_dir, 'Goal6_processed.csv')
             print(f"Loading SDG6 data from: {file_path}")
@@ -489,7 +541,7 @@ class ForecastAppGoal6:
                     data = pd.read_csv(file_path, 
                                      sep=';', 
                                      encoding=encoding,
-                                     on_bad_lines='skip',  # Skip problematic lines
+                                     on_bad_lines='skip',
                                      low_memory=False)
                     print(f"Successfully loaded {len(data)} rows of SDG6 data using {encoding} encoding")
                     print(f"Columns: {data.columns.tolist()}")
@@ -516,12 +568,15 @@ class ForecastAppGoal6:
         countries = self.df[self.df['Indicator'] == indicator_id]['GeoAreaName'].unique()
         return sorted(countries)
     
+    def get_available_series_codes(self, indicator_id, country):
+        """Get list of available series codes for a specific SDG6 indicator and country"""
+        series_codes = self.df[
+            (self.df['Indicator'] == indicator_id) & 
+            (self.df['GeoAreaName'] == country)
+        ]['SeriesCode'].unique()
+        return sorted(series_codes)
+    
     def create_selection_widgets(self):
-        # Configure grid weights for selection frame
-        self.selection_frame.grid_columnconfigure(0, weight=1)
-        self.selection_frame.grid_columnconfigure(1, weight=1)
-        
-        # Left column
         # Model selection
         ttk.Label(self.selection_frame, text="Model:").grid(row=0, column=0, padx=2, pady=2, sticky=tk.W)
         self.model_var = tk.StringVar()
@@ -536,96 +591,48 @@ class ForecastAppGoal6:
         self.indicator_combo = ttk.Combobox(self.selection_frame, textvariable=self.indicator_var, width=40)
         self.indicator_combo['values'] = [f"{ind} - {desc}" for ind, desc in zip(self.indicators['Indicator'], self.indicators['SeriesDescription'])]
         self.indicator_combo.grid(row=1, column=1, padx=2, pady=2, sticky=tk.W)
-        self.indicator_combo.bind('<<ComboboxSelected>>', self.update_series_codes)
+        self.indicator_combo.bind('<<ComboboxSelected>>', self.update_countries)
         self.indicator_combo.bind('<<ComboboxSelected>>', self.on_indicator_change, add='+')
         
-        # Series Code selection
-        ttk.Label(self.selection_frame, text="Series Code:").grid(row=2, column=0, padx=2, pady=2, sticky=tk.W)
-        self.series_code_var = tk.StringVar()
-        self.series_code_combo = ttk.Combobox(self.selection_frame, textvariable=self.series_code_var, width=15)
-        self.series_code_combo.grid(row=2, column=1, padx=2, pady=2, sticky=tk.W)
-        self.series_code_combo.bind('<<ComboboxSelected>>', self.update_countries)
-        
         # Country selection
-        ttk.Label(self.selection_frame, text="Country:").grid(row=3, column=0, padx=2, pady=2, sticky=tk.W)
+        ttk.Label(self.selection_frame, text="Country:").grid(row=2, column=0, padx=2, pady=2, sticky=tk.W)
         self.country_var = tk.StringVar()
         self.country_combo = ttk.Combobox(self.selection_frame, textvariable=self.country_var, width=15)
-        self.country_combo.grid(row=3, column=1, padx=2, pady=2, sticky=tk.W)
-        self.country_combo.bind('<<ComboboxSelected>>', self.on_country_change)
+        self.country_combo.grid(row=2, column=1, padx=2, pady=2, sticky=tk.W)
+        self.country_combo.bind('<<ComboboxSelected>>', self.update_series_codes)
+        self.country_combo.bind('<<ComboboxSelected>>', self.on_country_change, add='+')
         
-        # Level/Status selection (for water infrastructure level)
-        ttk.Label(self.selection_frame, text="Level/Status:").grid(row=4, column=0, padx=2, pady=2, sticky=tk.W)
-        self.level_var = tk.StringVar()
-        self.level_combo = ttk.Combobox(self.selection_frame, textvariable=self.level_var, width=15)
-        self.level_combo['values'] = ['ALL', 'NATIONAL', 'REGIONAL', 'SUBNATIONAL', 'BASIC', 'SAFELY_MANAGED', 'LIMITED', 'UNIMPROVED', 'SURFACE_WATER']
-        self.level_combo.set('ALL')
-        self.level_combo.grid(row=4, column=1, padx=2, pady=2, sticky=tk.W)
+        # Series Code selection
+        ttk.Label(self.selection_frame, text="Series Code:").grid(row=3, column=0, padx=2, pady=2, sticky=tk.W)
+        self.series_code_var = tk.StringVar()
+        self.series_code_combo = ttk.Combobox(self.selection_frame, textvariable=self.series_code_var, width=15)
+        self.series_code_combo.grid(row=3, column=1, padx=2, pady=2, sticky=tk.W)
         
-        # Right column
-        # Location selection (critical for water access)
-        ttk.Label(self.selection_frame, text="Location:").grid(row=0, column=2, padx=2, pady=2, sticky=tk.W)
-        self.location_var = tk.StringVar()
-        self.location_combo = ttk.Combobox(self.selection_frame, textvariable=self.location_var, width=15)
-        self.location_combo['values'] = [
-            'ALLAREA',
-            'RURAL',
-            'URBAN'
-        ]
-        self.location_combo.set('ALLAREA')
-        self.location_combo.grid(row=0, column=3, padx=2, pady=2, sticky=tk.W)
-        
-        # Activity selection (water/sanitation type)
-        ttk.Label(self.selection_frame, text="Water Activity:").grid(row=1, column=2, padx=2, pady=2, sticky=tk.W)
-        self.activity_var = tk.StringVar()
-        self.activity_combo = ttk.Combobox(self.selection_frame, textvariable=self.activity_var, width=15)
-        self.activity_combo['values'] = ['ALL', 'DRINKING', 'SANITATION', 'HYGIENE', 'WATER', 'WASTEWATER', 'WATER_QUALITY', 'WATER_STRESS']
-        self.activity_combo.set('ALL')
-        self.activity_combo.grid(row=1, column=3, padx=2, pady=2, sticky=tk.W)
-        
-        # Service Type selection (SDG6 specific)
-        ttk.Label(self.selection_frame, text="Service Type:").grid(row=2, column=2, padx=2, pady=2, sticky=tk.W)
-        self.service_type_var = tk.StringVar()
-        self.service_type_combo = ttk.Combobox(self.selection_frame, textvariable=self.service_type_var, width=15)
-        self.service_type_combo['values'] = ['ALL', 'BASIC', 'SAFELY_MANAGED', 'LIMITED', 'UNIMPROVED', 'OPEN_DEFECATION']
-        self.service_type_combo.set('ALL')
-        self.service_type_combo.grid(row=2, column=3, padx=2, pady=2, sticky=tk.W)
-        
-        # Water Source selection (SDG6 specific)
-        ttk.Label(self.selection_frame, text="Water Source:").grid(row=3, column=2, padx=2, pady=2, sticky=tk.W)
-        self.water_source_var = tk.StringVar()
-        self.water_source_combo = ttk.Combobox(self.selection_frame, textvariable=self.water_source_var, width=15)
-        self.water_source_combo['values'] = ['ALL', 'PIPED', 'IMPROVED', 'UNIMPROVED', 'SURFACE_WATER', 'GROUNDWATER', 'RAINWATER']
-        self.water_source_combo.set('ALL')
-        self.water_source_combo.grid(row=3, column=3, padx=2, pady=2, sticky=tk.W)
-        
-        # Forecast button - centered below all filters
-        self.forecast_button = ttk.Button(self.selection_frame, text="Generate Forecast", command=self.generate_forecast)
-        self.forecast_button.grid(row=5, column=0, columnspan=4, padx=5, pady=5)
+        # Forecast button
+        self.forecast_button = ttk.Button(self.selection_frame, text="Generate Water & Sanitation Forecast", command=self.generate_forecast)
+        self.forecast_button.grid(row=4, column=0, columnspan=2, padx=5, pady=5)
     
-    def update_series_codes(self, event=None):
-        """Update series code combobox when indicator is selected"""
+    def update_countries(self, event=None):
+        """Update country combobox when indicator is selected"""
         selected = self.indicator_var.get()
         if selected:
             indicator_id = selected.split(' - ')[0]
-            series_codes = self.df[self.df['Indicator'] == indicator_id]['SeriesCode'].unique()
-            self.series_code_combo['values'] = sorted(series_codes)
-            if series_codes.size > 0:
-                self.series_code_combo.set(series_codes[0])
-            self.update_countries()
-    
-    def update_countries(self, event=None):
-        """Update country combobox when indicator and series code are selected"""
-        selected = self.indicator_var.get()
-        series_code = self.series_code_var.get()
-        if selected and series_code:
-            indicator_id = selected.split(' - ')[0]
-            countries = self.df[
-                (self.df['Indicator'] == indicator_id) & 
-                (self.df['SeriesCode'] == series_code)
-            ]['GeoAreaName'].unique()
-            self.country_combo['values'] = sorted(countries)
-            if countries.size > 0:
+            countries = self.get_available_countries(indicator_id)
+            self.country_combo['values'] = countries
+            if countries:
                 self.country_combo.set(countries[0])
+            self.update_series_codes()
+    
+    def update_series_codes(self, event=None):
+        """Update series code combobox when country is selected"""
+        selected_indicator = self.indicator_var.get()
+        selected_country = self.country_var.get()
+        if selected_indicator and selected_country:
+            indicator_id = selected_indicator.split(' - ')[0]
+            series_codes = self.get_available_series_codes(indicator_id, selected_country)
+            self.series_code_combo['values'] = series_codes
+            if series_codes:
+                self.series_code_combo.set(series_codes[0])
     
     def prepare_time_series(self, data):
         """Prepare time series data for modeling"""
@@ -1157,31 +1164,11 @@ class ForecastAppGoal6:
                 return
                 
             country = self.country_var.get()
-            level = self.level_var.get()
-            location = self.location_var.get()
-            activity = self.activity_var.get()
-            
-            # Get additional SDG6-specific selections (with fallbacks)
-            try:
-                service_type = self.service_type_var.get()
-            except:
-                service_type = 'ALL'
-            
-            try:
-                water_source = self.water_source_var.get()
-            except:
-                water_source = 'ALL'
-                
             model_type = self.model_var.get()
             
             if not country:
                 messagebox.showerror("Error", "Please select a country")
                 return
-            
-            # Print selected filter values for debugging
-            print(f"\nSelected SDG6 filters:")
-            print(f"  Location: {location}, Level: {level}, Activity: {activity}")
-            print(f"  Service Type: {service_type}, Water Source: {water_source}")
             
             # Get data for the selected indicator, series code and country
             indicator_data = self.df[
@@ -1194,54 +1181,19 @@ class ForecastAppGoal6:
                 messagebox.showerror("Error", f"No data found for {indicator_id} in {country}")
                 return
             
-            # Handle missing values
-            indicator_data['Level/Status'] = indicator_data['Level/Status'].fillna('ALL')
-            indicator_data['Location'] = indicator_data['Location'].fillna('ALLAREA')
-            indicator_data['Activity'] = indicator_data['Activity'].fillna('ALL')
-            
-            # Print data counts before filtering
-            print(f"Data points before filtering: {len(indicator_data)}")
-            print(f"Unique locations: {indicator_data['Location'].unique()}")
-            print(f"Unique levels: {indicator_data['Level/Status'].unique()}")
-            print(f"Unique activities: {indicator_data['Activity'].unique()}")
-            
-            # Apply filters
-            filtered_data = indicator_data.copy()
-            
-            if level != 'ALL':
-                filtered_data = filtered_data[filtered_data['Level/Status'] == level]
-                if len(filtered_data) == 0:
-                    messagebox.showerror("Error", f"No data found for level {level} in {indicator_id} for {country}")
-                    return
-            
-            if location != 'ALLAREA':
-                filtered_data = filtered_data[filtered_data['Location'] == location]
-                if len(filtered_data) == 0:
-                    messagebox.showerror("Error", f"No data found for location {location} in {indicator_id} for {country}")
-                    return
-                    
-            if activity != 'ALL':
-                filtered_data = filtered_data[filtered_data['Activity'] == activity]
-                if len(filtered_data) == 0:
-                    messagebox.showerror("Error", f"No data found for activity {activity} in {indicator_id} for {country}")
-                    return
-            
-            # Print data counts after filtering
-            print(f"Data points after filtering: {len(filtered_data)}")
-            
             # Check if we have enough data points
             MIN_DATA_POINTS = 20
-            if len(filtered_data) < MIN_DATA_POINTS:
+            if len(indicator_data) < MIN_DATA_POINTS:
                 messagebox.showerror("Error", 
-                    f"Not enough data points for {level} and location {location}.\n"
-                    f"Found {len(filtered_data)} points, but need at least {MIN_DATA_POINTS} points "
+                    f"Not enough data points for {indicator_id} in {country}.\n"
+                    f"Found {len(indicator_data)} points, but need at least {MIN_DATA_POINTS} points "
                     f"for a reliable forecast.\n"
-                    f"Please try a different indicator, country, level, or location for more data points.")
+                    f"Please try a different indicator or country for more data points.")
                 return
             
             # Convert TimePeriod to datetime and sort
-            filtered_data['TimePeriod'] = pd.to_datetime(filtered_data['TimePeriod'], format='%Y')
-            filtered_data = filtered_data.sort_values('TimePeriod')
+            indicator_data['TimePeriod'] = pd.to_datetime(indicator_data['TimePeriod'], format='%Y')
+            indicator_data = indicator_data.sort_values('TimePeriod')
             
             # Create plot
             if self.canvas:
@@ -1254,17 +1206,17 @@ class ForecastAppGoal6:
             plt.rcParams.update({'font.size': 8})  # Default font size
             
             # Ensure Value column is numeric
-            filtered_data['Value'] = pd.to_numeric(filtered_data['Value'], errors='coerce')
+            indicator_data['Value'] = pd.to_numeric(indicator_data['Value'], errors='coerce')
             
             # Remove any rows with NaN values in Value column
-            filtered_data = filtered_data.dropna(subset=['Value'])
+            indicator_data = indicator_data.dropna(subset=['Value'])
             
-            if len(filtered_data) == 0:
+            if len(indicator_data) == 0:
                 messagebox.showerror("Error", "No valid numeric water/sanitation data found for the selected series")
                 return
             
             # Determine the unit and scale factor based on the series description
-            series_description = filtered_data['SeriesDescription'].iloc[0].lower()
+            series_description = indicator_data['SeriesDescription'].iloc[0].lower()
             unit = ""
             scale_factor = 1.0
             
@@ -1282,7 +1234,7 @@ class ForecastAppGoal6:
                 scale_factor = 1.0
             else:
                 # Check the actual values to determine the scale
-                max_value = filtered_data['Value'].max()
+                max_value = indicator_data['Value'].max()
                 if max_value > 1000000:
                     unit = "millions"
                     scale_factor = 1000000.0
@@ -1294,7 +1246,7 @@ class ForecastAppGoal6:
                     scale_factor = 1.0
             
             # Scale the data
-            scaled_data = filtered_data.copy()
+            scaled_data = indicator_data.copy()
             scaled_data['Value'] = scaled_data['Value'] / scale_factor
             
             # Plot historical data points with larger markers
@@ -1409,7 +1361,7 @@ class ForecastAppGoal6:
                     
                 elif model_type == 'Random Forest':
                     # Fit Random Forest model and make forecast
-                    rf_results = self.fit_random_forest_model(series, country, location, level, activity)
+                    rf_results = self.fit_random_forest_model(series, country)
                     
                     # Scale the predictions
                     scaled_test_predictions = rf_results['test_predictions'] / scale_factor
@@ -1559,8 +1511,7 @@ class ForecastAppGoal6:
             
             # Display comprehensive results
             self.display_water_results(scaled_data, scaled_forecast, future_dates, model_type, 
-                                     indicator_id, country, series_code, level, location, activity, 
-                                     service_type, water_source, unit, scale_factor)
+                                     indicator_id, country, series_code, unit, scale_factor)
             
             # Enable save button after plot is generated
             self.save_button.state(['!disabled'])
@@ -1573,8 +1524,7 @@ class ForecastAppGoal6:
             print(traceback.format_exc())
     
     def display_water_results(self, scaled_data, scaled_forecast, future_dates, model_type, 
-                             indicator_id, country, series_code, level, location, activity, 
-                             service_type, water_source, unit, scale_factor):
+                             indicator_id, country, series_code, unit, scale_factor):
         """Display comprehensive water/sanitation forecast results"""
         
         # Clear and display results
@@ -1583,11 +1533,6 @@ class ForecastAppGoal6:
         self.results_text.insert(tk.END, f"💧 Water Indicator: {indicator_id}\n")
         self.results_text.insert(tk.END, f"🌍 Country: {country}\n")
         self.results_text.insert(tk.END, f"📊 Series Code: {series_code}\n")
-        self.results_text.insert(tk.END, f"🏛️ Level/Status: {level}\n")
-        self.results_text.insert(tk.END, f"📍 Location: {location}\n")
-        self.results_text.insert(tk.END, f"🚰 Activity: {activity}\n")
-        self.results_text.insert(tk.END, f"🔧 Service Type: {service_type}\n")
-        self.results_text.insert(tk.END, f"💧 Water Source: {water_source}\n")
         self.results_text.insert(tk.END, f"📈 Model: {model_type}\n")
         self.results_text.insert(tk.END, f"📏 Unit: {unit}\n\n")
         
@@ -1687,14 +1632,12 @@ class ForecastAppGoal6:
         """Load external data including processed GDP, GINI, R&D, Social Coverage, and Unemployment data"""
         external_data = {}
         try:
-            # Get absolute path to parent directory
-            current_file = os.path.abspath(__file__)  # Absolute path to this script
-            print(f"Current file: {current_file}")
-            
-            sdg6_dir = os.path.dirname(current_file)  # SDG6 directory
-            parent_dir = os.path.dirname(sdg6_dir)  # SDG parent directory
+            # Get the parent directory where processed CSV files are located
+            parent_dir = os.path.dirname(self.current_dir)  # SDG (parent of SDG6)
             
             print(f"Looking for external data in: {parent_dir}")
+            print(f"Current directory: {self.current_dir}")
+            print(f"Parent directory: {parent_dir}")
             
             # Dictionary of processed files with their corresponding names and column mappings
             processed_files = {
@@ -1740,87 +1683,48 @@ class ForecastAppGoal6:
                 }
             }
             
-            # Try to read each file and check for errors
             for data_name, config in processed_files.items():
                 file_path = os.path.join(parent_dir, config['filename'])
-                print(f"\nChecking for file: {file_path}")
-                
-                # Verify if file exists
-                if not os.path.exists(file_path):
-                    print(f"✗ File not found: {file_path}")
-                    continue
-                
-                print(f"✓ File exists: {file_path}")
-                
-                try:
-                    # Try to read the file
-                    data = pd.read_csv(file_path)
-                    print(f"File shape: {data.shape}")
-                    print(f"File columns: {data.columns.tolist()}")
-                    
-                    # Check if required columns exist
-                    required_columns = list(config['columns'].values())
-                    column_exists = [col in data.columns for col in required_columns]
-                    
-                    if not all(column_exists):
-                        missing_cols = [col for i, col in enumerate(required_columns) if not column_exists[i]]
-                        print(f"✗ Missing columns: {missing_cols}")
+                if os.path.exists(file_path):
+                    try:
+                        data = pd.read_csv(file_path)
+                        print(f"Loaded {data_name} data with shape: {data.shape}")
+                        print(f"Columns in {data_name} data: {data.columns.tolist()}")
                         
-                        # Check for similar column names
-                        for missing_col in missing_cols:
-                            similar_cols = [col for col in data.columns if missing_col.lower() in col.lower()]
-                            if similar_cols:
-                                print(f"  Similar columns found for '{missing_col}': {similar_cols}")
-                                
-                                # If there's only one similar column, use it automatically
-                                if len(similar_cols) == 1:
-                                    print(f"  Auto-mapping '{missing_col}' to '{similar_cols[0]}'")
-                                    # Update the column mapping
-                                    for key, val in config['columns'].items():
-                                        if val == missing_col:
-                                            config['columns'][key] = similar_cols[0]
-                    
-                    # Try again with possibly updated column mappings
-                    required_columns = list(config['columns'].values())
-                    if all(col in data.columns for col in required_columns):
-                        # Rename columns to standard format
-                        data = data.rename(columns={
-                            config['columns']['country']: 'Country Name',
-                            config['columns']['year']: 'Year',
-                            config['columns']['value']: 'Value'
-                        })
-                        
-                        # Process data
-                        data['Year'] = pd.to_numeric(data['Year'], errors='coerce')
-                        data['Value'] = pd.to_numeric(data['Value'], errors='coerce')
-                        data = data.dropna(subset=['Year', 'Value'])
-                        data = data[data['Year'] > 0]
-                        
-                        if len(data) > 0:
+                        # Check if required columns exist
+                        required_columns = list(config['columns'].values())
+                        if all(col in data.columns for col in required_columns):
+                            # Rename columns to standard format
+                            data = data.rename(columns={
+                                config['columns']['country']: 'Country Name',
+                                config['columns']['year']: 'Year',
+                                config['columns']['value']: 'Value'
+                            })
+                            
+                            # Process data
+                            data['Year'] = pd.to_numeric(data['Year'], errors='coerce')
+                            data['Value'] = pd.to_numeric(data['Value'], errors='coerce')
+                            data = data.dropna(subset=['Year', 'Value'])
+                            data = data[data['Year'] > 0]
                             external_data[data_name] = data
                             print(f"✓ {data_name.upper()} data loaded ({len(data)} records)")
-                            # Print sample data
-                            print(f"Sample data (first 3 rows):")
-                            print(data.head(3))
                         else:
-                            print(f"✗ {data_name.upper()} data empty after processing")
-                    else:
-                        print(f"✗ {data_name.upper()} data columns mismatch")
-                        print(f"  Required: {required_columns}")
-                        print(f"  Available: {data.columns.tolist()}")
-                    
-                except Exception as e:
-                    print(f"✗ Error loading {data_name}: {str(e)}")
-                    import traceback
-                    print(traceback.format_exc())
+                            print(f"✗ {data_name.upper()} data not loaded")
+                            print(f"    Expected columns: {required_columns}")
+                            print(f"    Found columns: {data.columns.tolist()}")
+                        
+                    except Exception as e:
+                        print(f"✗ {data_name.upper()} data not loaded")
+                        print(f"    Error: {str(e)}")
+                else:
+                    print(f"✗ {data_name.upper()} data not loaded")
+                    print(f"    File not found: {file_path}")
             
             print(f"\nSuccessfully loaded {len(external_data)} external datasets")
             return external_data
             
         except Exception as e:
             print(f"Error loading external data: {str(e)}")
-            import traceback
-            print(traceback.format_exc())
             return {}
     
     def show_external_data_status(self):
@@ -1840,18 +1744,16 @@ class ForecastAppGoal6:
         
         self.results_text.insert(tk.END, status_text)
 
-    def fit_random_forest_model(self, series, country, location='ALLAREA', level='ALL', activity='ALL'):
+    def fit_random_forest_model(self, series, country):
         """Fit Enhanced Random Forest model with external factors integration for water/sanitation"""
         try:
             print(f"\nFitting Enhanced Random Forest model for {country} (SDG6)")
-            print(f"Using water/sanitation filters: Location={location}, Level={level}, Activity={activity}")
             
-            # Use the enhanced Random Forest model with filter parameters
-            results = self.rf_model.fit(series, country, location, level, activity)
+            # Use the enhanced Random Forest model
+            results = self.rf_model.fit(series, country)
             
-            # Generate future predictions with intervals using the same filter parameters
-            future_results = self.rf_model.predict_future(series, country, periods=7, 
-                                                          location=location, level=level, activity=activity)
+            # Generate future predictions with intervals
+            future_results = self.rf_model.predict_future(series, country, periods=7)
             
             # Add all future prediction results to the main results
             results['future_predictions'] = future_results['predictions']
@@ -1879,12 +1781,9 @@ class ForecastAppGoal6:
             # Get current selections for default filename
             indicator_id = self.indicator_var.get().split(' - ')[0] if self.indicator_var.get() else "SDG6"
             country = self.country_var.get() if self.country_var.get() else "Unknown"
-            activity = self.activity_var.get() if self.activity_var.get() else "ALL"
-            location = self.location_var.get() if self.location_var.get() else "ALLAREA"
-            level = self.level_var.get() if self.level_var.get() else "ALL"
             
             # Create default filename with water/sanitation context
-            default_filename = f"SDG6_Water_Sanitation_{indicator_id}_{country}_{activity}_{location}_{level}.png"
+            default_filename = f"SDG6_Water_Sanitation_{indicator_id}_{country}.png"
             default_filename = default_filename.replace(" ", "_")
             
             # Open file dialog
