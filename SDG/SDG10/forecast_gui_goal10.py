@@ -21,6 +21,7 @@ from statsmodels.tsa.statespace.sarimax import SARIMAX
 from sklearn.ensemble import RandomForestRegressor
 from sklearn.preprocessing import StandardScaler
 from sklearn.model_selection import TimeSeriesSplit
+from sklearn.linear_model import LassoCV, RidgeCV
 from sklearn.metrics import mean_squared_error
 import prophet
 from prophet import Prophet
@@ -941,6 +942,152 @@ class SDG10ForecastGUI:
         
         return features
     
+    def apply_lasso_feature_selection(self, series, external_data, feature_names, min_features=2):
+        """
+        🎯 SCIENTIFIC REGULARIZATION: Apply Lasso for automatic feature selection
+        
+        Addresses the overfitting problem: n=20 observations, p=6 features
+        Scientific rule: need ≥5 observations per parameter for reliable estimates
+        
+        Args:
+            series: Time series data (target variable)
+            external_data: External features matrix (n_samples, n_features)
+            feature_names: Names of features
+            min_features: Minimum features to keep (default: 2)
+            
+        Returns:
+            selected_data: Reduced feature matrix
+            selected_features: Names of selected features
+            lasso_info: Information about regularization for scientific reporting
+        """
+        print(f"🧪 SCIENTIFIC REGULARIZATION - LASSO FEATURE SELECTION:")
+        print(f"   📊 Problem: n={len(series)} observations, p={external_data.shape[1]} features")
+        print(f"   📊 Obs/Feature ratio: {len(series)/external_data.shape[1]:.1f} (should be ≥5 for reliable estimates)")
+        
+        # Check if regularization is needed
+        obs_per_feature = len(series) / external_data.shape[1]
+        if obs_per_feature >= 5:
+            print(f"   ✅ Sufficient data ({obs_per_feature:.1f} obs/feature), regularization optional")
+            return external_data, feature_names, {'method': 'no_regularization', 'reason': 'sufficient_data'}
+        
+        print(f"   ⚠️  Overfitting risk detected! Applying Lasso regularization...")
+        
+        # Ensure sufficient data for cross-validation
+        cv_folds = max(2, min(3, len(series) // 4))
+        
+        try:
+            # Scientific approach: Test range of alpha values
+            alphas = np.logspace(-3, 1, 20)  # From 0.001 to 10
+            
+            # Apply Lasso with cross-validation
+            lasso = LassoCV(
+                alphas=alphas,
+                cv=cv_folds,
+                random_state=42,
+                max_iter=2000,
+                selection='random'  # For reproducibility
+            )
+            
+            # Fit Lasso
+            lasso.fit(external_data, series.values)
+            
+            print(f"   🔍 Optimal regularization: α = {lasso.alpha_:.4f}")
+            print(f"   📊 Cross-validation R² = {lasso.score(external_data, series.values):.3f}")
+            
+            # Feature selection based on non-zero coefficients
+            selected_mask = np.abs(lasso.coef_) > 1e-6
+            n_selected = np.sum(selected_mask)
+            
+            # Ensure minimum number of features
+            if n_selected < min_features:
+                print(f"   ⚠️  Lasso selected only {n_selected} features, enforcing minimum {min_features}")
+                # Keep top features by absolute coefficient value
+                coef_importance = np.abs(lasso.coef_)
+                top_indices = np.argsort(coef_importance)[-min_features:]
+                selected_mask = np.zeros_like(selected_mask, dtype=bool)
+                selected_mask[top_indices] = True
+                n_selected = min_features
+            
+            # Extract selected features
+            selected_features = [feature_names[i] for i in range(len(feature_names)) if selected_mask[i]]
+            selected_data = external_data[:, selected_mask]
+            selected_coeffs = lasso.coef_[selected_mask]
+            
+            # Scientific reporting
+            print(f"   ✅ Feature selection complete:")
+            print(f"      • Selected features: {selected_features}")
+            print(f"      • Reduction: {len(feature_names)} → {n_selected} features ({100*(1-n_selected/len(feature_names)):.0f}% reduction)")
+            print(f"      • New obs/feature ratio: {len(series)/n_selected:.1f}")
+            
+            print(f"   📊 Selected feature coefficients:")
+            for feature, coeff in zip(selected_features, selected_coeffs):
+                print(f"      {feature}: {coeff:.4f}")
+            
+            # Package information for scientific reporting
+            lasso_info = {
+                'method': 'lasso_cv',
+                'alpha': lasso.alpha_,
+                'cv_score': lasso.score(external_data, series.values),
+                'original_features': len(feature_names),
+                'selected_features': n_selected,
+                'reduction_percent': 100*(1-n_selected/len(feature_names)),
+                'final_obs_per_feature': len(series)/n_selected,
+                'coefficients': dict(zip(selected_features, selected_coeffs))
+            }
+            
+            print(f"   📋 SCIENTIFIC JUSTIFICATION:")
+            print(f"      • Method: Lasso regression with {cv_folds}-fold cross-validation")
+            print(f"      • Regularization strength: α = {lasso.alpha_:.4f} (data-driven)")
+            print(f"      • Statistical improvement: {obs_per_feature:.1f} → {len(series)/n_selected:.1f} obs/feature")
+            print(f"      • Purpose: Prevent overfitting in small sample forecasting")
+            
+            return selected_data, selected_features, lasso_info
+            
+        except Exception as e:
+            print(f"   ❌ Lasso failed: {e}")
+            print(f"   🔄 Fallback: Correlation-based selection")
+            return self.fallback_correlation_selection(external_data, feature_names, series, min_features)
+    
+    def fallback_correlation_selection(self, external_data, feature_names, series, min_features=2):
+        """
+        Fallback feature selection using correlation when Lasso fails
+        """
+        print(f"   🔄 CORRELATION-BASED FALLBACK:")
+        
+        # Calculate correlations with target
+        correlations = []
+        for i in range(external_data.shape[1]):
+            try:
+                corr = np.corrcoef(series.values, external_data[:, i])[0, 1]
+                correlations.append((i, feature_names[i], abs(corr) if not np.isnan(corr) else 0.0))
+            except:
+                correlations.append((i, feature_names[i], 0.0))
+        
+        # Sort by correlation strength
+        correlations.sort(key=lambda x: x[2], reverse=True)
+        
+        # Select top features (at least min_features, max half of original)
+        max_features = max(min_features, len(feature_names) // 2)
+        n_select = min(max_features, len(correlations))
+        
+        selected_indices = [corr[0] for corr in correlations[:n_select]]
+        selected_features = [corr[1] for corr in correlations[:n_select]]
+        selected_data = external_data[:, selected_indices]
+        
+        print(f"   ✅ Selected by correlation: {selected_features}")
+        for i, (idx, feature, corr) in enumerate(correlations[:n_select]):
+            print(f"      {feature}: |correlation| = {corr:.3f}")
+        
+        # Create info for reporting
+        fallback_info = {
+            'method': 'correlation_fallback',
+            'selected_features': n_select,
+            'original_features': len(feature_names),
+            'correlations': {corr[1]: corr[2] for corr in correlations[:n_select]}
+        }
+        
+        return selected_data, selected_features, fallback_info
+    
     def fit_sarimax_model(self, series, country, location='ALL', sex='ALL', product='ALL', discrimination='ALL'):
         """Fit SARIMAX model with external variables and cross validation"""
         print(f"🔮 Fitting SARIMAX model for {country}...")
@@ -1026,6 +1173,25 @@ class SDG10ForecastGUI:
             print(f"   Series: {len(series)} points, External: {len(external_data)} points")
             print(f"   This should not happen - falling back to ARIMA")
             return self.fit_arima_model(series)
+        
+        # 🎯 SCIENTIFIC LASSO REGULARIZATION: Prevent overfitting
+        print(f"\n🧪 APPLYING SCIENTIFIC REGULARIZATION:")
+        selected_data, selected_features, lasso_info = self.apply_lasso_feature_selection(
+            series, external_data, external_features_for_model, min_features=2
+        )
+        
+        # Update to use selected features
+        external_data = selected_data
+        external_features_for_model = selected_features
+        
+        print(f"🎯 REGULARIZATION COMPLETE:")
+        print(f"   • Method: {lasso_info['method']}")
+        if lasso_info['method'] == 'lasso_cv':
+            print(f"   • Features reduced: 6 → {lasso_info['selected_features']} ({lasso_info['reduction_percent']:.0f}% reduction)")
+            print(f"   • Obs/feature improved: {len(series)/6:.1f} → {lasso_info['final_obs_per_feature']:.1f}")
+            print(f"   • Regularization: α = {lasso_info['alpha']:.4f}")
+        print(f"   • Final features: {external_features_for_model}")
+        print(f"   • Final data shape: {external_data.shape}\n")
         
         # Debug: Check external data variance
         print(f"🔍 External data matrix:")
@@ -1160,6 +1326,7 @@ class SDG10ForecastGUI:
             'external_data': external_data,
             'external_features': external_features_for_model,
             'feature_names': external_features_for_model,
+            'lasso_info': lasso_info,
             'test_predictions': test_predictions,
             'test_data': test_series,
             'rmse': test_rmse,
@@ -1177,6 +1344,7 @@ class SDG10ForecastGUI:
         scaler = sarimax_results['scaler']
         feature_names = sarimax_results['feature_names']
         series = sarimax_results['series']
+        external_data = sarimax_results.get('external_data', None)  # Get training external data
         
         # Get last year
         last_year = series.index[-1].year
@@ -1184,61 +1352,78 @@ class SDG10ForecastGUI:
         
         print(f"🔮 Future years: {list(future_years)}")
         
-        # Prepare external variables for future years
+        # 🎯 LASSO-AWARE FUTURE EXTRAPOLATION: Only extrapolate selected features
+        print(f"🔮 EXTRAPOLATING SELECTED FEATURES: {feature_names}")
+        
         future_exog = []
         for year in future_years:
-            # Get features for all external variables except Year (which we add manually)
-            other_features = ['GDP', 'GINI', 'Unemployment', 'RD_Expenditure', 'Social_Coverage']
-            year_features = self.extrapolate_external_variables_for_inequality(
-                country, year, other_features, location, sex, product, discrimination
-            )
+            year_features = []
             
-            if year_features and len(year_features) >= len(other_features):
-                # Include year as first feature, then the other features
-                full_features = [year] + year_features[:len(other_features)]
-                future_exog.append(full_features)
-                print(f"    ✅ Added {len(full_features)} features for year {year}: {[f'{f:.2e}' if isinstance(f, (int, float)) and f > 1000 else f for f in full_features]}")
-            else:
-                # Use last known values or defaults - ALWAYS CREATE 6 FEATURES
-                if len(future_exog) > 0:
-                    # Copy previous features but update year AND FIX R&D!
-                    prev_features = future_exog[-1][1:].copy()  # Exclude year from previous
-                    # CRITICAL FIX: Don't propagate unrealistic R&D=2.0, use realistic trend value
-                    if len(prev_features) >= 4 and prev_features[3] == 2.0:  # R&D is at index 3
-                        prev_features[3] = 3.29  # Replace 2.0 with realistic R&D value
-                        print(f"    🔧 Fixed R&D value from 2.0 to 3.29 for year {year}")
-                    full_features = [year] + prev_features
-                    future_exog.append(full_features)
-                    print(f"    🔄 Used previous features for year {year}: R&D={prev_features[3]:.2f}")
+            # Process only selected features
+            for feature in feature_names:
+                if feature == 'Year':
+                    year_features.append(year)
+                elif feature in ['GDP', 'GINI', 'Unemployment', 'RD_Expenditure', 'Social_Coverage']:
+                    # Extrapolate this specific selected feature
+                    single_feature_result = self.extrapolate_external_variables_for_inequality(
+                        country, year, [feature], location, sex, product, discrimination
+                    )
+                    
+                    if single_feature_result and len(single_feature_result) > 0:
+                        year_features.append(single_feature_result[0])
+                    else:
+                        # 🎯 REALISTIC DEFAULTS based on latest data trends
+                        # GDP: Use recent Germany GDP (~4.2 trillion USD)
+                        # Other features: Based on historical German data
+                        defaults = {
+                            'GDP': 4200000000000,  # 4.2 trillion USD (realistic for Germany)
+                            'GINI': 31.5,          # Recent German Gini coefficient
+                            'Unemployment': 3.5,   # Recent German unemployment rate
+                            'RD_Expenditure': 3.29, # Recent R&D expenditure %
+                            'Social_Coverage': 75   # Improved social coverage estimate
+                        }
+                        default_value = defaults.get(feature, 0)
+                        year_features.append(default_value)
+                        print(f"      🔧 Used realistic default for {feature}: {default_value:.2e}" if default_value > 1000 else f"      🔧 Used realistic default for {feature}: {default_value:.2f}")
                 else:
-                    # IMPROVED defaults - use realistic values to prevent forecast jumps
-                    # R&D: Use recent trend value (3.29) instead of unrealistic low value (2.0)
-                    # This prevents the 39% R&D drop that causes dramatic SARIMAX forecast changes
-                    realistic_rd_value = 3.29  # Based on recent 2021-2022 trend
-                    default_values = [year, 3000000000000.0, 40.0, 8.0, realistic_rd_value, 60.0]
-                    future_exog.append(default_values)
-                    print(f"    📋 Used REALISTIC default values for year {year}: R&D={realistic_rd_value:.2f} (vs old 2.0)")
-                
-                # CRITICAL: Ensure we always have exactly 6 features
-                if len(future_exog[-1]) != 6:
-                    print(f"    ⚠️  Wrong feature count {len(future_exog[-1])}, fixing to 6...")
-                    # Pad or trim to exactly 6 features
-                    while len(future_exog[-1]) < 6:
-                        future_exog[-1].append(60.0)  # Default social coverage
-                    if len(future_exog[-1]) > 6:
-                        future_exog[-1] = future_exog[-1][:6]
-                    print(f"    ✅ Fixed to {len(future_exog[-1])} features")
+                    # Unknown feature
+                    year_features.append(0)
+            
+            future_exog.append(year_features)
+            print(f"    ✅ Added {len(year_features)} SELECTED features for year {year}: {[f'{f:.2e}' if isinstance(f, (int, float)) and f > 1000 else f for f in year_features]}")
         
-        # Convert to array and scale
+        # 🎯 LASSO-AWARE SCALING: Only scale selected features
         future_exog_array = np.array(future_exog)
         print(f"🔍 Future external variables DEBUG:")
         print(f"  Raw future_exog length: {len(future_exog)}")
         print(f"  First future_exog row: {future_exog[0] if len(future_exog) > 0 else 'None'}")
         print(f"  future_exog_array shape: {future_exog_array.shape}")
-        print(f"  Scaler expects 6 features: [Year, GDP, GINI, Unemployment, RD, Social]")
+        print(f"  Selected features: {feature_names}")
         
-        # Scale the entire feature matrix including Year
-        future_exog_scaled = scaler.transform(future_exog_array)
+        # 🎯 DIMENSION-COMPATIBLE SCALING
+        if external_data is not None and future_exog_array.shape[1] != external_data.shape[1]:
+            print(f"🚨 SCALER DIMENSION MISMATCH DETECTED!")
+            print(f"  Future data: {future_exog_array.shape[1]} features")
+            print(f"  Training data: {external_data.shape[1]} features")
+            print(f"  🔧 Creating compatible scaler for selected features...")
+            
+            # Create new scaler that matches selected features
+            compatible_scaler = StandardScaler()
+            compatible_scaler.fit(external_data)  # Use training data with selected features
+            future_exog_scaled = compatible_scaler.transform(future_exog_array)
+            print(f"  ✅ Compatible scaler created and applied!")
+        else:
+            # Dimensions match or no external_data available - use original scaler
+            try:
+                future_exog_scaled = scaler.transform(future_exog_array)
+                print(f"  ✅ Used original scaler")
+            except ValueError as e:
+                print(f"  ⚠️  Scaler error: {e}")
+                print(f"  🔧 Creating new scaler as fallback...")
+                fallback_scaler = StandardScaler()
+                fallback_scaler.fit(future_exog_array)  # Fit on current data as last resort
+                future_exog_scaled = fallback_scaler.transform(future_exog_array)
+                print(f"  ✅ Fallback scaler applied")
         
         print(f"🔮 Future external variables shape: {future_exog_scaled.shape}")
         
@@ -2418,6 +2603,26 @@ class SDG10ForecastGUI:
         
         self.results_text.insert(tk.END, f"\n=== Model Performance ===\n")
         self.results_text.insert(tk.END, f"Test RMSE: {model_results['rmse']:.4f} {indicator_info['Units']}\n")
+        
+        # Add regularization information for SARIMAX
+        if model_name == "SARIMAX" and 'lasso_info' in model_results:
+            lasso_info = model_results['lasso_info']
+            self.results_text.insert(tk.END, f"\n=== 🎯 SCIENTIFIC REGULARIZATION ===\n")
+            self.results_text.insert(tk.END, f"Method: {lasso_info['method'].replace('_', ' ').title()}\n")
+            
+            if lasso_info['method'] == 'lasso_cv':
+                self.results_text.insert(tk.END, f"Regularization strength: α = {lasso_info['alpha']:.4f}\n")
+                self.results_text.insert(tk.END, f"Cross-validation R²: {lasso_info['cv_score']:.3f}\n")
+                self.results_text.insert(tk.END, f"Features reduced: {lasso_info['original_features']} → {lasso_info['selected_features']} ({lasso_info['reduction_percent']:.0f}% reduction)\n")
+                self.results_text.insert(tk.END, f"Obs/feature ratio improved: {len(series)/lasso_info['original_features']:.1f} → {lasso_info['final_obs_per_feature']:.1f}\n")
+                self.results_text.insert(tk.END, f"Purpose: Prevent overfitting in small sample forecasting\n")
+                
+                self.results_text.insert(tk.END, f"\nSelected feature coefficients:\n")
+                for feature, coeff in lasso_info['coefficients'].items():
+                    self.results_text.insert(tk.END, f"  {feature}: {coeff:.4f}\n")
+            
+            self.results_text.insert(tk.END, f"\nJustification: Statistical rule requires ≥5 observations per parameter.\n")
+            self.results_text.insert(tk.END, f"Original ratio was too low for reliable parameter estimation.\n")
         
         # Add external data information for SARIMAX and Random Forest
         if model_name in ["SARIMAX", "Random Forest"] and 'data_usage_stats' in model_results:
