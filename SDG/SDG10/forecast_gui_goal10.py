@@ -13,7 +13,17 @@ from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 import seaborn as sns
 from datetime import datetime
 import warnings
-warnings.filterwarnings('ignore')
+# Unterdrücke ALLE störenden Warnungen für saubere Debug-Ausgabe
+warnings.filterwarnings('ignore', category=UserWarning)
+warnings.filterwarnings('ignore', category=RuntimeWarning)
+warnings.filterwarnings('ignore', category=FutureWarning)
+warnings.filterwarnings('ignore', message='.*date index has been provided.*')
+warnings.filterwarnings('ignore', message='.*No supported index is available.*')
+warnings.filterwarnings('ignore', message='.*Maximum Likelihood optimization failed to converge.*')
+warnings.filterwarnings('ignore', message='.*Non-stationary starting autoregressive parameters.*')
+warnings.filterwarnings('ignore', message='.*Non-invertible starting MA parameters.*')
+warnings.filterwarnings('ignore', message='.*Too few observations to estimate starting parameters.*')
+warnings.filterwarnings('ignore', message='.*No frequency information was provided.*')
 
 # Time series and ML imports
 from statsmodels.tsa.arima.model import ARIMA
@@ -441,9 +451,11 @@ class SDG10ForecastGUI:
                     train_series = series.iloc[train_idx]
                     test_series = series.iloc[test_idx]
                     
-                    # Fit ARIMA
-                    model = ARIMA(train_series, order=order)
-                    fitted_model = model.fit()
+                    # Fit ARIMA with warnings suppressed
+                    with warnings.catch_warnings():
+                        warnings.simplefilter("ignore")
+                        model = ARIMA(train_series, order=order)
+                        fitted_model = model.fit()
                     
                     # Forecast
                     forecast = fitted_model.forecast(steps=len(test_series))
@@ -470,9 +482,11 @@ class SDG10ForecastGUI:
         
         print(f"  ✅ Best ARIMA order: {best_order} with RMSE: {best_score:.4f}")
         
-        # Fit final model on full data
-        final_model = ARIMA(series, order=best_order)
-        fitted_final_model = final_model.fit()
+        # Fit final model on full data with warnings suppressed
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore")
+            final_model = ARIMA(series, order=best_order)
+            fitted_final_model = final_model.fit()
         
         print(f"  Final model summary:")
         print(f"    AIC: {fitted_final_model.aic:.2f}")
@@ -484,9 +498,11 @@ class SDG10ForecastGUI:
         test_series = series[-n_test:] if n_test > 0 else pd.Series()
         
         if len(test_series) > 0:
-            test_model = ARIMA(train_series, order=best_order)
-            test_fitted = test_model.fit()
-            test_predictions = test_fitted.forecast(steps=len(test_series))
+            with warnings.catch_warnings():
+                warnings.simplefilter("ignore")
+                test_model = ARIMA(train_series, order=best_order)
+                test_fitted = test_model.fit()
+                test_predictions = test_fitted.forecast(steps=len(test_series))
             
             # 🔥 REVOLUTIONARY CHANGE: No bounds for ARIMA test predictions either!
             # Let the model show its natural performance without artificial constraints
@@ -789,7 +805,6 @@ class SDG10ForecastGUI:
         
         # If we can't find the required columns, return None
         if not all([country_col, year_col, value_col]):
-            print(f"⚠️  Missing columns in {dataset_name}: country={country_col}, year={year_col}, value={value_col}")
             return None
         
         # Filter by country and year
@@ -802,10 +817,9 @@ class SDG10ForecastGUI:
                 print(f"      ✅ Found {dataset_name} for {country} {year}: {value}")
                 return value
             else:
-                print(f"      🔍 No data for {dataset_name}: {country} {year}")
                 return None
         except Exception as e:
-            print(f"      ⚠️  Error filtering {dataset_name}: {e}")
+            return None
         
         return None
     
@@ -815,7 +829,6 @@ class SDG10ForecastGUI:
         features = []
         
         for feature_name in feature_names:
-            print(f"    🔍 Processing {feature_name} for {year}")
             
             if feature_name == 'GDP':
                 # GDP growth with inequality considerations
@@ -1100,21 +1113,16 @@ class SDG10ForecastGUI:
         external_data = []
         
         for year in years:
-            print(f"  🔍 Processing external data for year {year}")
             # Get features for all external variables except Year (which we add manually)
             other_features = ['GDP', 'GINI', 'Unemployment', 'RD_Expenditure', 'Social_Coverage']
             year_features = self.extrapolate_external_variables_for_inequality(
                 country, year, other_features, location, sex, product, discrimination
             )
             
-            print(f"    📊 Received features: {year_features}")
-            print(f"    📊 Expected {len(other_features)} features, got {len(year_features) if year_features else 0}")
-            
             if year_features and len(year_features) == len(other_features):
                 # Include year as first feature, then the other features
                 full_features = [year] + year_features
                 external_data.append(full_features)
-                print(f"    ✅ Added full features: {full_features}")
             else:
                 # Use interpolation or default values
                 if len(external_data) > 0:
@@ -1122,12 +1130,10 @@ class SDG10ForecastGUI:
                     prev_data = external_data[-1][1:].copy()  # Exclude year from previous
                     full_features = [year] + prev_data
                     external_data.append(full_features)
-                    print(f"    🔄 Used previous year data: {full_features}")
                 else:
                     default_values = [30000, 40, 8, 2, 60]  # Default values for other features
                     full_features = [year] + default_values
                     external_data.append(full_features)
-                    print(f"    ⚠️  Used default values: {full_features}")
         
         if len(external_data) < len(series):
             print("⚠️  Insufficient external data, falling back to ARIMA")
@@ -1604,23 +1610,17 @@ class SDG10ForecastGUI:
         external_data = []
         
         for year in years:
-            print(f"  🔍 RF: Processing external data for year {year}")
             year_features = self.extrapolate_external_variables_for_inequality(
                 country, year, external_features, location, sex, product, discrimination
             )
             
-            print(f"    📊 RF: Received features: {year_features}")
-            print(f"    📊 RF: Expected {len(external_features)} features, got {len(year_features) if year_features else 0}")
-            
             if year_features and len(year_features) == len(external_features):
                 feature_row = [year] + year_features  # Include year as feature
                 external_data.append(feature_row)
-                print(f"    ✅ RF: Added year {year} features: {feature_row}")
             else:
                 # Use default values
                 default_row = [year, 30000, 40, 8, 2, 60]
                 external_data.append(default_row)
-                print(f"    ⚠️  RF: Used default values for {year}: {default_row}")
         
         if len(external_data) < len(series):
             print("⚠️  Insufficient external data, falling back to ARIMA")
