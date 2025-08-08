@@ -110,6 +110,73 @@ class SDG10ForecastGUI:
         
         print(f"🔄 External data loading complete. Loaded {len([k for k,v in self.external_data.items() if v is not None])} datasets.")
     
+    def resolve_columns(self, df, dataset_name=None, preferred_value_col=None):
+        """Resolve common column names for country, year, and value across heterogeneous CSVs.
+        Returns a tuple (country_col, year_col, value_col) or (None, None, None) if not resolvable.
+        """
+        if df is None or len(df) == 0:
+            return None, None, None
+        # Country
+        country_col = None
+        for c in ['GeoAreaName', 'Country Name', 'Country']:
+            if c in df.columns:
+                country_col = c
+                break
+        # Year
+        year_col = None
+        for y in ['TimePeriod', 'Year']:
+            if y in df.columns:
+                year_col = y
+                break
+        # Value
+        value_col = None
+        # Explicit preference if provided
+        if preferred_value_col and preferred_value_col in df.columns:
+            value_col = preferred_value_col
+        # Dataset-specific fallback
+        if value_col is None and dataset_name == 'gdp' and 'GDP' in df.columns:
+            value_col = 'GDP'
+        # Generic fallbacks
+        if value_col is None:
+            for v in ['Value', 'GINI', 'Unemployment', 'RD_Expenditure', 'Social_Coverage']:
+                if v in df.columns:
+                    value_col = v
+                    break
+        return country_col, year_col, value_col
+
+    def split_train_test(self, series, test_cap):
+        """Create a small, consistent temporal split for test visualization.
+        Returns (train_series, test_series, n_test).
+        """
+        n_test = min(len(series) // 5, test_cap)
+        train_series = series[:-n_test] if n_test > 0 else series
+        test_series = series[-n_test:] if n_test > 0 else pd.Series()
+        return train_series, test_series, n_test
+
+    def scale_future_exog(self, future_exog_array, scaler, training_exog=None):
+        """Safely scale future exogenous variables using an existing scaler or a compatible fallback.
+        If dimensions mismatch, fit a temporary compatible scaler on training_exog; if that fails, fit on future data.
+        """
+        if future_exog_array is None or len(future_exog_array) == 0:
+            return future_exog_array
+        # Try using provided scaler first
+        try:
+            return scaler.transform(future_exog_array)
+        except Exception as e:
+            print(f"  ⚠️  Scaler direct transform failed: {e}")
+        # Try a compatible scaler using training exog
+        if training_exog is not None:
+            try:
+                compatible_scaler = StandardScaler()
+                compatible_scaler.fit(training_exog)
+                return compatible_scaler.transform(future_exog_array)
+            except Exception as e:
+                print(f"  ⚠️  Compatible scaler failed: {e}")
+        # Last resort: fit on future data
+        fallback_scaler = StandardScaler()
+        fallback_scaler.fit(future_exog_array)
+        return fallback_scaler.transform(future_exog_array)
+    
     def create_external_data_status_panel(self, parent):
         """Create external data status text panel"""
         # External Data Status Section
@@ -493,9 +560,7 @@ class SDG10ForecastGUI:
         print(f"    Parameters: {fitted_final_model.params.values}")
         
         # Generate test predictions for plotting
-        n_test = min(len(series) // 5, 10)
-        train_series = series[:-n_test] if n_test > 0 else series
-        test_series = series[-n_test:] if n_test > 0 else pd.Series()
+        train_series, test_series, n_test = self.split_train_test(series, test_cap=10)
         
         if len(test_series) > 0:
             with warnings.catch_warnings():
@@ -862,32 +927,10 @@ class SDG10ForecastGUI:
             print(f"      ❌ Dataset {dataset_name} is empty")
             return None
         
-        # Check column names and map them correctly
-        country_col = None
-        year_col = None
-        value_col = None
-        
-        # Find country column
-        if 'GeoAreaName' in data.columns:
-            country_col = 'GeoAreaName'
-        elif 'Country Name' in data.columns:
-            country_col = 'Country Name'
-        elif 'Country' in data.columns:
-            country_col = 'Country'
-        
-        # Find year column
-        if 'TimePeriod' in data.columns:
-            year_col = 'TimePeriod'
-        elif 'Year' in data.columns:
-            year_col = 'Year'
-        
-        # Find value column
-        if value_column in data.columns:
-            value_col = value_column
-        elif 'Value' in data.columns:
-            value_col = 'Value'
-        elif dataset_name == 'gdp' and 'GDP' in data.columns:
-            value_col = 'GDP'
+        # Resolve columns consistently
+        country_col, year_col, value_col = self.resolve_columns(
+            data, dataset_name=dataset_name, preferred_value_col=value_column
+        )
         
         # If we can't find the required columns, return None
         if not all([country_col, year_col, value_col]):
@@ -1384,9 +1427,7 @@ class SDG10ForecastGUI:
         fitted_final_model = final_model.fit(disp=False)
         
         # Generate test predictions for plotting
-        n_test = min(len(series) // 5, 8)
-        train_series = series[:-n_test] if n_test > 0 else series
-        test_series = series[-n_test:] if n_test > 0 else pd.Series()
+        train_series, test_series, n_test = self.split_train_test(series, test_cap=8)
         
         if len(test_series) > 0:
             train_exog = external_data_scaled[:-n_test]
@@ -1498,24 +1539,11 @@ class SDG10ForecastGUI:
             print(f"  Future data: {future_exog_array.shape[1]} features")
             print(f"  Training data: {external_data.shape[1]} features")
             print(f"  🔧 Creating compatible scaler for selected features...")
-            
-            # Create new scaler that matches selected features
-            compatible_scaler = StandardScaler()
-            compatible_scaler.fit(external_data)  # Use training data with selected features
-            future_exog_scaled = compatible_scaler.transform(future_exog_array)
-            print(f"  ✅ Compatible scaler created and applied!")
+            future_exog_scaled = self.scale_future_exog(future_exog_array, scaler, training_exog=external_data)
+            print(f"  ✅ Compatible scaling applied!")
         else:
             # Dimensions match or no external_data available - use original scaler
-            try:
-                future_exog_scaled = scaler.transform(future_exog_array)
-                print(f"  ✅ Used original scaler")
-            except ValueError as e:
-                print(f"  ⚠️  Scaler error: {e}")
-                print(f"  🔧 Creating new scaler as fallback...")
-                fallback_scaler = StandardScaler()
-                fallback_scaler.fit(future_exog_array)  # Fit on current data as last resort
-                future_exog_scaled = fallback_scaler.transform(future_exog_array)
-                print(f"  ✅ Fallback scaler applied")
+            future_exog_scaled = self.scale_future_exog(future_exog_array, scaler, training_exog=external_data)
         
         print(f"🔮 Future external variables shape: {future_exog_scaled.shape}")
         
@@ -1627,6 +1655,8 @@ class SDG10ForecastGUI:
             
             # Confidence Intervals - Model uncertainty only
             forecast_ci = forecast_obj.conf_int()
+            # Ensure future index alignment
+            forecast_ci.index = future_dates
             
             # For SARIMAX, get_forecast() already provides prediction intervals!
             # CI = narrow band (model uncertainty) 
@@ -1643,9 +1673,9 @@ class SDG10ForecastGUI:
             pi_upper = ci_upper + (ci_width * pi_expansion / 2)
             
             forecast_pi = pd.DataFrame({
-                'lower': pi_lower,
-                'upper': pi_upper  
-            }, index=forecast_series.index)
+                'lower': pi_lower.values,
+                'upper': pi_upper.values
+            }, index=future_dates)
             
             print(f"🚀 SARIMAX: Both CI and PI without artificial bounds!")
             print(f"  CI range (first value): {ci_lower.iloc[0]:.2f} to {ci_upper.iloc[0]:.2f}")
@@ -2045,21 +2075,8 @@ class SDG10ForecastGUI:
             if dataset_name in self.external_data and self.external_data[dataset_name] is not None:
                 data = self.external_data[dataset_name]
                 
-                # Find correct column names
-                country_col = None
-                year_col = None
-                
-                if 'GeoAreaName' in data.columns:
-                    country_col = 'GeoAreaName'
-                elif 'Country Name' in data.columns:
-                    country_col = 'Country Name'
-                elif 'Country' in data.columns:
-                    country_col = 'Country'
-                
-                if 'TimePeriod' in data.columns:
-                    year_col = 'TimePeriod'
-                elif 'Year' in data.columns:
-                    year_col = 'Year'
+                # Resolve columns consistently
+                country_col, year_col, _ = self.resolve_columns(data)
                 
                 if country_col and year_col:
                     try:
