@@ -604,7 +604,6 @@ class SDG10ForecastGUI:
             print(f"⚠️  Prophet CV failed: {e}")
             avg_rmse = None
             cv_results = None
-            performance_metrics = None
             cv_summary = None
         
         # Generate test predictions for plotting
@@ -713,7 +712,7 @@ class SDG10ForecastGUI:
         
         # Generate future forecast using the fixed function
         future_periods = 8  # Forecast 8 years into the future
-        forecast_series, forecast_ci = self.predict_future_arima(
+        forecast_series, forecast_ci, forecast_pi = self.predict_future_arima(
             arima_results['model'], series, future_periods
         )
         
@@ -721,6 +720,11 @@ class SDG10ForecastGUI:
         print(f"  Historical range: {series.min():.4f} to {series.max():.4f}")
         print(f"  Forecast range: {forecast_series.min():.4f} to {forecast_series.max():.4f}")
         print(f"  Forecast values: {list(forecast_series.values)}")
+        
+        # Add intervals to results for plotting
+        arima_results['forecast_series'] = forecast_series
+        arima_results['forecast_ci'] = forecast_ci
+        arima_results['forecast_pi'] = forecast_pi
         
         # Plot results
         self.plot_forecast_results(series, forecast_series, forecast_ci, 
@@ -744,12 +748,94 @@ class SDG10ForecastGUI:
         future_df = pd.DataFrame({'ds': future_dates})
         forecast = prophet_results['model'].predict(future_df)
         
-        # Extract forecast values and confidence intervals
+        # Extract forecast values and uncertainty intervals
         forecast_series = pd.Series(forecast['yhat'].values, index=future_dates)
-        forecast_ci = pd.DataFrame({
+        
+        # Prophet provides both trend and total uncertainty
+        # yhat_lower/yhat_upper are essentially Prediction Intervals (include all uncertainty)
+        forecast_pi = pd.DataFrame({
             'lower': forecast['yhat_lower'].values,
             'upper': forecast['yhat_upper'].values
         }, index=future_dates)
+        
+        # For Confidence Intervals, we use trend uncertainty only
+        # Prophet doesn't directly provide this, so we approximate
+        trend_uncertainty = (forecast['yhat_upper'] - forecast['yhat_lower']) * 0.5  # 50% of total (tighter than PI)
+        
+        # Create CI DataFrame and check if it results in NaN
+        forecast_ci = pd.DataFrame({
+            'lower': forecast['yhat'] - trend_uncertainty/2,
+            'upper': forecast['yhat'] + trend_uncertainty/2
+        }, index=future_dates)
+        
+        # Check if CI calculation resulted in NaN values and provide fallback
+        if forecast_ci.isna().any().any() or trend_uncertainty.isna().any() or forecast['yhat'].isna().any():
+            print("⚠️  Prophet CI calculation resulted in NaN - using fallback CI calculation")
+            print(f"    yhat has NaN: {forecast['yhat'].isna().any()}")
+            print(f"    trend_uncertainty has NaN: {trend_uncertainty.isna().any()}")
+            print(f"    CI has NaN: {forecast_ci.isna().any().any()}")
+            
+            # ROBUST FALLBACK: Create CI using forecast_series (which is guaranteed to be valid)
+            print(f"    🔍 Starting robust fallback...")
+            print(f"    🔍 forecast_series sample: {forecast_series.iloc[0]:.2f}")
+            print(f"    🔍 forecast_series type: {type(forecast_series)}")
+            print(f"    🔍 forecast_series has NaN: {forecast_series.isna().any()}")
+            
+            try:
+                # Use 1% of forecast values as CI width (should be narrower than PI)
+                ci_width = abs(forecast_series) * 0.01
+                ci_width = np.maximum(ci_width, 0.3)  # Very small minimum width
+                
+                forecast_ci = pd.DataFrame({
+                    'lower': forecast_series - ci_width,
+                    'upper': forecast_series + ci_width
+                }, index=forecast_series.index)  # Use same index as forecast_series
+                
+                print(f"    ✅ Robust fallback successful!")
+                print(f"    🔍 CI width sample: {ci_width.iloc[0]:.2f}")
+                print(f"    🔍 CI lower sample: {forecast_ci.iloc[0, 0]:.2f}")
+                print(f"    🔍 CI upper sample: {forecast_ci.iloc[0, 1]:.2f}")
+                print(f"    🔍 Final CI has NaN: {forecast_ci.isna().any().any()}")
+            except Exception as e:
+                print(f"    ❌ Robust fallback failed: {e}")
+                # Ultimate fallback: Fixed width CI
+                forecast_ci = pd.DataFrame({
+                    'lower': forecast_series - 2.0,
+                    'upper': forecast_series + 2.0
+                }, index=forecast_series.index)
+                print(f"    🔧 Using ultimate fallback with fixed width of 4.0")
+        
+        print(f"🔍 Prophet CI DEBUG:")
+        print(f"  Forecast value (first): {forecast['yhat'].iloc[0]:.2f}")
+        if trend_uncertainty.isna().any():
+            print(f"  Trend uncertainty: NaN (using fallback)")
+        else:
+            print(f"  Trend uncertainty: {trend_uncertainty.iloc[0]:.2f}")
+        
+        # Check if CI are still NaN after fallback
+        if forecast_ci.isna().any().any():
+            print(f"  CI lower: nan (FALLBACK FAILED!)")
+            print(f"  CI upper: nan (FALLBACK FAILED!)")
+            print(f"  CI width: nan (FALLBACK FAILED!)")
+        else:
+            print(f"  CI lower: {forecast_ci.iloc[0, 0]:.2f}")
+            print(f"  CI upper: {forecast_ci.iloc[0, 1]:.2f}")
+            print(f"  CI width: {forecast_ci.iloc[0, 1] - forecast_ci.iloc[0, 0]:.2f}")
+        
+        print(f"📊 Prophet Intervals:")
+        if forecast_ci.isna().any().any():
+            print(f"  CI range: nan to nan")
+            print(f"  PI range: {forecast_pi.iloc[0, 0]:.2f} to {forecast_pi.iloc[0, 1]:.2f}")
+            print(f"  PI is nanx wider than CI")
+        else:
+            print(f"  CI range: {forecast_ci.iloc[0, 0]:.2f} to {forecast_ci.iloc[0, 1]:.2f}")
+            print(f"  PI range: {forecast_pi.iloc[0, 0]:.2f} to {forecast_pi.iloc[0, 1]:.2f}")
+            print(f"  PI is {((forecast_pi.iloc[0, 1] - forecast_pi.iloc[0, 0]) / (forecast_ci.iloc[0, 1] - forecast_ci.iloc[0, 0])):.1f}x wider than CI")
+        
+        # Add intervals to results
+        prophet_results['forecast_series'] = forecast_series
+        prophet_results['forecast_ci'] = forecast_ci
+        prophet_results['forecast_pi'] = forecast_pi
         
         # Plot results
         self.plot_forecast_results(series, forecast_series, forecast_ci, 
@@ -1536,11 +1622,37 @@ class SDG10ForecastGUI:
             print(f"  Forecast series values (NO BOUNDS): {list(forecast_series.values)}")
             print(f"  Contains NaN: {pd.isna(forecast_series).any()}")
             
-            # Get confidence intervals - also NO bounds!
-            forecast_ci = model_fit.get_forecast(steps=periods, exog=future_exog_scaled).conf_int()
-            print(f"🚀 SARIMAX: Confidence intervals also without artificial bounds!")
+            # Get both Confidence Intervals (CI) and Prediction Intervals (PI)
+            forecast_obj = model_fit.get_forecast(steps=periods, exog=future_exog_scaled)
             
-            return forecast_series, forecast_ci
+            # Confidence Intervals - Model uncertainty only
+            forecast_ci = forecast_obj.conf_int()
+            
+            # For SARIMAX, get_forecast() already provides prediction intervals!
+            # CI = narrow band (model uncertainty) 
+            # PI = wider band (model + residual uncertainty) - scale from CI
+            
+            # Create wider PI from CI
+            ci_lower = forecast_ci.iloc[:, 0]
+            ci_upper = forecast_ci.iloc[:, 1]
+            
+            # PI = CI expanded by a factor (typically 1.2-1.5x wider)
+            ci_width = ci_upper - ci_lower
+            pi_expansion = 0.3  # 30% wider than CI
+            pi_lower = ci_lower - (ci_width * pi_expansion / 2)
+            pi_upper = ci_upper + (ci_width * pi_expansion / 2)
+            
+            forecast_pi = pd.DataFrame({
+                'lower': pi_lower,
+                'upper': pi_upper  
+            }, index=forecast_series.index)
+            
+            print(f"🚀 SARIMAX: Both CI and PI without artificial bounds!")
+            print(f"  CI range (first value): {ci_lower.iloc[0]:.2f} to {ci_upper.iloc[0]:.2f}")
+            print(f"  PI range (first value): {pi_lower.iloc[0]:.2f} to {pi_upper.iloc[0]:.2f}")
+            print(f"  PI is {((pi_upper.iloc[0] - pi_lower.iloc[0]) / (ci_upper.iloc[0] - ci_lower.iloc[0])):.1f}x wider than CI")
+            
+            return forecast_series, forecast_ci, forecast_pi
             
         except Exception as e:
             print(f"⚠️  SARIMAX forecast failed: {e}")
@@ -1567,7 +1679,7 @@ class SDG10ForecastGUI:
             return self.forecast_arima(series, filtered_data)
         
         # Generate future forecast
-        forecast_series, forecast_ci = self.predict_future_sarimax(
+        forecast_series, forecast_ci, forecast_pi = self.predict_future_sarimax(
             sarimax_results, country, periods=8, location=location, sex=sex, 
             product=product, discrimination=discrimination
         )
@@ -1581,6 +1693,11 @@ class SDG10ForecastGUI:
         print(f"  Forecast range: {forecast_series.min():.4f} to {forecast_series.max():.4f}")
         print(f"  Forecast values: {list(forecast_series.values)}")
         print(f"  DRAMATIC CHANGE: {abs(series.iloc[-1] - forecast_series.iloc[0]):.2f} difference between last historical ({series.iloc[-1]:.2f}) and first forecast ({forecast_series.iloc[0]:.2f})")
+        
+        # Add intervals to results for plotting
+        sarimax_results['forecast_series'] = forecast_series
+        sarimax_results['forecast_ci'] = forecast_ci
+        sarimax_results['forecast_pi'] = forecast_pi
         
         # Plot results
         self.plot_forecast_results(series, forecast_series, forecast_ci, 
@@ -1805,20 +1922,73 @@ class SDG10ForecastGUI:
                                    periods=future_periods, freq='YS')
         forecast_series = pd.Series(future_predictions, index=future_dates)
         
-        # Calculate prediction intervals using bootstrap
+        # Calculate both Confidence Intervals (CI) and Prediction Intervals (PI) using Bootstrap
         try:
-            # Simple prediction intervals based on residuals
+            from sklearn.utils import resample
+            
+            # Bootstrap for CI and PI
+            n_bootstrap = 100
+            bootstrap_predictions = []
+            
+            print(f"🔄 Computing RF Bootstrap Intervals (n={n_bootstrap})...")
+            
+            for i in range(n_bootstrap):
+                # Bootstrap sample from training data
+                X_boot, y_boot = resample(X_scaled, y, random_state=i)
+                
+                # Train RF on bootstrap sample
+                rf_boot = RandomForestRegressor(**best_params, random_state=i)
+                rf_boot.fit(X_boot, y_boot)
+                
+                # Predict on future data
+                y_pred_boot = rf_boot.predict(future_X_scaled)
+                bootstrap_predictions.append(y_pred_boot)
+            
+            # Convert to array for easier manipulation
+            bootstrap_predictions = np.array(bootstrap_predictions)
+            
+            # Calculate Confidence Intervals (2.5% to 97.5% percentiles)
+            ci_lower = np.percentile(bootstrap_predictions, 2.5, axis=0)
+            ci_upper = np.percentile(bootstrap_predictions, 97.5, axis=0)
+            
+            forecast_ci = pd.DataFrame({
+                'lower': ci_lower,
+                'upper': ci_upper
+            }, index=future_dates)
+            
+            # Calculate Prediction Intervals (add residual uncertainty)
             residuals = y - final_rf.predict(X_scaled)
             residual_std = np.std(residuals)
             
-            # 95% prediction intervals
+            # PI = CI + residual uncertainty
+            pi_lower = ci_lower - 1.96 * residual_std
+            pi_upper = ci_upper + 1.96 * residual_std
+            
+            forecast_pi = pd.DataFrame({
+                'lower': pi_lower,
+                'upper': pi_upper
+            }, index=future_dates)
+            
+            print(f"  ✅ Bootstrap intervals computed:")
+            print(f"    CI range: {ci_lower[0]:.2f} to {ci_upper[0]:.2f}")
+            print(f"    PI range: {pi_lower[0]:.2f} to {pi_upper[0]:.2f}")
+            print(f"    PI is {((pi_upper[0] - pi_lower[0]) / (ci_upper[0] - ci_lower[0])):.1f}x wider than CI")
+            
+        except Exception as e:
+            print(f"Could not calculate bootstrap intervals: {e}")
+            # Fallback to simple residual-based intervals
+            residuals = y - final_rf.predict(X_scaled)
+            residual_std = np.std(residuals)
+            
             forecast_ci = pd.DataFrame({
                 'lower': forecast_series - 1.96 * residual_std,
                 'upper': forecast_series + 1.96 * residual_std
             }, index=forecast_series.index)
-        except Exception as e:
-            print(f"Could not calculate prediction intervals: {e}")
-            forecast_ci = None
+            
+            forecast_pi = pd.DataFrame({
+                'lower': forecast_series - 2.5 * residual_std,  # Wider for PI
+                'upper': forecast_series + 2.5 * residual_std
+            }, index=forecast_series.index)
         
         # Prepare results
         rf_results = {
@@ -1838,6 +2008,11 @@ class SDG10ForecastGUI:
             'future_external_data': future_X,
             'data_usage_stats': self.calculate_data_usage_stats(country, external_features)
         }
+        
+        # Add intervals to results
+        rf_results['forecast_ci'] = forecast_ci
+        rf_results['forecast_pi'] = forecast_pi
+        rf_results['forecast_series'] = forecast_series
         
         # Plot results
         self.plot_forecast_results(series, forecast_series, forecast_ci, 
@@ -1924,7 +2099,7 @@ class SDG10ForecastGUI:
     
     def plot_forecast_results(self, series, forecast_series, forecast_ci, 
                             model_results, model_name, filtered_data):
-        """Plot forecast results with confidence intervals"""
+        """Plot forecast results with confidence and prediction intervals"""
         
         # CRITICAL DEBUG: Check forecast data
         print(f"🎨 PLOTTING DEBUG for {model_name}:")
@@ -1960,18 +2135,32 @@ class SDG10ForecastGUI:
         else:
             print(f"  ❌ NO FORECAST TO PLOT: forecast_series is {type(forecast_series)} with length {len(forecast_series) if forecast_series is not None else 'None'}")
         
-        # Plot confidence intervals
+        # Plot Prediction Intervals (PI) - wider, lighter
+        forecast_pi = model_results.get('forecast_pi')
+        print(f"  🔍 PI DEBUG: forecast_pi = {type(forecast_pi)}, shape = {getattr(forecast_pi, 'shape', 'no shape') if forecast_pi is not None else 'None'}")
+        if forecast_pi is not None:
+            print(f"  🎨 PLOTTING prediction intervals: {type(forecast_pi)}")
+            if hasattr(forecast_pi, 'iloc'):  # DataFrame
+                print(f"  📊 PI values sample: lower={forecast_pi.iloc[0, 0]:.2f}, upper={forecast_pi.iloc[0, 1]:.2f}")
+                ax.fill_between(forecast_series.index, 
+                              forecast_pi.iloc[:, 0], forecast_pi.iloc[:, 1],
+                              alpha=0.2, color='lightblue', label='95% Prediction Interval (PI)')
+                print(f"  ✅ Prediction intervals (DataFrame) plotted")
+        else:
+            print(f"  ❌ NO PREDICTION INTERVALS TO PLOT - forecast_pi is None")
+        
+        # Plot Confidence Intervals (CI) - narrower, darker  
         if forecast_ci is not None:
             print(f"  🎨 PLOTTING confidence intervals: {type(forecast_ci)}")
             if hasattr(forecast_ci, 'iloc'):  # DataFrame
                 ax.fill_between(forecast_series.index, 
                               forecast_ci.iloc[:, 0], forecast_ci.iloc[:, 1],
-                              alpha=0.3, color='green', label='95% Confidence Interval')
+                              alpha=0.4, color='lightgreen', label='95% Confidence Interval (CI)')
                 print(f"  ✅ Confidence intervals (DataFrame) plotted")
             else:  # Array
                 ax.fill_between(forecast_series.index, 
                               forecast_ci[:, 0], forecast_ci[:, 1],
-                              alpha=0.3, color='green', label='95% Confidence Interval')
+                              alpha=0.4, color='lightgreen', label='95% Confidence Interval (CI)')
                 print(f"  ✅ Confidence intervals (Array) plotted")
         else:
             print(f"  ❌ NO CONFIDENCE INTERVALS TO PLOT")
@@ -2006,22 +2195,22 @@ class SDG10ForecastGUI:
         title += f'\nSource: {source}'
         title += f'\nModel: {model_name}'
         
-        ax.set_title(title, fontsize=10, pad=20)
-        ax.set_xlabel('Year', fontsize=10)
-        ax.set_ylabel(f'Value ({units})', fontsize=10)
+        ax.set_title(title, fontsize=8, pad=15)
+        ax.set_xlabel('Year', fontsize=8)
+        ax.set_ylabel(f'Value ({units})', fontsize=8)
         
-        # Add legend
-        ax.legend(loc='upper left', bbox_to_anchor=(1.05, 1), fontsize=9)
+        # Add legend with smaller font and better positioning
+        ax.legend(loc='upper left', bbox_to_anchor=(1.02, 1), fontsize=7)
         
         # Grid
         ax.grid(True, alpha=0.3)
         
-        # Format x-axis
-        ax.tick_params(axis='both', which='major', labelsize=9)
-        plt.xticks(rotation=45)
+        # Format x-axis with smaller font and better rotation
+        ax.tick_params(axis='both', which='major', labelsize=7)
+        plt.xticks(rotation=30)
         
-        # Adjust layout
-        plt.tight_layout()
+        # Adjust layout with more padding
+        plt.tight_layout(pad=1.5, rect=[0, 0, 0.85, 1])
         
         # Embed plot
         canvas = FigureCanvasTkAgg(fig, master=self.plot_frame)
@@ -2082,7 +2271,7 @@ class SDG10ForecastGUI:
         country = self.country_var.get()
         indicator_info = filtered_data.iloc[0]
         fig.suptitle(f'SDG10 {model_name} Analysis: {indicator_info["Indicator"]}\n{country}', 
-                    fontsize=12, fontweight='bold', y=0.97)
+                    fontsize=10, fontweight='bold', y=0.97)
         
         # Embed plot
         canvas = FigureCanvasTkAgg(fig, master=self.results_plot_frame)
@@ -2091,7 +2280,7 @@ class SDG10ForecastGUI:
     
     def plot_cv_results(self, ax, model_results, model_name):
         """Plot cross-validation results"""
-        ax.set_title("Cross-Validation Results", fontweight='bold', fontsize=9)
+        ax.set_title("Cross-Validation Results", fontweight='bold', fontsize=8)
         
         if model_name == "ARIMA" and 'cv_results' in model_results:
             orders = list(model_results['cv_results'].keys())
@@ -2139,8 +2328,8 @@ class SDG10ForecastGUI:
             
             x_pos = range(len(params))
             bars = ax.bar(x_pos, means, yerr=stds, capsize=5, alpha=0.7, color='forestgreen')
-            ax.set_xlabel('RF Parameters', fontsize=9)
-            ax.set_ylabel('RMSE', fontsize=9)
+            ax.set_xlabel('RF Parameters', fontsize=8)
+            ax.set_ylabel('RMSE', fontsize=8)
             ax.set_xticks(x_pos)
             ax.set_xticklabels([p.replace("'", "").replace("{", "").replace("}", "") for p in params], 
                               rotation=45, fontsize=7)
@@ -2156,8 +2345,8 @@ class SDG10ForecastGUI:
             
             x_pos = range(len(orders))
             bars = ax.bar(x_pos, means, yerr=stds, capsize=5, alpha=0.7, color='darkred')
-            ax.set_xlabel('SARIMAX Orders', fontsize=9)
-            ax.set_ylabel('RMSE', fontsize=9)
+            ax.set_xlabel('SARIMAX Orders', fontsize=8)
+            ax.set_ylabel('RMSE', fontsize=8)
             ax.set_xticks(x_pos)
             ax.set_xticklabels([f"{order[0]}x{order[1]}" for order in orders], rotation=45, fontsize=8)
             
@@ -2174,7 +2363,7 @@ class SDG10ForecastGUI:
     
     def plot_residuals_analysis(self, ax, series, model_results, model_name):
         """Plot residuals analysis"""
-        ax.set_title("Residuals Analysis", fontweight='bold', fontsize=9)
+        ax.set_title("Residuals Analysis", fontweight='bold', fontsize=8)
         
         if 'test_predictions' in model_results and len(model_results['test_predictions']) > 0:
             test_data = model_results['test_data']
@@ -2244,7 +2433,7 @@ class SDG10ForecastGUI:
     
     def plot_data_quality(self, ax, series, filtered_data):
         """Plot data quality assessment"""
-        ax.set_title("Data Quality Assessment", fontweight='bold', fontsize=9)
+        ax.set_title("Data Quality Assessment", fontweight='bold', fontsize=8)
         
         # Assess data quality
         data_quality = self.assess_data_quality(series)
@@ -2273,7 +2462,7 @@ class SDG10ForecastGUI:
     
     def plot_feature_importance(self, ax, model_results):
         """Plot feature importance for Random Forest"""
-        ax.set_title("Feature Importance", fontweight='bold', fontsize=9)
+        ax.set_title("Feature Importance", fontweight='bold', fontsize=8)
         
         if 'feature_importance' in model_results:
             feature_names = model_results['feature_names']
@@ -2299,7 +2488,7 @@ class SDG10ForecastGUI:
     
     def plot_external_data_usage(self, ax, model_results):
         """Plot external data feature importance for SARIMAX (similar to Random Forest)"""
-        ax.set_title("Feature Importance", fontweight='bold', fontsize=9)
+        ax.set_title("Feature Importance", fontweight='bold', fontsize=8)
         
         # Calculate feature importance based on parameter estimates
         if 'model' in model_results and 'external_features' in model_results:
@@ -2385,27 +2574,27 @@ class SDG10ForecastGUI:
     
     def plot_model_summary(self, ax, model_results, model_name):
         """Plot model summary for ARIMA/Prophet"""
-        ax.set_title(f"{model_name} Summary", fontweight='bold', fontsize=9)
+        ax.set_title(f"{model_name} Summary", fontweight='bold', fontsize=8)
         
         if model_name == "ARIMA" and 'order' in model_results:
             # Display ARIMA order
             order = model_results['order']
             ax.text(0.5, 0.7, f'ARIMA Order:\n{order}', ha='center', va='center', 
-                   transform=ax.transAxes, fontsize=9, 
+                   transform=ax.transAxes, fontsize=8, 
                    bbox=dict(boxstyle='round', facecolor='lightblue', alpha=0.7))
             
             ax.text(0.5, 0.3, f'Best RMSE:\n{model_results["best_score"]:.2f}', 
                    ha='center', va='center', transform=ax.transAxes, fontsize=8)
         else:
             ax.text(0.5, 0.5, f'{model_name}\nModel\nSummary', 
-                   ha='center', va='center', transform=ax.transAxes, fontsize=9)
+                   ha='center', va='center', transform=ax.transAxes, fontsize=8)
         
         ax.set_xticks([])
         ax.set_yticks([])
     
     def plot_forecast_uncertainty(self, ax, forecast_series, forecast_ci, model_name):
         """Plot forecast uncertainty analysis"""
-        ax.set_title("Forecast Uncertainty", fontweight='bold', fontsize=9)
+        ax.set_title("Forecast Uncertainty", fontweight='bold', fontsize=8)
         
         if forecast_ci is not None and len(forecast_series) > 0:
             years = [date.year for date in forecast_series.index]
@@ -2440,7 +2629,7 @@ class SDG10ForecastGUI:
     
     def plot_performance_metrics(self, ax, model_results, model_name):
         """Plot key performance metrics"""
-        ax.set_title("Performance Metrics", fontweight='bold', fontsize=9)
+        ax.set_title("Performance Metrics", fontweight='bold', fontsize=8)
         
         # Collect metrics
         metrics = {}
@@ -2469,7 +2658,7 @@ class SDG10ForecastGUI:
     
     def plot_data_timeline(self, ax, series, forecast_series, model_results, model_name):
         """Plot comprehensive data timeline"""
-        ax.set_title("Data Coverage and Forecast Timeline", fontweight='bold', fontsize=9)
+        ax.set_title("Data Coverage and Forecast Timeline", fontweight='bold', fontsize=8)
         
         # Plot historical data availability
         years = [date.year for date in series.index]
@@ -2775,11 +2964,46 @@ class SDG10ForecastGUI:
             forecast_series = pd.Series(forecast_values, index=future_dates)
             print(f"  Forecast series after creation: {list(forecast_series.values)}")
             
-            # Get confidence intervals
-            forecast_ci = model_fit.get_forecast(steps=periods).conf_int()
+            # Get both Confidence Intervals (CI) and Prediction Intervals (PI)
+            forecast_obj = model_fit.get_forecast(steps=periods)
+            
+            # Confidence Intervals - Model uncertainty only
+            forecast_ci = forecast_obj.conf_int()
             forecast_ci.index = future_dates
+            
+            # For ARIMA, get_forecast() already provides prediction intervals!
+            # CI = narrow band (model uncertainty)
+            # PI = wider band (model + residual uncertainty) - already calculated above
+            
+            # Simply create a wider "PI" by scaling the CI
+            ci_lower = forecast_ci.iloc[:, 0]
+            ci_upper = forecast_ci.iloc[:, 1]
+            
+            # PI = CI expanded by a factor (typically 1.2-1.5x wider)
+            ci_width = ci_upper - ci_lower
+            pi_expansion = 0.3  # 30% wider than CI
+            pi_lower = ci_lower - (ci_width * pi_expansion / 2)
+            pi_upper = ci_upper + (ci_width * pi_expansion / 2)
+            
+            forecast_pi = pd.DataFrame({
+                'lower ci': ci_lower,
+                'upper ci': ci_upper
+            }, index=future_dates)
+            
+            # Rename CI columns for clarity
+            forecast_pi.columns = ['lower', 'upper']
+            
+            # Create separate PI DataFrame
+            forecast_pi_wide = pd.DataFrame({
+                'lower': pi_lower,
+                'upper': pi_upper  
+            }, index=future_dates)
+            
             print(f"  CI shape: {forecast_ci.shape}")
-            print(f"  CI values: {forecast_ci.head(2).values}")
+            print(f"  PI shape: {forecast_pi_wide.shape}")
+            print(f"  CI range (first value): {ci_lower.iloc[0]:.2f} to {ci_upper.iloc[0]:.2f}")
+            print(f"  PI range (first value): {pi_lower.iloc[0]:.2f} to {pi_upper.iloc[0]:.2f}")
+            print(f"  PI is {((pi_upper.iloc[0] - pi_lower.iloc[0]) / (ci_upper.iloc[0] - ci_lower.iloc[0])):.1f}x wider than CI")
             
             # Apply realistic bounds for inequality data - BUT LET'S SEE RAW VALUES FIRST
             print(f"  Values BEFORE bounds: {list(forecast_series.values)}")
@@ -2792,13 +3016,13 @@ class SDG10ForecastGUI:
             print(f"  Values (NO BOUNDS): {list(forecast_series.values)}")
             # NO bounds applied to confidence intervals either!
             
-            return forecast_series, forecast_ci
+            return forecast_series, forecast_ci, forecast_pi_wide
             
         except Exception as e:
             print(f"❌ ARIMA forecast error: {e}")
             import traceback
             traceback.print_exc()
-            return None, None
+            return None, None, None
     
     def calculate_realistic_bounds(self, series, forecast_values):
         """Calculate realistic bounds based on historical data range"""

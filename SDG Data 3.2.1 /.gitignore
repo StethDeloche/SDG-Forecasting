@@ -36,7 +36,9 @@ Thumbs.db
 # Project specific
 data/processed/*
 !data/processed/.gitkeep
-results/figures/*
-!results/figures/.gitkeep
+results/figures/*.csv
+results/figures/*.xlsx
+results/figures/*.txt
+results/figures/*.log
 results/reports/*
 !results/reports/.gitkeep 
